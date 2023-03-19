@@ -16,8 +16,8 @@ export const BookMoveSchema = z.object({
 export type BookMove = z.infer<typeof BookMoveSchema>;
 export const BookPositionSchema = z.object({
   fen: z.string(),
-  bookMoves: z.array(BookMoveSchema).default([]),
-  opponentMoves: z.array(BookMoveSchema).default([]),
+  bookMoves: z.record(z.string(), BookMoveSchema).default({}),
+  opponentMoves: z.record(z.string(), BookMoveSchema).default({}),
 });
 export type BookPosition = z.infer<typeof BookPositionSchema>;
 
@@ -47,6 +47,28 @@ export class ChessBook {
     const path = isOpponentMove ? "opponentMoves" : "bookMoves";
     this.db.push(`${separator}${fen}${separator}fen`, fen, true);
     this.db.push(["", fen, path, move].join(separator), bookMove, true);
+  }
+
+  public async getRandomOpponentMove(fen: string) {
+    console.log("getting data from", fen);
+    const position = await this.db.getData(separator + fen);
+    if (!position) {
+      return null;
+    }
+    console.log("got db position", position);
+    const { opponentMoves } = BookPositionSchema.parse(position);
+    const moveList = Object.keys(opponentMoves);
+    const randomIndex = Math.floor(Math.random() * moveList.length);
+    return opponentMoves[moveList[randomIndex]];
+  }
+
+  public async getPosition(fen: string) {
+    const data = await this.db.getData(separator + fen);
+    if (!data) {
+      return null;
+    }
+
+    return BookPositionSchema.parse(data);
   }
 
   public async dump() {

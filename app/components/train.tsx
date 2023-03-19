@@ -1,46 +1,51 @@
-import { useState } from "react";
-import type { Move } from "chess.js";
+import { useEffect, useState } from "react";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import type {
   BoardOrientation,
   Square,
 } from "react-chessboard/dist/chessboard/types";
+import { GetChallengeOutputSchema } from "~/routes/api/moves/challenge";
 
 export function Train(props: { orientation: BoardOrientation }) {
   const [fen, setFen] = useState(new Chess().fen());
 
-  const game = new Chess(fen);
-  if (
-    (props.orientation === "black" && game.turn() === "w") ||
-    (props.orientation === "white" && game.turn() === "b")
-  ) {
-    setTimeout(makeRandomMove, 500);
-  }
+  const turn = new Chess(fen).turn();
 
-  function makeMove(move: string | { from: Square; to: Square }): Move | null {
+  useEffect(() => {
+    async function makeOpponentMove() {
+      const response = await fetch(
+        `api/moves/challenge?fen=${encodeURIComponent(fen)}`
+      );
+      const challenge = GetChallengeOutputSchema.parse(await response.json());
+      if (challenge.challengeMove) {
+        const g = new Chess(fen);
+        g.move(challenge.challengeMove);
+        setFen(g.fen());
+      }
+    }
+
+    if (
+      (props.orientation === "black" && turn === "w") ||
+      (props.orientation === "white" && turn === "b")
+    ) {
+      makeOpponentMove();
+    }
+  }, [fen, props.orientation, turn, setFen]);
+
+  function makeMove(move: string | { from: Square; to: Square }): boolean {
     try {
-      const validMove = game.move(move);
-      setFen(game.fen());
-      return validMove;
+      const g = new Chess(fen);
+      g.move(move);
+      setFen(g.fen());
+      return true;
     } catch {
-      return null;
+      return false;
     }
-  }
-
-  function makeRandomMove() {
-    const possibleMoves = game.moves();
-
-    // exit if the game is over
-    if (possibleMoves.length === 0) {
-      return;
-    }
-
-    const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-    makeMove(possibleMoves[randomIndex]);
   }
 
   function onDrop(sourceSquare: Square, targetSquare: Square) {
+    console.log("dropped");
     return makeMove({ from: sourceSquare, to: targetSquare }) !== null;
   }
 
