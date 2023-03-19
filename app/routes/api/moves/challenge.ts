@@ -15,15 +15,13 @@ export const loader: LoaderFunction = async ({ request }) => {
   if (!fen) {
     throw new Error("Missing fen");
   }
-  console.log("getting move");
+
   const move = await ChessBookService.getRandomOpponentMove(fen);
   if (!move) {
-    return json({ challengeMove: null, expectedMove: null });
+    return json({ challengeMove: null, expectedMoves: [] });
   }
-  console.log("got move", move);
 
   const nextPos = await ChessBookService.getPosition(move.targetFEN);
-  console.log("nextPos", nextPos);
 
   const resp: GetChallengeOutput = {
     challengeMove: move?.move ?? null,

@@ -49,26 +49,32 @@ export class ChessBook {
     this.db.push(["", fen, path, move].join(separator), bookMove, true);
   }
 
-  public async getRandomOpponentMove(fen: string) {
-    console.log("getting data from", fen);
-    const position = await this.db.getData(separator + fen);
-    if (!position) {
+  public async getRandomOpponentMove(fen: string): Promise<BookMove | null> {
+    try {
+      const position = await this.db.getData(separator + fen);
+      if (!position) {
+        return null;
+      }
+      console.log("got db position", position);
+      const { opponentMoves } = BookPositionSchema.parse(position);
+      const moveList = Object.keys(opponentMoves);
+      const randomIndex = Math.floor(Math.random() * moveList.length);
+      return opponentMoves[moveList[randomIndex]];
+    } catch (e) {
+      console.error("error getting random opponent move", e);
       return null;
     }
-    console.log("got db position", position);
-    const { opponentMoves } = BookPositionSchema.parse(position);
-    const moveList = Object.keys(opponentMoves);
-    const randomIndex = Math.floor(Math.random() * moveList.length);
-    return opponentMoves[moveList[randomIndex]];
   }
 
-  public async getPosition(fen: string) {
-    const data = await this.db.getData(separator + fen);
-    if (!data) {
+  public async getPosition(fen: string): Promise<BookPosition | null> {
+    console.log("getting position");
+    try {
+      const data = await this.db.getData(separator + fen);
+      return BookPositionSchema.parse(data);
+    } catch (e) {
+      console.error("error getting position", e);
       return null;
     }
-
-    return BookPositionSchema.parse(data);
   }
 
   public async dump() {

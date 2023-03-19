@@ -45,7 +45,6 @@ export function Train(props: { orientation: BoardOrientation }) {
   }
 
   function onDrop(sourceSquare: Square, targetSquare: Square) {
-    console.log("dropped");
     return makeMove({ from: sourceSquare, to: targetSquare }) !== null;
   }
 
