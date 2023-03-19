@@ -77,10 +77,13 @@ export function Train(props: {
           boardWidth={400}
           boardOrientation={props.orientation}
         />
-        <Button onClick={() => props.startRecording(fen)}>
-          {" "}
-          record more moves from there{" "}
-        </Button>
+        <Box>
+          <Button onClick={() => props.startRecording(fen)}>
+            {" "}
+            record more moves from there{" "}
+          </Button>
+        </Box>
+        <Box>{msg}</Box>
       </Flex>
     </>
   );
