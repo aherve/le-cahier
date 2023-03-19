@@ -45,7 +45,7 @@ export class ChessBook {
     });
 
     const path = isOpponentMove ? "opponentMoves" : "bookMoves";
-    this.db.push(`${separator}${fen}`, { fen }, true);
+    this.db.push(`${separator}${fen}${separator}fen`, fen, true);
     this.db.push(["", fen, path, move].join(separator), bookMove, true);
   }
 
