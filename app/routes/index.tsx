@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Button, ChakraProvider, Flex } from "@chakra-ui/react";
+import { Button, Flex } from "@chakra-ui/react";
 import { useState } from "react";
 import { Train } from "~/components/train";
 import { Record } from "~/components/record";
@@ -10,12 +10,7 @@ type GameModeType = z.infer<typeof GameMode>;
 export default function Index() {
   const [mode, setMode] = useState<GameModeType>(GameMode.enum.trainWithWhite);
   const [gameId, setGameId] = useState(Date.now().toString());
-
-  function ping() {
-    fetch(`api/ping`, { method: "POST" }).then((res) => {
-      console.log(res);
-    });
-  }
+  const [initialFen, setInitialFen] = useState<string | undefined>();
 
   function startTrainingWithWhite() {
     setGameId(Date.now().toString());
@@ -25,7 +20,8 @@ export default function Index() {
     setGameId(Date.now().toString());
     setMode(GameMode.enum.trainWithBlack);
   }
-  function startRecordingMoves() {
+  function startRecordingMoves(fen?: string) {
+    setInitialFen(fen);
     setGameId(Date.now().toString());
     setMode(GameMode.enum.recordMoves);
   }
@@ -33,11 +29,23 @@ export default function Index() {
   function renderSwitch() {
     switch (mode) {
       case GameMode.enum.trainWithWhite:
-        return <Train orientation="white" key={gameId} />;
+        return (
+          <Train
+            orientation="white"
+            key={gameId}
+            startRecording={startRecordingMoves}
+          />
+        );
       case GameMode.enum.trainWithBlack:
-        return <Train orientation="black" key={gameId} />;
+        return (
+          <Train
+            orientation="black"
+            key={gameId}
+            startRecording={startRecordingMoves}
+          />
+        );
       case GameMode.enum.recordMoves:
-        return <Record orientation="white" key={gameId} />;
+        return <Record key={gameId} initialFen={initialFen} />;
     }
   }
 
@@ -53,7 +61,7 @@ export default function Index() {
           >
             <Button onClick={startTrainingWithWhite}>Train with white</Button>
             <Button onClick={startTrainingWithBlack}>Train with black</Button>
-            <Button onClick={startRecordingMoves}>Record moves</Button>
+            <Button onClick={() => startRecordingMoves()}>Record moves</Button>
           </Flex>
           <Flex grow={1} basis="100%" alignItems="center">
             {renderSwitch()}

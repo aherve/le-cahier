@@ -5,10 +5,17 @@ import type {
   BoardOrientation,
   Square,
 } from "react-chessboard/dist/chessboard/types";
+import type { GetChallengeOutput } from "~/routes/api/moves/challenge";
 import { GetChallengeOutputSchema } from "~/routes/api/moves/challenge";
+import { Box, Button, Flex } from "@chakra-ui/react";
 
-export function Train(props: { orientation: BoardOrientation }) {
+export function Train(props: {
+  orientation: BoardOrientation;
+  startRecording: (fen: string) => void;
+}) {
   const [fen, setFen] = useState(new Chess().fen());
+  const [msg, setMsg] = useState("");
+  const [challenge, setChallenge] = useState<GetChallengeOutput | null>(null);
 
   const turn = new Chess(fen).turn();
 
@@ -18,10 +25,14 @@ export function Train(props: { orientation: BoardOrientation }) {
         `api/moves/challenge?fen=${encodeURIComponent(fen)}`
       );
       const challenge = GetChallengeOutputSchema.parse(await response.json());
+      setChallenge(challenge);
       if (challenge.challengeMove) {
         const g = new Chess(fen);
         g.move(challenge.challengeMove);
         setFen(g.fen());
+        setMsg("Your turn");
+      } else {
+        setMsg("No more data");
       }
     }
 
@@ -45,17 +56,32 @@ export function Train(props: { orientation: BoardOrientation }) {
   }
 
   function onDrop(sourceSquare: Square, targetSquare: Square) {
-    return makeMove({ from: sourceSquare, to: targetSquare }) !== null;
+    if (!challenge) {
+      return makeMove({ from: sourceSquare, to: targetSquare });
+    } else if (
+      challenge.expectedMoves.includes(`${sourceSquare}${targetSquare}`)
+    ) {
+      return makeMove({ from: sourceSquare, to: targetSquare });
+    } else {
+      setMsg("NOPE");
+      return false;
+    }
   }
 
   return (
     <>
-      <Chessboard
-        position={fen}
-        onPieceDrop={onDrop}
-        boardWidth={400}
-        boardOrientation={props.orientation}
-      />
+      <Flex direction="column" align="center" gap="10">
+        <Chessboard
+          position={fen}
+          onPieceDrop={onDrop}
+          boardWidth={400}
+          boardOrientation={props.orientation}
+        />
+        <Button onClick={() => props.startRecording(fen)}>
+          {" "}
+          record more moves from there{" "}
+        </Button>
+      </Flex>
     </>
   );
 }

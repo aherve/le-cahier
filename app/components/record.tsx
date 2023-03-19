@@ -5,11 +5,12 @@ import type {
   BoardOrientation,
   Square,
 } from "react-chessboard/dist/chessboard/types";
-import { Flex } from "@chakra-ui/react";
+import { Button, Flex } from "@chakra-ui/react";
 import { SaveMoveInputSchema } from "~/routes/api/moves/create";
 
-export function Record(props: { orientation: BoardOrientation }) {
-  const [fen, setFen] = useState(new Chess().fen());
+export function Record(props: { initialFen?: string }) {
+  const [fen, setFen] = useState(props.initialFen ?? new Chess().fen());
+  const [orientation, setOrientation] = useState<BoardOrientation>("white");
 
   const game = new Chess(fen);
 
@@ -18,8 +19,8 @@ export function Record(props: { orientation: BoardOrientation }) {
       const validMove = game.move(move);
 
       const wasOpponentMove =
-        (validMove.color === "b" && props.orientation === "white") ||
-        (validMove.color === "w" && props.orientation === "black");
+        (validMove.color === "b" && orientation === "white") ||
+        (validMove.color === "w" && orientation === "black");
 
       await fetch("api/moves/create", {
         method: "POST",
@@ -44,6 +45,10 @@ export function Record(props: { orientation: BoardOrientation }) {
     return makeMove({ from: sourceSquare, to: targetSquare }) !== null;
   }
 
+  function flip() {
+    setOrientation((o) => (o === "white" ? "black" : "white"));
+  }
+
   return (
     <>
       <Flex direction="column" align="center" gap="10">
@@ -51,8 +56,9 @@ export function Record(props: { orientation: BoardOrientation }) {
           position={game.fen()}
           onPieceDrop={onDrop}
           boardWidth={400}
-          boardOrientation={props.orientation}
+          boardOrientation={orientation}
         />
+        <Button onClick={flip}>flip board</Button>
       </Flex>
     </>
   );
