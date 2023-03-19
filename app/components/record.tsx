@@ -5,7 +5,8 @@ import type {
   BoardOrientation,
   Square,
 } from "react-chessboard/dist/chessboard/types";
-import { Button, Flex } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
+import { SaveMoveInputSchema } from "~/routes/api/moves/create";
 
 export function Record(props: { orientation: BoardOrientation }) {
   const [fen, setFen] = useState(new Chess().fen());
@@ -15,15 +16,28 @@ export function Record(props: { orientation: BoardOrientation }) {
   async function makeMove(move: string | { from: Square; to: Square }) {
     try {
       const validMove = game.move(move);
+
+      const wasOpponentMove =
+        (validMove.color === "b" && props.orientation === "white") ||
+        (validMove.color === "w" && props.orientation === "black");
+
+      await fetch("api/moves/create", {
+        method: "POST",
+        body: JSON.stringify(
+          SaveMoveInputSchema.parse({
+            isOpponentMove: wasOpponentMove,
+            fen,
+            move: `${validMove.from}${validMove.to}`,
+          })
+        ),
+      });
       setFen(game.fen());
+
       return validMove;
-    } catch {
+    } catch (e) {
+      console.error(e);
       return null;
     }
-  }
-
-  async function save() {
-    //await props.book.save();
   }
 
   function onDrop(sourceSquare: Square, targetSquare: Square) {
@@ -39,7 +53,6 @@ export function Record(props: { orientation: BoardOrientation }) {
           boardWidth={400}
           boardOrientation={props.orientation}
         />
-        <Button onClick={save}>save</Button>
       </Flex>
     </>
   );
