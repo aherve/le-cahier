@@ -5,6 +5,7 @@ import { Chess } from "chess.js";
 import { useState } from "react";
 import { Chessboard } from "react-chessboard";
 import type { BoardOrientation } from "react-chessboard/dist/chessboard/types";
+import LichessLink from "./lichess-link";
 import type { MoveType } from "./moves";
 import Moves from "./moves";
 
@@ -69,13 +70,14 @@ export default function Explore(props: {
             boardWidth={400}
             boardOrientation={orientation}
           />
-          <Flex direction="row" gap="5">
+          <Flex direction="row" gap="5" align="center">
             <Button leftIcon={<RepeatIcon />} onClick={flip}>
               flip board
             </Button>
             <Button onClick={() => props.startTraining(fen, orientation)}>
-              Train from here
+              Train from this position
             </Button>
+            <LichessLink fen={fen}></LichessLink>
           </Flex>
         </Flex>
         <Spacer />

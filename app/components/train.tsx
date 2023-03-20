@@ -8,6 +8,8 @@ import type {
 import type { GetChallengeOutput } from "~/routes/api/moves/challenge";
 import { GetChallengeOutputSchema } from "~/routes/api/moves/challenge";
 import { Box, Button, Flex } from "@chakra-ui/react";
+import { EditIcon } from "@chakra-ui/icons";
+import LichessLink from "./lichess-link";
 
 export function Train(props: {
   orientation: BoardOrientation;
@@ -80,12 +82,15 @@ export function Train(props: {
           boardWidth={400}
           boardOrientation={props.orientation}
         />
-        <Box>
-          <Button onClick={() => props.startRecording(fen)}>
-            {" "}
-            record more moves from there{" "}
+        <Flex direction="row" gap="5">
+          <Button
+            leftIcon={<EditIcon />}
+            onClick={() => props.startRecording(fen)}
+          >
+            Add move from this position
           </Button>
-        </Box>
+          <LichessLink fen={fen}></LichessLink>
+        </Flex>
         <Box>{msg}</Box>
       </Flex>
     </>
