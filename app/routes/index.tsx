@@ -86,12 +86,7 @@ export default function Index() {
     <>
       <div className="App">
         <Flex height="100vh" direction="column" align="center">
-          <Flex
-            direction="row"
-            gap={10}
-            align="space-between"
-            minWidth="max-content"
-          >
+          <Flex direction="row" gap={10} align="center" minWidth="max-content">
             <Button onClick={() => startExplore()}>Explore</Button>
             <Button onClick={() => startTrainingWithWhite()}>
               Train with white
@@ -101,7 +96,7 @@ export default function Index() {
             </Button>
             <Button onClick={() => startRecordingMoves()}>Record moves</Button>
           </Flex>
-          <Flex grow={1} basis="100%" alignItems="center">
+          <Flex grow={1} alignItems="center">
             {renderSwitch()}
           </Flex>
         </Flex>
