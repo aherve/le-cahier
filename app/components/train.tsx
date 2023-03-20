@@ -25,6 +25,7 @@ export function Train(props: {
         `api/moves/challenge?fen=${encodeURIComponent(fen)}`
       );
       const challenge = GetChallengeOutputSchema.parse(await response.json());
+      console.log(challenge);
       setChallenge(challenge);
       if (challenge.challengeMove) {
         const g = new Chess(fen);
@@ -56,13 +57,14 @@ export function Train(props: {
   }
 
   function onDrop(sourceSquare: Square, targetSquare: Square) {
-    if (!challenge) {
+    if (!challenge || challenge.expectedMoves.length === 0) {
       return makeMove({ from: sourceSquare, to: targetSquare });
     } else if (
       challenge.expectedMoves.includes(`${sourceSquare}${targetSquare}`)
     ) {
       return makeMove({ from: sourceSquare, to: targetSquare });
     } else {
+      console.log("expected", challenge.expectedMoves);
       setMsg("NOPE");
       return false;
     }
