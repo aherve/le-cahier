@@ -45,43 +45,31 @@ export class ChessBook {
     });
 
     const path = isOpponentMove ? "opponentMoves" : "bookMoves";
-    this.db.push(`${sep}${fen}${sep}fen`, fen, true);
-    this.db.push(["", fen, path, move].join(sep), bookMove, true);
+    await Promise.all([
+      this.db.push(`${sep}${fen}${sep}fen`, fen, true),
+      this.db.push(["", fen, path, move].join(sep), bookMove, true),
+    ]);
   }
 
   public async getRandomOpponentMove(fen: string): Promise<BookMove | null> {
-    try {
-      const position = await this.db.getData(sep + fen);
-      if (!position) {
-        return null;
-      }
-      console.log("got db position", position);
-      const { opponentMoves } = BookPositionSchema.parse(position);
-      const moveList = Object.keys(opponentMoves);
-      const randomIndex = Math.floor(Math.random() * moveList.length);
-      return opponentMoves[moveList[randomIndex]];
-    } catch (e) {
-      console.error("error getting random opponent move", e);
+    const position = await this.getPosition(fen);
+    if (!position) {
       return null;
     }
-  }
-
-  public async getPosition(fen: string): Promise<BookPosition | null> {
-    console.log("getting position");
-    try {
-      const data = await this.db.getData(sep + fen);
-      return BookPositionSchema.parse(data);
-    } catch (e) {
-      console.error("error getting position", e);
+    const opponentMoves = position.opponentMoves;
+    const moveList = Object.keys(opponentMoves);
+    if (moveList.length === 0) {
       return null;
     }
+    const randomIndex = Math.floor(Math.random() * moveList.length);
+    return opponentMoves[moveList[randomIndex]];
   }
 
   public async dump() {
     return this.db.getData(sep);
   }
 
-  public async connect() {
+  public async linkGraph() {
     const db = new JsonDB(new Config("public/db.json", false, false, sep));
     await db.load();
     const allPositions = await db.getData(sep);
@@ -136,6 +124,20 @@ export class ChessBook {
       }
     }
     await db.save();
+  }
+
+  protected async getPosition(fen: string): Promise<BookPosition | null> {
+    try {
+      const data = await this.db.getData(sep + fen);
+      const parsed = BookPositionSchema.safeParse(data);
+      if (!parsed.success) {
+        console.error("could not parse position", { data });
+        throw new Error("could not parsed position document");
+      }
+      return parsed.data;
+    } catch {
+      return null;
+    }
   }
 }
 
