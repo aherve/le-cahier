@@ -1,12 +1,5 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Flex,
-  Spacer,
-} from "@chakra-ui/react";
+import { RepeatIcon } from "@chakra-ui/icons";
+import { Button, Flex, Spacer } from "@chakra-ui/react";
 import type { Square } from "chess.js";
 import { Chess } from "chess.js";
 import { useState } from "react";
@@ -18,6 +11,7 @@ import Moves from "./moves";
 export default function Explore(props: {
   initialFen?: string;
   orientation?: BoardOrientation;
+  startTraining: (fen: string, orientation: BoardOrientation) => void;
 }) {
   const [fen, setFen] = useState(props.initialFen ?? new Chess().fen());
   const [orientation, setOrientation] = useState<BoardOrientation>(
@@ -55,31 +49,38 @@ export default function Explore(props: {
     }
   }
 
+  function moveIndex(fen: string) {
+    return Number(fen.split(" ")[5]);
+  }
+
   return (
     <>
-      <Flex direction="column" align="center" gap="10">
-        <Flex grow="1" direction="row" align="top" gap="20">
+      <Flex grow="1" direction="row" align="top" gap="20">
+        <Flex
+          direction="column"
+          align="center"
+          justify="space-between"
+          gap="10"
+          grow="1"
+        >
           <Chessboard
             position={fen}
             onPieceDrop={onDrop}
             boardWidth={400}
             boardOrientation={orientation}
           />
-          <Spacer />
-          <Card minWidth="200px" flexGrow="1">
-            <CardBody>
-              <Moves moves={moves}></Moves>
-            </CardBody>
-          </Card>
+          <Flex direction="row" gap="5">
+            <Button leftIcon={<RepeatIcon />} onClick={flip}>
+              flip board
+            </Button>
+            <Button onClick={() => props.startTraining(fen, orientation)}>
+              Train from here
+            </Button>
+          </Flex>
         </Flex>
-        <Box>
-          <Button onClick={flip}>flip board</Button>
-        </Box>
+        <Spacer />
+        <Moves moves={moves}></Moves>
       </Flex>
     </>
   );
-}
-
-function moveIndex(fen: string) {
-  return Number(fen.split(" ")[5]);
 }

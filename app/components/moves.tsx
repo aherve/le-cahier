@@ -1,4 +1,12 @@
-import { Text, Flex, List, Heading } from "@chakra-ui/react";
+import {
+  Card,
+  CardBody,
+  Text,
+  Flex,
+  List,
+  Heading,
+  CardHeader,
+} from "@chakra-ui/react";
 
 export type MoveType = {
   moveIndex: number;
@@ -9,14 +17,18 @@ export default function Moves(props: { moves: Array<MoveType> }) {
   console.log(props.moves);
   return (
     <>
-      <Flex direction="column" gap="5">
-        <Heading size="sm">Moves</Heading>
-        <List>
-          {props.moves.map((m) => {
-            return <Move move={m} key={m.moveIndex}></Move>;
-          })}
-        </List>
-      </Flex>
+      <Card minWidth="200px">
+        <CardHeader>
+          <Heading size="sm">Moves</Heading>
+        </CardHeader>
+        <CardBody>
+          <List>
+            {props.moves.map((m) => {
+              return <Move move={m} key={m.moveIndex}></Move>;
+            })}
+          </List>
+        </CardBody>
+      </Card>
     </>
   );
 }

@@ -5,6 +5,7 @@ import { Train } from "~/components/train";
 import { Record } from "~/components/record";
 import Explore from "~/components/explore";
 import { Chess } from "chess.js";
+import type { BoardOrientation } from "react-chessboard/dist/chessboard/types";
 
 const GameMode = z.enum([
   "trainWithWhite",
@@ -19,11 +20,22 @@ export default function Index() {
   const [gameId, setGameId] = useState(Date.now().toString());
   const [initialFen, setInitialFen] = useState<string | undefined>();
 
-  function startTrainingWithWhite() {
+  function startTraining(fen: string, orientation: BoardOrientation) {
+    switch (orientation) {
+      case "black":
+        return startTrainingWithBlack(fen);
+      default:
+        return startTrainingWithWhite(fen);
+    }
+  }
+
+  function startTrainingWithWhite(fen?: string) {
+    setInitialFen(fen ?? new Chess().fen());
     setMode(GameMode.enum.trainWithWhite);
     setGameId(Date.now().toString());
   }
-  function startTrainingWithBlack() {
+  function startTrainingWithBlack(fen?: string) {
+    setInitialFen(fen ?? new Chess().fen());
     setMode(GameMode.enum.trainWithBlack);
     setGameId(Date.now().toString());
   }
@@ -46,6 +58,7 @@ export default function Index() {
             orientation="white"
             key={gameId}
             startRecording={startRecordingMoves}
+            initialFen={initialFen}
           />
         );
       case GameMode.enum.trainWithBlack:
@@ -54,12 +67,18 @@ export default function Index() {
             orientation="black"
             key={gameId}
             startRecording={startRecordingMoves}
+            initialFen={initialFen}
           />
         );
       case GameMode.enum.recordMoves:
         return <Record key={gameId} initialFen={initialFen} />;
       case GameMode.enum.explore:
-        return <Explore initialFen={initialFen}></Explore>;
+        return (
+          <Explore
+            startTraining={startTraining}
+            initialFen={initialFen}
+          ></Explore>
+        );
     }
   }
 
@@ -74,8 +93,12 @@ export default function Index() {
             minWidth="max-content"
           >
             <Button onClick={() => startExplore()}>Explore</Button>
-            <Button onClick={startTrainingWithWhite}>Train with white</Button>
-            <Button onClick={startTrainingWithBlack}>Train with black</Button>
+            <Button onClick={() => startTrainingWithWhite()}>
+              Train with white
+            </Button>
+            <Button onClick={() => startTrainingWithBlack()}>
+              Train with black
+            </Button>
             <Button onClick={() => startRecordingMoves()}>Record moves</Button>
           </Flex>
           <Flex grow={1} basis="100%" alignItems="center">

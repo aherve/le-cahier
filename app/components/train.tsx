@@ -12,8 +12,9 @@ import { Box, Button, Flex } from "@chakra-ui/react";
 export function Train(props: {
   orientation: BoardOrientation;
   startRecording: (fen: string) => void;
+  initialFen?: string;
 }) {
-  const [fen, setFen] = useState(new Chess().fen());
+  const [fen, setFen] = useState(props.initialFen ?? new Chess().fen());
   const [msg, setMsg] = useState("");
   const [challenge, setChallenge] = useState<GetChallengeOutput | null>(null);
 
