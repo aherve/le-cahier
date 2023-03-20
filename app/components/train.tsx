@@ -8,8 +8,10 @@ import type {
 import type { GetChallengeOutput } from "~/routes/api/moves/challenge";
 import { GetChallengeOutputSchema } from "~/routes/api/moves/challenge";
 import { Box, Button, Flex } from "@chakra-ui/react";
-import { EditIcon } from "@chakra-ui/icons";
+import { EditIcon, RepeatIcon } from "@chakra-ui/icons";
 import LichessLink from "./lichess-link";
+import type { TrainMessageInputType } from "./train-message";
+import TrainMessage, { TrainMessageInput } from "./train-message";
 
 export function Train(props: {
   orientation: BoardOrientation;
@@ -17,7 +19,7 @@ export function Train(props: {
   initialFen?: string;
 }) {
   const [fen, setFen] = useState(props.initialFen ?? new Chess().fen());
-  const [msg, setMsg] = useState("");
+  const [msg, setMsg] = useState<TrainMessageInputType>("");
   const [challenge, setChallenge] = useState<GetChallengeOutput | null>(null);
 
   const turn = new Chess(fen).turn();
@@ -34,9 +36,9 @@ export function Train(props: {
         const g = new Chess(fen);
         g.move(challenge.challengeMove);
         setFen(g.fen());
-        setMsg("Your turn");
+        setMsg(TrainMessageInput.enum.yourTurn);
       } else {
-        setMsg("No more data");
+        setMsg(TrainMessageInput.enum.noMoreData);
       }
     }
 
@@ -68,30 +70,37 @@ export function Train(props: {
       return makeMove({ from: sourceSquare, to: targetSquare });
     } else {
       console.log("expected", challenge.expectedMoves);
-      setMsg("NOPE");
+      setMsg(TrainMessageInput.enum.nope);
       return false;
     }
   }
 
+  function again() {
+    setFen(props.initialFen ?? new Chess().fen());
+  }
+
   return (
     <>
-      <Flex direction="column" align="center" gap="10">
+      <Flex direction="column" align="center" gap="5">
+        <TrainMessage type={msg} />
         <Chessboard
           position={fen}
           onPieceDrop={onDrop}
           boardWidth={400}
           boardOrientation={props.orientation}
         />
-        <Flex direction="row" gap="5">
+        <Flex direction="row" gap="5" align="center">
           <Button
             leftIcon={<EditIcon />}
             onClick={() => props.startRecording(fen)}
           >
             Add move from this position
           </Button>
+          <Button leftIcon={<RepeatIcon />} onClick={again}>
+            Again
+          </Button>
           <LichessLink fen={fen}></LichessLink>
         </Flex>
-        <Box>{msg}</Box>
       </Flex>
     </>
   );
