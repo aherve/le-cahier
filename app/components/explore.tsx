@@ -1,5 +1,5 @@
 import { RepeatIcon } from "@chakra-ui/icons";
-import { Button, Flex, Spacer } from "@chakra-ui/react";
+import { Button, Code, Flex, Spacer } from "@chakra-ui/react";
 import type { Square } from "chess.js";
 import { Chess } from "chess.js";
 import { useState } from "react";
@@ -56,32 +56,36 @@ export default function Explore(props: {
 
   return (
     <>
-      <Flex grow="1" direction="row" align="top" gap="20">
-        <Flex
-          direction="column"
-          align="center"
-          justify="space-between"
-          gap="10"
-          grow="1"
-        >
-          <Chessboard
-            position={fen}
-            onPieceDrop={onDrop}
-            boardWidth={400}
-            boardOrientation={orientation}
-          />
-          <Flex direction="row" gap="5" align="center">
-            <Button leftIcon={<RepeatIcon />} onClick={flip}>
-              flip board
-            </Button>
-            <Button onClick={() => props.startTraining(fen, orientation)}>
-              Train from this position
-            </Button>
-            <LichessLink fen={fen}></LichessLink>
+      <Flex direction="column" align="center" gap="5">
+        <Flex grow="1" direction="row" align="top" gap="20">
+          <Flex
+            direction="column"
+            align="center"
+            justify="space-between"
+            gap="10"
+            grow="1"
+          >
+            <Chessboard
+              position={fen}
+              onPieceDrop={onDrop}
+              boardWidth={400}
+              boardOrientation={orientation}
+            />
+            <Flex direction="row" gap="5" align="center">
+              <Button leftIcon={<RepeatIcon />} onClick={flip}>
+                flip board
+              </Button>
+              <Button onClick={() => props.startTraining(fen, orientation)}>
+                Train from this position
+              </Button>
+              <LichessLink fen={fen}></LichessLink>
+            </Flex>
           </Flex>
+          <Spacer />
+          <Moves moves={moves}></Moves>
         </Flex>
         <Spacer />
-        <Moves moves={moves}></Moves>
+        <Code>{fen}</Code>
       </Flex>
     </>
   );

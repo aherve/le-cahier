@@ -7,7 +7,7 @@ import type {
 } from "react-chessboard/dist/chessboard/types";
 import type { GetChallengeOutput } from "~/routes/api/moves/challenge";
 import { GetChallengeOutputSchema } from "~/routes/api/moves/challenge";
-import { Box, Button, Flex } from "@chakra-ui/react";
+import { Button, Code, Flex } from "@chakra-ui/react";
 import { EditIcon, RepeatIcon } from "@chakra-ui/icons";
 import LichessLink from "./lichess-link";
 import type { TrainMessageInputType } from "./train-message";
@@ -21,6 +21,9 @@ export function Train(props: {
   const [fen, setFen] = useState(props.initialFen ?? new Chess().fen());
   const [msg, setMsg] = useState<TrainMessageInputType>("");
   const [challenge, setChallenge] = useState<GetChallengeOutput | null>(null);
+  const [firstExpectedMove, setFirstExpectedMove] = useState<
+    string | undefined
+  >(undefined);
 
   const turn = new Chess(fen).turn();
 
@@ -79,10 +82,22 @@ export function Train(props: {
     setFen(props.initialFen ?? new Chess().fen());
   }
 
+  function hint() {
+    const expected = challenge?.expectedMoves;
+    if (!expected || !expected.length) {
+      return;
+    }
+    const raw = expected[0];
+    const g = new Chess(fen);
+    const move = g.move(raw);
+    setMsg(TrainMessageInput.enum.hint);
+    setFirstExpectedMove(move.san);
+  }
+
   return (
     <>
       <Flex direction="column" align="center" gap="5">
-        <TrainMessage type={msg} />
+        <TrainMessage type={msg} hint={firstExpectedMove} />
         <Chessboard
           position={fen}
           onPieceDrop={onDrop}
@@ -99,8 +114,10 @@ export function Train(props: {
           <Button leftIcon={<RepeatIcon />} onClick={again}>
             Again
           </Button>
+          <Button onClick={hint}>get hint</Button>
           <LichessLink fen={fen}></LichessLink>
         </Flex>
+        <Code>{fen}</Code>
       </Flex>
     </>
   );
