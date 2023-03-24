@@ -31,12 +31,12 @@ export function Train(props: {
   const turn = new Chess(fen).turn();
 
   useEffect(() => {
+    console.log("effect triggered", fen, props.orientation, turn, moves);
     async function makeOpponentMove() {
       const response = await fetch(
         `api/moves/challenge?fen=${encodeURIComponent(fen)}`
       );
       const challenge = GetChallengeOutputSchema.parse(await response.json());
-      console.log(challenge);
       setChallenge(challenge);
       if (challenge.challengeMove) {
         const g = new Chess(fen);
@@ -53,6 +53,7 @@ export function Train(props: {
       (props.orientation === "black" && turn === "w") ||
       (props.orientation === "white" && turn === "b")
     ) {
+      console.log("making opponent move");
       makeOpponentMove();
     }
   }, [fen, props.orientation, turn, setFen, moves]);
