@@ -41,8 +41,8 @@ export function Train(props: {
       if (challenge.challengeMove) {
         const g = new Chess(fen);
         const m = g.move(challenge.challengeMove);
+        setMoves(addMove(m, moves, fen));
         setFen(g.fen());
-        setMoves(addMove(m, moves));
         setMsg(TrainMessageInput.enum.yourTurn);
       } else {
         setMsg(TrainMessageInput.enum.noMoreData);
@@ -61,7 +61,7 @@ export function Train(props: {
     try {
       const g = new Chess(fen);
       const m = g.move(move);
-      setMoves(addMove(m, moves));
+      setMoves(addMove(m, moves, fen));
       setFen(g.fen());
       return true;
     } catch {
@@ -100,6 +100,11 @@ export function Train(props: {
     setFirstExpectedMove(move.san);
   }
 
+  function goTo(fen: string, moves: MoveType[]) {
+    setMoves(moves);
+    setFen(fen);
+  }
+
   return (
     <>
       <Flex direction="column" align="center" gap="5">
@@ -111,7 +116,7 @@ export function Train(props: {
             boardWidth={400}
             boardOrientation={props.orientation}
           />
-          <Moves moves={moves}></Moves>
+          <Moves moves={moves} goTo={goTo}></Moves>
         </Flex>
         <Flex direction="row" gap="5" align="center">
           <Button

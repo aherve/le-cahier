@@ -30,12 +30,17 @@ export default function Explore(props: {
     try {
       const g = new Chess(fen);
       const m = g.move({ from, to });
-      setMoves(addMove(m, moves));
+      setMoves(addMove(m, moves, fen));
       setFen(g.fen());
       return true;
     } catch {
       return false;
     }
+  }
+
+  function goTo(fen: string, moves: MoveType[]) {
+    setMoves(moves);
+    setFen(fen);
   }
 
   return (
@@ -55,7 +60,7 @@ export default function Explore(props: {
               boardWidth={400}
               boardOrientation={orientation}
             />
-            <Moves moves={moves}></Moves>
+            <Moves moves={moves} goTo={goTo}></Moves>
           </Flex>
           <Flex direction="row" gap="5" align="center">
             <Button leftIcon={<RepeatIcon />} onClick={flip}>
