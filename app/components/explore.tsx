@@ -7,6 +7,7 @@ import { Chessboard } from "react-chessboard";
 import type { BoardOrientation } from "react-chessboard/dist/chessboard/types";
 import LichessLink from "./lichess-link";
 import type { MoveType } from "./moves";
+import { addMove } from "./moves";
 import Moves from "./moves";
 
 export default function Explore(props: {
@@ -29,20 +30,7 @@ export default function Explore(props: {
     try {
       const g = new Chess(fen);
       const m = g.move({ from, to });
-      if (m.color === "w") {
-        setMoves((moves) => [
-          ...moves,
-          {
-            moveIndex: moveIndex(fen),
-            whiteMove: m.san,
-          },
-        ]);
-      } else {
-        setMoves((moves) => {
-          moves[moves.length - 1].blackMove = m.san;
-          return moves;
-        });
-      }
+      setMoves(addMove(m, moves));
       setFen(g.fen());
       return true;
     } catch {
@@ -50,39 +38,34 @@ export default function Explore(props: {
     }
   }
 
-  function moveIndex(fen: string) {
-    return Number(fen.split(" ")[5]);
-  }
-
   return (
     <>
       <Flex direction="column" align="center" gap="5">
-        <Flex grow="1" direction="row" align="top" gap="20">
-          <Flex
-            direction="column"
-            align="center"
-            justify="space-between"
-            gap="10"
-            grow="1"
-          >
+        <Flex
+          direction="column"
+          align="center"
+          justify="space-between"
+          gap="10"
+          grow="1"
+        >
+          <Flex direction="row" gap="20">
             <Chessboard
               position={fen}
               onPieceDrop={onDrop}
               boardWidth={400}
               boardOrientation={orientation}
             />
-            <Flex direction="row" gap="5" align="center">
-              <Button leftIcon={<RepeatIcon />} onClick={flip}>
-                flip board
-              </Button>
-              <Button onClick={() => props.startTraining(fen, orientation)}>
-                Train from this position
-              </Button>
-              <LichessLink fen={fen}></LichessLink>
-            </Flex>
+            <Moves moves={moves}></Moves>
           </Flex>
-          <Spacer />
-          <Moves moves={moves}></Moves>
+          <Flex direction="row" gap="5" align="center">
+            <Button leftIcon={<RepeatIcon />} onClick={flip}>
+              flip board
+            </Button>
+            <Button onClick={() => props.startTraining(fen, orientation)}>
+              Train from this position
+            </Button>
+            <LichessLink fen={fen}></LichessLink>
+          </Flex>
         </Flex>
         <Spacer />
         <Code>{fen}</Code>

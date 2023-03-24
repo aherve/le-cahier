@@ -12,6 +12,8 @@ import { EditIcon, RepeatIcon } from "@chakra-ui/icons";
 import LichessLink from "./lichess-link";
 import type { TrainMessageInputType } from "./train-message";
 import TrainMessage, { TrainMessageInput } from "./train-message";
+import type { MoveType } from "./moves";
+import Moves, { addMove } from "./moves";
 
 export function Train(props: {
   orientation: BoardOrientation;
@@ -19,11 +21,12 @@ export function Train(props: {
   initialFen?: string;
 }) {
   const [fen, setFen] = useState(props.initialFen ?? new Chess().fen());
-  const [msg, setMsg] = useState<TrainMessageInputType>("");
+  const [msg, setMsg] = useState<TrainMessageInputType>("empty");
   const [challenge, setChallenge] = useState<GetChallengeOutput | null>(null);
   const [firstExpectedMove, setFirstExpectedMove] = useState<
     string | undefined
   >(undefined);
+  const [moves, setMoves] = useState<Array<MoveType>>([]);
 
   const turn = new Chess(fen).turn();
 
@@ -37,8 +40,9 @@ export function Train(props: {
       setChallenge(challenge);
       if (challenge.challengeMove) {
         const g = new Chess(fen);
-        g.move(challenge.challengeMove);
+        const m = g.move(challenge.challengeMove);
         setFen(g.fen());
+        setMoves(addMove(m, moves));
         setMsg(TrainMessageInput.enum.yourTurn);
       } else {
         setMsg(TrainMessageInput.enum.noMoreData);
@@ -51,12 +55,13 @@ export function Train(props: {
     ) {
       makeOpponentMove();
     }
-  }, [fen, props.orientation, turn, setFen]);
+  }, [fen, props.orientation, turn, setFen, moves]);
 
   function makeMove(move: string | { from: Square; to: Square }): boolean {
     try {
       const g = new Chess(fen);
-      g.move(move);
+      const m = g.move(move);
+      setMoves(addMove(m, moves));
       setFen(g.fen());
       return true;
     } catch {
@@ -80,6 +85,7 @@ export function Train(props: {
 
   function again() {
     setFen(props.initialFen ?? new Chess().fen());
+    setMoves([]);
   }
 
   function hint() {
@@ -98,12 +104,15 @@ export function Train(props: {
     <>
       <Flex direction="column" align="center" gap="5">
         <TrainMessage type={msg} hint={firstExpectedMove} />
-        <Chessboard
-          position={fen}
-          onPieceDrop={onDrop}
-          boardWidth={400}
-          boardOrientation={props.orientation}
-        />
+        <Flex direction="row" gap="20">
+          <Chessboard
+            position={fen}
+            onPieceDrop={onDrop}
+            boardWidth={400}
+            boardOrientation={props.orientation}
+          />
+          <Moves moves={moves}></Moves>
+        </Flex>
         <Flex direction="row" gap="5" align="center">
           <Button
             leftIcon={<EditIcon />}
