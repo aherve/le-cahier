@@ -2,6 +2,7 @@ import { Chess } from "chess.js";
 import { JsonDB, Config } from "node-json-db";
 import { z } from "zod";
 import type { SaveMoveInput } from "~/routes/api/moves/create";
+import { stripFEN } from "./utils";
 
 const sep = "|";
 
@@ -41,18 +42,18 @@ export class ChessBook {
     const bookMove = BookMoveSchema.parse({
       move,
       comments,
-      targetFEN: game.fen(),
+      targetFEN: stripFEN(game.fen()),
     });
 
     const path = isOpponentMove ? "opponentMoves" : "bookMoves";
     await Promise.all([
-      this.db.push(`${sep}${fen}${sep}fen`, fen, true),
-      this.db.push(["", fen, path, move].join(sep), bookMove, true),
+      this.db.push(`${sep}${stripFEN(fen)}${sep}fen`, stripFEN(fen), true),
+      this.db.push(["", stripFEN(fen), path, move].join(sep), bookMove, true),
     ]);
   }
 
   public async getRandomOpponentMove(fen: string): Promise<BookMove | null> {
-    const position = await this.getPosition(fen);
+    const position = await this.getPosition(stripFEN(fen));
     if (!position) {
       return null;
     }
@@ -72,6 +73,7 @@ export class ChessBook {
   public async linkGraph() {
     const db = new JsonDB(new Config("public/db.json", false, false, sep));
     await db.load();
+    let linked = 0;
     const allPositions = await db.getData(sep);
     for (const fen of Object.keys(allPositions)) {
       const position = BookPositionSchema.parse(allPositions[fen]);
@@ -85,9 +87,10 @@ export class ChessBook {
           try {
             const gg = new Chess(bookMove.targetFEN);
             const cleanMove = gg.move(validMove);
+            const strippedFEN = stripFEN(gg.fen());
 
             const found = BookPositionSchema.parse(
-              await db.getData(sep + gg.fen())
+              await db.getData(sep + strippedFEN)
             );
 
             const newMove: BookMove = {
@@ -95,15 +98,22 @@ export class ChessBook {
               targetFEN: found.fen,
             };
 
-            await db.push(`${sep}${g.fen()}${sep}fen`, g.fen());
             await db.push(
-              `${sep}${g.fen()}${sep}opponentMoves${sep}${cleanMove.lan}`,
+              `${sep}${stripFEN(g.fen())}${sep}fen`,
+              stripFEN(g.fen())
+            );
+            await db.push(
+              `${sep}${stripFEN(g.fen())}${sep}opponentMoves${sep}${
+                cleanMove.lan
+              }`,
               newMove
             );
+            linked++;
           } catch {}
         }
       }
     }
+    console.log(`(re)created ${linked} connections`);
     await db.save();
   }
 
@@ -111,16 +121,30 @@ export class ChessBook {
     const db = new JsonDB(new Config("public/db.json", false, false, sep));
     await db.load();
     const allPositions = await db.getData(sep);
-    for (const [originalFEN, pos] of Object.entries(allPositions)) {
+    for (const [originalKey, pos] of Object.entries(allPositions)) {
       const position = BookPositionSchema.parse(pos);
 
-      const newFEN = new Chess(position.fen).fen();
-      if (newFEN != originalFEN) {
-        console.log("normalizing", originalFEN);
+      // normalize db key
+      const newKey = stripFEN(position.fen);
+      // normalize book moves
+      position.fen = newKey;
+      for (const [k, v] of Object.entries(position.bookMoves)) {
+        position.bookMoves[k] = {
+          ...v,
+          targetFEN: stripFEN(v.targetFEN),
+        };
+      }
+      for (const [k, v] of Object.entries(position.opponentMoves)) {
+        position.opponentMoves[k] = {
+          ...v,
+          targetFEN: stripFEN(v.targetFEN),
+        };
+      }
 
-        position.fen = newFEN;
-        await db.push(`${sep}${newFEN}`, position);
-        await db.delete(`${sep}${originalFEN}`);
+      await db.push(`${sep}${newKey}`, position);
+
+      if (newKey != originalKey) {
+        await db.delete(`${sep}${originalKey}`);
       }
     }
     await db.save();
@@ -128,7 +152,7 @@ export class ChessBook {
 
   protected async getPosition(fen: string): Promise<BookPosition | null> {
     try {
-      const data = await this.db.getData(sep + fen);
+      const data = await this.db.getData(sep + stripFEN(fen));
       const parsed = BookPositionSchema.safeParse(data);
       if (!parsed.success) {
         console.error("could not parse position", { data });
