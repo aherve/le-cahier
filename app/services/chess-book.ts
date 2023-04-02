@@ -30,7 +30,7 @@ export class ChessBook {
     // If you put false, you'll have to call the save() method.
     // The third argument is to ask JsonDB to save the database in an human readable format. (default false)
     // The last argument is the separator. By default it's slash (/)
-    this.db = new JsonDB(new Config("public/db.json", true, false, sep));
+    this.db = new JsonDB(new Config("db.json", true, false, sep));
   }
 
   public async addMove(input: SaveMoveInput) {
