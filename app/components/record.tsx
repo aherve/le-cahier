@@ -7,13 +7,11 @@ import type {
 } from "react-chessboard/dist/chessboard/types";
 import { Button, Flex } from "@chakra-ui/react";
 import { SaveMoveInputSchema } from "~/routes/api/moves/create";
-import type { MoveType } from "./moves";
-import Moves, { addMove } from "./moves";
 
 export function Record(props: { initialFen?: string }) {
   const [fen, setFen] = useState(props.initialFen ?? new Chess().fen());
   const [orientation, setOrientation] = useState<BoardOrientation>("white");
-  const [moves, setMoves] = useState<Array<MoveType>>([]);
+  //const [moves, setMoves] = useState<Array<Move>>([]);
 
   const game = new Chess(fen);
 
@@ -25,7 +23,7 @@ export function Record(props: { initialFen?: string }) {
         (validMove.color === "b" && orientation === "white") ||
         (validMove.color === "w" && orientation === "black");
 
-      setMoves(addMove(validMove, moves, fen));
+      //setMoves(addMove(validMove, moves, fen));
       setFen(game.fen());
       await fetch("api/moves/create", {
         method: "POST",
@@ -43,11 +41,6 @@ export function Record(props: { initialFen?: string }) {
       console.error(e);
       return null;
     }
-  }
-
-  function goTo(fen: string, moves: MoveType[]) {
-    setMoves(moves);
-    setFen(fen);
   }
 
   function onDrop(sourceSquare: Square, targetSquare: Square) {
@@ -70,7 +63,7 @@ export function Record(props: { initialFen?: string }) {
           />
           <Button onClick={flip}>flip board</Button>
         </Flex>
-        <Moves moves={moves} goTo={goTo}></Moves>
+        <p>moves goes here</p>
       </Flex>
     </>
   );

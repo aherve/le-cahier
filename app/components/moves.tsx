@@ -1,3 +1,4 @@
+import { chunk } from "lodash";
 import {
   Card,
   CardBody,
@@ -8,52 +9,13 @@ import {
   CardHeader,
   Link,
 } from "@chakra-ui/react";
-import type { Color, Move } from "chess.js";
-import { Chess } from "chess.js";
-
-export type MoveType = {
-  moveIndex: number;
-  whiteMove: string;
-  blackMove?: string;
-  fenBeforeMove: string;
-};
-
-export function addMove(
-  m: Move,
-  moves: Array<MoveType>,
-  fenBeforeMove: string
-): Array<MoveType> {
-  if (m.color === "w") {
-    moves.push({
-      fenBeforeMove,
-      moveIndex: moves.length + 1,
-      whiteMove: m.san,
-    });
-  } else {
-    moves[moves.length - 1].blackMove = m.san;
-  }
-  return moves;
-}
+import type { Move } from "chess.js";
 
 export default function Moves(props: {
-  moves: Array<MoveType>;
-  goTo: (fen: string, moves: Array<MoveType>) => void;
+  moves: Array<Move>;
+  onReset: (fen: string) => void;
 }) {
-  function goTo(move: MoveType, color: Color) {
-    const g = new Chess(move.fenBeforeMove);
-    g.move(move.whiteMove);
-    if (color === "b" && move.blackMove) {
-      g.move(move.blackMove);
-    }
-    const newFen = g.fen();
-
-    const newMoves = props.moves.slice(0, move.moveIndex);
-    if (color === "w") {
-      newMoves[newMoves.length - 1].blackMove = undefined;
-    }
-
-    props.goTo(newFen, newMoves);
-  }
+  const chunks = chunk(props.moves, 2);
 
   return (
     <>
@@ -63,9 +25,14 @@ export default function Moves(props: {
         </CardHeader>
         <CardBody>
           <List>
-            {props.moves.map((m) => {
+            {chunks.map((c, i) => {
               return (
-                <MoveItem move={m} goTo={goTo} key={m.moveIndex}></MoveItem>
+                <MoveItem
+                  onReset={props.onReset}
+                  movePair={c}
+                  moveIndex={i}
+                  key={i}
+                ></MoveItem>
               );
             })}
           </List>
@@ -76,18 +43,19 @@ export default function Moves(props: {
 }
 
 function MoveItem(props: {
-  move: MoveType;
-  goTo: (move: MoveType, color: Color) => void;
+  movePair: Move[];
+  moveIndex: number;
+  onReset: (fen: string) => void;
 }) {
   return (
     <>
       <Flex direction="row" gap="5" grow="1">
-        <Text as="b">{props.move.moveIndex}.</Text>
-        <Link onClick={() => props.goTo(props.move, "w")}>
-          {props.move.whiteMove}
+        <Text as="b">{2 * props.moveIndex + 1}.</Text>
+        <Link onClick={() => props.onReset(props.movePair[0].after)}>
+          {props.movePair[0].san}
         </Link>
-        <Link onClick={() => props.goTo(props.move, "b")}>
-          {props.move.blackMove}
+        <Link onClick={() => props.onReset(props.movePair[1].after)}>
+          {props.movePair[1]?.san ?? ""}
         </Link>
       </Flex>
     </>
