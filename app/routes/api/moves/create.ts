@@ -4,7 +4,6 @@ import { z } from 'zod'
 import { DynamoChessBookService } from '~/services/dynamo-chess-book'
 
 export const SaveMoveInputSchema = z.object({
-  comments: z.string().optional(),
   fen: z.string(),
   isOpponentMove: z.boolean(),
   move: z.string(),
