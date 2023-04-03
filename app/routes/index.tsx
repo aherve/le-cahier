@@ -1,53 +1,93 @@
-import { z } from "zod";
-import { Button, Flex } from "@chakra-ui/react";
-import { useState } from "react";
-import { Train } from "~/components/train";
-import { Record } from "~/components/record";
-import Explore from "~/components/explore";
-import { Chess } from "chess.js";
-import type { BoardOrientation } from "react-chessboard/dist/chessboard/types";
+import { z } from 'zod'
+import { Button, Flex } from '@chakra-ui/react'
+import { useState } from 'react'
+import { Train } from '~/components/train'
+import { Record } from '~/components/record'
+import Explore from '~/components/explore'
+import { Chess } from 'chess.js'
+import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types'
+import type { LoaderFunction } from '@remix-run/node'
+import { json } from '@remix-run/node'
+import { useLoaderData } from '@remix-run/react'
+
+export const headers = () => ({
+  'WWW-Authenticate': 'Basic',
+})
+const isAuthorized = (request: Request) => {
+  const header = request.headers.get('Authorization')
+
+  if (!header) return false
+
+  const base64 = header.replace('Basic ', '')
+  const [username, password] = Buffer.from(base64, 'base64')
+    .toString()
+    .split(':')
+
+  return (
+    username === process.env.BASIC_AUTH_USERNAME &&
+    password === process.env.BASIC_AUTH_PASSWORD
+  )
+}
+
+export const loader: LoaderFunction = async ({ request }) => {
+  if (!isAuthorized(request)) {
+    return json({ authorized: false }, { status: 401 })
+  }
+
+  // Load data for password-protected page here.
+
+  return json({
+    authorized: true,
+    // Include extra data for password-protected page here.
+  })
+}
 
 const GameMode = z.enum([
-  "trainWithWhite",
-  "trainWithBlack",
-  "recordMoves",
-  "explore",
-]);
-type GameModeType = z.infer<typeof GameMode>;
+  'trainWithWhite',
+  'trainWithBlack',
+  'recordMoves',
+  'explore',
+])
+type GameModeType = z.infer<typeof GameMode>
 
 export default function Index() {
-  const [mode, setMode] = useState<GameModeType>(GameMode.enum.explore);
-  const [gameId, setGameId] = useState(Date.now().toString());
-  const [initialFen, setInitialFen] = useState<string | undefined>();
+  const [mode, setMode] = useState<GameModeType>(GameMode.enum.explore)
+  const [gameId, setGameId] = useState(Date.now().toString())
+  const [initialFen, setInitialFen] = useState<string | undefined>()
+
+  const data = useLoaderData()
+  if (!data.authorized) {
+    return <p>Please login</p>
+  }
 
   function startTraining(fen: string, orientation: BoardOrientation) {
     switch (orientation) {
-      case "black":
-        return startTrainingWithBlack(fen);
+      case 'black':
+        return startTrainingWithBlack(fen)
       default:
-        return startTrainingWithWhite(fen);
+        return startTrainingWithWhite(fen)
     }
   }
 
   function startTrainingWithWhite(fen?: string) {
-    setInitialFen(fen ?? new Chess().fen());
-    setMode(GameMode.enum.trainWithWhite);
-    setGameId(Date.now().toString());
+    setInitialFen(fen ?? new Chess().fen())
+    setMode(GameMode.enum.trainWithWhite)
+    setGameId(Date.now().toString())
   }
   function startTrainingWithBlack(fen?: string) {
-    setInitialFen(fen ?? new Chess().fen());
-    setMode(GameMode.enum.trainWithBlack);
-    setGameId(Date.now().toString());
+    setInitialFen(fen ?? new Chess().fen())
+    setMode(GameMode.enum.trainWithBlack)
+    setGameId(Date.now().toString())
   }
   function startRecordingMoves(fen?: string) {
-    setInitialFen(fen);
-    setMode(GameMode.enum.recordMoves);
-    setGameId(Date.now().toString());
+    setInitialFen(fen)
+    setMode(GameMode.enum.recordMoves)
+    setGameId(Date.now().toString())
   }
   function startExplore(fen?: string) {
-    setInitialFen(fen ?? new Chess().fen());
-    setMode(GameMode.enum.explore);
-    setGameId(Date.now().toString());
+    setInitialFen(fen ?? new Chess().fen())
+    setMode(GameMode.enum.explore)
+    setGameId(Date.now().toString())
   }
 
   function renderSwitch() {
@@ -60,7 +100,7 @@ export default function Index() {
             startRecording={startRecordingMoves}
             initialFen={initialFen}
           />
-        );
+        )
       case GameMode.enum.trainWithBlack:
         return (
           <Train
@@ -69,16 +109,16 @@ export default function Index() {
             startRecording={startRecordingMoves}
             initialFen={initialFen}
           />
-        );
+        )
       case GameMode.enum.recordMoves:
-        return <Record key={gameId} initialFen={initialFen} />;
+        return <Record key={gameId} initialFen={initialFen} />
       case GameMode.enum.explore:
         return (
           <Explore
             startTraining={startTraining}
             initialFen={initialFen}
           ></Explore>
-        );
+        )
     }
   }
 
@@ -102,5 +142,5 @@ export default function Index() {
         </Flex>
       </div>
     </>
-  );
+  )
 }
