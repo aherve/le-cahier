@@ -1,7 +1,7 @@
 import type { ActionFunction } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import { z } from 'zod'
-import { DynamoChessBookService } from '~/services/dynamo-chess-book'
+import { ChessBookService } from '~/services/chess-book'
 
 export const SaveMoveInputSchema = z.object({
   fen: z.string(),
@@ -12,7 +12,7 @@ export type SaveMoveInput = z.infer<typeof SaveMoveInputSchema>
 
 export const action: ActionFunction = async ({ request }) => {
   const input = SaveMoveInputSchema.parse(await request.json())
-  await DynamoChessBookService.addMove(input)
+  await ChessBookService.addMove(input)
 
   return json({ success: true })
 }

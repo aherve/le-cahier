@@ -1,6 +1,6 @@
 import type { LoaderFunction } from '@remix-run/node'
 import { json } from '@remix-run/node'
-import { DynamoChessBookService } from '~/services/dynamo-chess-book'
+import { ChessBookService } from '~/services/chess-book'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url)
@@ -9,7 +9,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Error('Missing fen')
   }
 
-  const move = await DynamoChessBookService.getPosition(fen)
+  const move = await ChessBookService.getPosition(fen)
   console.log('got move', move)
   return json(move)
 }
