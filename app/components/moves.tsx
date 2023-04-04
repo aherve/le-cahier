@@ -49,12 +49,14 @@ function MoveItem(props: {
 }) {
   return (
     <>
-      <Flex direction="row" gap="5" grow="1">
-        <Text as="b">{2 * props.moveIndex + 1}.</Text>
-        <Link onClick={() => props.onNavigate(props.movePair[0])}>
+      <Flex direction="row" alignContent="start" justifyContent="space-between">
+        <Text as="b" flex="1 1 0">
+          {2 * props.moveIndex + 1}.
+        </Text>
+        <Link flex="2 1 0" onClick={() => props.onNavigate(props.movePair[0])}>
           {props.movePair[0].san}
         </Link>
-        <Link onClick={() => props.onNavigate(props.movePair[1])}>
+        <Link flex="2 1 0" onClick={() => props.onNavigate(props.movePair[1])}>
           {props.movePair[1]?.san ?? ''}
         </Link>
       </Flex>
