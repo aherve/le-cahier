@@ -1,62 +1,66 @@
-import { z } from "zod";
-import { Button, Flex } from "@chakra-ui/react";
-import { useState } from "react";
-import { Train } from "~/components/train";
-import { Record } from "~/components/record";
-import Explore from "~/components/explore";
-import { Chess } from "chess.js";
-import type { BoardOrientation } from "react-chessboard/dist/chessboard/types";
-import { BasicAuthHeaders, basicAuthLoader } from "~/services/utils";
-import { useLoaderData } from "@remix-run/react";
+import { z } from 'zod'
+import { Button, Flex } from '@chakra-ui/react'
+import { useState } from 'react'
+import { Train } from '~/components/train'
+import { Record } from '~/components/record'
+import Explore from '~/components/explore'
+import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types'
+import { BasicAuthHeaders, basicAuthLoader } from '~/services/utils'
+import { useLoaderData } from '@remix-run/react'
+import { GameService } from '~/services/gameService'
+import type { Move } from 'chess.js'
 
 const GameMode = z.enum([
-  "trainWithWhite",
-  "trainWithBlack",
-  "recordMoves",
-  "explore",
-]);
-type GameModeType = z.infer<typeof GameMode>;
+  'trainWithWhite',
+  'trainWithBlack',
+  'recordMoves',
+  'explore',
+])
+type GameModeType = z.infer<typeof GameMode>
 
-export const headers = BasicAuthHeaders;
-export const loader = basicAuthLoader;
+export const headers = BasicAuthHeaders
+export const loader = basicAuthLoader
 
 export default function Index() {
-  const [mode, setMode] = useState<GameModeType>(GameMode.enum.explore);
-  const [gameId, setGameId] = useState(Date.now().toString());
-  const [initialFen, setInitialFen] = useState<string | undefined>();
+  const [mode, setMode] = useState<GameModeType>(GameMode.enum.explore)
+  const [fromLastMove, setFromLastMove] = useState<Move | undefined>()
+  const [gameId, setGameId] = useState(Date.now().toString())
 
   if (!useLoaderData().authorized) {
-    return <div>Not authorized</div>;
+    return <div>Not authorized</div>
   }
 
-  function startTraining(fen: string, orientation: BoardOrientation) {
+  function startTraining(
+    orientation: BoardOrientation,
+    resetBoard: boolean,
+    lastMove?: Move
+  ) {
+    if (resetBoard) {
+      GameService.reset()
+    }
+    setFromLastMove(lastMove)
+    setGameId(Date.now().toString())
     switch (orientation) {
-      case "black":
-        return startTrainingWithBlack(fen);
+      case 'black':
+        return setMode(GameMode.enum.trainWithBlack)
       default:
-        return startTrainingWithWhite(fen);
+        return setMode(GameMode.enum.trainWithWhite)
     }
   }
 
-  function startTrainingWithWhite(fen?: string) {
-    setInitialFen(fen ?? new Chess().fen());
-    setMode(GameMode.enum.trainWithWhite);
-    setGameId(Date.now().toString());
+  function startRecordingMoves(resetBoard: boolean) {
+    setGameId(Date.now().toString())
+    if (resetBoard) {
+      GameService.reset()
+    }
+    setMode(GameMode.enum.recordMoves)
   }
-  function startTrainingWithBlack(fen?: string) {
-    setInitialFen(fen ?? new Chess().fen());
-    setMode(GameMode.enum.trainWithBlack);
-    setGameId(Date.now().toString());
-  }
-  function startRecordingMoves(fen?: string) {
-    setInitialFen(fen);
-    setMode(GameMode.enum.recordMoves);
-    setGameId(Date.now().toString());
-  }
-  function startExplore(fen?: string) {
-    setInitialFen(fen ?? new Chess().fen());
-    setMode(GameMode.enum.explore);
-    setGameId(Date.now().toString());
+  function startExplore(resetBoard: boolean) {
+    setGameId(Date.now().toString())
+    if (resetBoard) {
+      GameService.reset()
+    }
+    setMode(GameMode.enum.explore)
   }
 
   function renderSwitch() {
@@ -66,28 +70,30 @@ export default function Index() {
           <Train
             orientation="white"
             key={gameId}
-            startRecording={startRecordingMoves}
-            initialFen={initialFen}
+            startRecording={() => startRecordingMoves(false)}
+            startingMove={fromLastMove}
           />
-        );
+        )
       case GameMode.enum.trainWithBlack:
         return (
           <Train
             orientation="black"
             key={gameId}
-            startRecording={startRecordingMoves}
-            initialFen={initialFen}
+            startRecording={() => startRecordingMoves(false)}
+            startingMove={fromLastMove}
           />
-        );
+        )
       case GameMode.enum.recordMoves:
-        return <Record key={gameId} initialFen={initialFen} />;
+        return <Record key={gameId} />
       case GameMode.enum.explore:
         return (
           <Explore
-            startTraining={startTraining}
-            initialFen={initialFen}
+            key={gameId}
+            startTraining={(orientation, lastMove) =>
+              startTraining(orientation, false, lastMove)
+            }
           ></Explore>
-        );
+        )
     }
   }
 
@@ -96,14 +102,16 @@ export default function Index() {
       <div className="App">
         <Flex height="100vh" direction="column" align="center">
           <Flex direction="row" gap={10} align="center" minWidth="max-content">
-            <Button onClick={() => startExplore()}>Explore</Button>
-            <Button onClick={() => startTrainingWithWhite()}>
+            <Button onClick={() => startExplore(true)}>Explore</Button>
+            <Button onClick={() => startTraining('white', true)}>
               Train with white
             </Button>
-            <Button onClick={() => startTrainingWithBlack()}>
+            <Button onClick={() => startTraining('black', true)}>
               Train with black
             </Button>
-            <Button onClick={() => startRecordingMoves()}>Record moves</Button>
+            <Button onClick={() => startRecordingMoves(true)}>
+              Record moves
+            </Button>
           </Flex>
           <Flex grow={1} alignItems="center">
             {renderSwitch()}
@@ -111,5 +119,5 @@ export default function Index() {
         </Flex>
       </div>
     </>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { chunk } from "lodash";
+import { chunk } from 'lodash'
 import {
   Card,
   CardBody,
@@ -8,14 +8,14 @@ import {
   Heading,
   CardHeader,
   Link,
-} from "@chakra-ui/react";
-import type { Move } from "chess.js";
+} from '@chakra-ui/react'
+import type { Move } from 'chess.js'
 
 export default function Moves(props: {
-  moves: Array<Move>;
-  onReset: (fen: string) => void;
+  moves: Array<Move>
+  onNavigate: (move: Move) => void
 }) {
-  const chunks = chunk(props.moves, 2);
+  const chunks = chunk(props.moves, 2)
 
   return (
     <>
@@ -28,36 +28,36 @@ export default function Moves(props: {
             {chunks.map((c, i) => {
               return (
                 <MoveItem
-                  onReset={props.onReset}
+                  onNavigate={props.onNavigate}
                   movePair={c}
                   moveIndex={i}
                   key={i}
                 ></MoveItem>
-              );
+              )
             })}
           </List>
         </CardBody>
       </Card>
     </>
-  );
+  )
 }
 
 function MoveItem(props: {
-  movePair: Move[];
-  moveIndex: number;
-  onReset: (fen: string) => void;
+  movePair: Move[]
+  moveIndex: number
+  onNavigate: (m: Move) => void
 }) {
   return (
     <>
       <Flex direction="row" gap="5" grow="1">
         <Text as="b">{2 * props.moveIndex + 1}.</Text>
-        <Link onClick={() => props.onReset(props.movePair[0].after)}>
+        <Link onClick={() => props.onNavigate(props.movePair[0])}>
           {props.movePair[0].san}
         </Link>
-        <Link onClick={() => props.onReset(props.movePair[1].after)}>
-          {props.movePair[1]?.san ?? ""}
+        <Link onClick={() => props.onNavigate(props.movePair[1])}>
+          {props.movePair[1]?.san ?? ''}
         </Link>
       </Flex>
     </>
-  );
+  )
 }

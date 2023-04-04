@@ -1,108 +1,123 @@
-import { useEffect, useState } from "react";
-import type { Move } from "chess.js";
-import { Chess } from "chess.js";
-import { Chessboard } from "react-chessboard";
+import { useEffect, useState } from 'react'
+import { Chessboard } from 'react-chessboard'
 import type {
   BoardOrientation,
   Square,
-} from "react-chessboard/dist/chessboard/types";
-import type { GetChallengeOutput } from "~/routes/api/moves/challenge";
-import { GetChallengeOutputSchema } from "~/routes/api/moves/challenge";
-import { Button, Code, Flex } from "@chakra-ui/react";
-import { EditIcon, RepeatIcon } from "@chakra-ui/icons";
-import LichessLink from "./lichess-link";
-import type { TrainMessageInputType } from "./train-message";
-import TrainMessage, { TrainMessageInput } from "./train-message";
+} from 'react-chessboard/dist/chessboard/types'
+import type { GetChallengeOutput } from '~/routes/api/moves/challenge'
+import { GetChallengeOutputSchema } from '~/routes/api/moves/challenge'
+import { Button, Code, Flex } from '@chakra-ui/react'
+import { EditIcon, RepeatIcon } from '@chakra-ui/icons'
+import LichessLink from './lichess-link'
+import type { TrainMessageInputType } from './train-message'
+import TrainMessage, { TrainMessageInput } from './train-message'
+import { GameService } from '~/services/gameService'
+import type { Move } from 'chess.js'
+import { Chess } from 'chess.js'
+import Moves from './moves'
+import { useFetcher } from '@remix-run/react'
 
 export function Train(props: {
-  orientation: BoardOrientation;
-  startRecording: (fen: string) => void;
-  initialFen?: string;
+  orientation: BoardOrientation
+  startRecording: (fen: string) => void
+  startingMove?: Move
 }) {
-  const [fen, setFen] = useState(props.initialFen ?? new Chess().fen());
-  const [msg, setMsg] = useState<TrainMessageInputType>("empty");
-  const [challenge, setChallenge] = useState<GetChallengeOutput | null>(null);
-  const [expectedMoves, setExpectedMoves] = useState<string[]>([]);
-  const [moves, setMoves] = useState<Array<Move>>([]);
+  const [fen, setFen] = useState(GameService.fen)
+  const [msg, setMsg] = useState<TrainMessageInputType>('empty')
+  const [challenge, setChallenge] = useState<GetChallengeOutput | null>(null)
 
-  const turn = new Chess(fen).turn();
+  const turn = GameService.turn
+  const isPlayerTurn =
+    (props.orientation === 'white' && turn === 'w') ||
+    (props.orientation === 'black' && turn === 'b')
+
+  const fetcher = useFetcher()
+  const moves = GameService.moves
+
+  const hints = (challenge?.expectedMoves ?? [])
+    .map((m) => {
+      try {
+        const g = new Chess(fen)
+        const move = g.move(m)
+        return move.san
+      } catch {
+        return null
+      }
+    })
+    .filter(Boolean) as string[]
 
   useEffect(() => {
-    async function makeOpponentMove() {
-      const response = await fetch(
-        `api/moves/challenge?fen=${encodeURIComponent(fen)}`
-      );
-      const challenge = GetChallengeOutputSchema.parse(await response.json());
-      setChallenge(challenge);
-      if (challenge.challengeMove) {
-        const g = new Chess(fen);
-        g.move(challenge.challengeMove);
-        //setMoves(addMove(m, moves, fen));
-        setFen(g.fen());
-        setMsg(TrainMessageInput.enum.yourTurn);
-      } else {
-        setMsg(TrainMessageInput.enum.noMoreData);
-      }
+    if (!isPlayerTurn && fetcher.state === 'idle' && fetcher.data == null) {
+      console.log('fetching challenge for', turn)
+      fetcher.load(`/api/moves/challenge?fen=${encodeURIComponent(fen)}`)
     }
 
-    if (
-      (props.orientation === "black" && turn === "w") ||
-      (props.orientation === "white" && turn === "b")
-    ) {
-      console.log("making opponent move");
-      makeOpponentMove();
+    if (!isPlayerTurn && fetcher.state === 'idle' && fetcher.data) {
+      const data = GetChallengeOutputSchema.parse(fetcher.data)
+      if (!data.challengeMove) {
+        console.log('no more data')
+        setMsg(TrainMessageInput.enum.noMoreData)
+      } else {
+        console.log('opponent moves', data.challengeMove)
+        GameService.makeMove(data.challengeMove)
+        console.log('setting fen', GameService.fen)
+        fetcher.data = null
+        setChallenge(data)
+        setMsg(TrainMessageInput.enum.yourTurn)
+        setFen(GameService.fen)
+      }
     }
-  }, [fen, props.orientation, turn, setFen, moves]);
+  }, [fen, fetcher, props.orientation, turn, isPlayerTurn])
+
+  function onNavigate(move: Move) {
+    GameService.backTo(move)
+    console.log('resetting fen after navigation')
+    setFen(GameService.fen)
+  }
 
   function makeMove(move: string | { from: Square; to: Square }): boolean {
     try {
-      const g = new Chess(fen);
-      g.move(move);
-      //setMoves(addMove(m, moves, fen));
-      setFen(g.fen());
-      return true;
+      GameService.makeMove(move)
+      setFen(GameService.fen)
+      return true
     } catch {
-      return false;
+      return false
     }
   }
 
   function onDrop(sourceSquare: Square, targetSquare: Square) {
     if (!challenge || challenge.expectedMoves.length === 0) {
-      return makeMove({ from: sourceSquare, to: targetSquare });
+      return makeMove({ from: sourceSquare, to: targetSquare })
     } else if (
       challenge.expectedMoves.includes(`${sourceSquare}${targetSquare}`)
     ) {
-      return makeMove({ from: sourceSquare, to: targetSquare });
+      return makeMove({ from: sourceSquare, to: targetSquare })
     } else {
-      console.log("expected", challenge.expectedMoves);
-      setMsg(TrainMessageInput.enum.nope);
-      return false;
+      setMsg(TrainMessageInput.enum.nope)
+      return false
     }
   }
 
   function again() {
-    setFen(props.initialFen ?? new Chess().fen());
-    //setMoves([]);
+    if (props.startingMove) {
+      GameService.backTo(props.startingMove)
+    } else {
+      GameService.reset()
+    }
+    setFen(GameService.fen)
   }
 
-  function hint() {
-    const expected = challenge?.expectedMoves;
-    if (!expected || !expected.length) {
-      return;
+  function showHint() {
+    if (hints.length === 0) {
+      return
     }
-    const friendlyMoves = expected.map((m) => {
-      const g = new Chess(fen);
-      const move = g.move(m);
-      return move.san;
-    });
-    setMsg(TrainMessageInput.enum.hint);
-    setExpectedMoves(friendlyMoves);
+    setMsg(TrainMessageInput.enum.hint)
   }
 
   return (
     <>
       <Flex direction="column" align="center" gap="5">
-        <TrainMessage type={msg} hints={expectedMoves} />
+        <TrainMessage type={msg} hints={hints} />
         <Flex direction="row" gap="20">
           <Chessboard
             position={fen}
@@ -110,7 +125,7 @@ export function Train(props: {
             boardWidth={400}
             boardOrientation={props.orientation}
           />
-          <p> moves goes here</p>
+          <Moves moves={moves} onNavigate={onNavigate}></Moves>
         </Flex>
         <Flex direction="row" gap="5" align="center">
           <Button
@@ -122,11 +137,11 @@ export function Train(props: {
           <Button leftIcon={<RepeatIcon />} onClick={again}>
             Again
           </Button>
-          <Button onClick={hint}>get hint</Button>
+          <Button onClick={showHint}>get hint</Button>
           <LichessLink fen={fen}></LichessLink>
         </Flex>
         <Code>{fen}</Code>
       </Flex>
     </>
-  );
+  )
 }
