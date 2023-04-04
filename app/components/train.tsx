@@ -102,6 +102,8 @@ export function Train(props: {
     } else {
       GameService.reset()
     }
+    fetcher.data = null
+    setChallenge(null)
     setFen(GameService.fen)
   }
 
