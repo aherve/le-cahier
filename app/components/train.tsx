@@ -55,12 +55,9 @@ export function Train(props: {
     if (!isPlayerTurn && fetcher.state === 'idle' && fetcher.data) {
       const data = GetChallengeOutputSchema.parse(fetcher.data)
       if (!data.challengeMove) {
-        console.log('no more data')
         setMsg(TrainMessageInput.enum.noMoreData)
       } else {
-        console.log('opponent moves', data.challengeMove)
         GameService.makeMove(data.challengeMove)
-        console.log('setting fen', GameService.fen)
         fetcher.data = null
         setChallenge(data)
         setMsg(TrainMessageInput.enum.yourTurn)
@@ -71,7 +68,8 @@ export function Train(props: {
 
   function onNavigate(move: Move) {
     GameService.backTo(move)
-    console.log('resetting fen after navigation')
+    fetcher.data = null
+    setChallenge(null)
     setFen(GameService.fen)
   }
 
