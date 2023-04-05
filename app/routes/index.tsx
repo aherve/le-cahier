@@ -9,12 +9,15 @@ import { BasicAuthHeaders, basicAuthLoader } from '~/services/utils'
 import { useLoaderData } from '@remix-run/react'
 import { GameService } from '~/services/gameService'
 import type { Move } from 'chess.js'
+import { BellIcon, EditIcon, SearchIcon } from '@chakra-ui/icons'
+import LichessReport from '~/components/lichess-report'
 
 const GameMode = z.enum([
-  'trainWithWhite',
-  'trainWithBlack',
-  'recordMoves',
   'explore',
+  'lichessReport',
+  'recordMoves',
+  'trainWithBlack',
+  'trainWithWhite',
 ])
 type GameModeType = z.infer<typeof GameMode>
 
@@ -22,12 +25,16 @@ export const headers = BasicAuthHeaders
 export const loader = basicAuthLoader
 
 export default function Index() {
-  const [mode, setMode] = useState<GameModeType>(GameMode.enum.explore)
+  const [mode, setMode] = useState<GameModeType>(GameMode.enum.lichessReport)
   const [fromLastMove, setFromLastMove] = useState<Move | undefined>()
   const [gameId, setGameId] = useState(Date.now().toString())
 
   if (!useLoaderData().authorized) {
     return <div>Not authorized</div>
+  }
+
+  function startLichessReport() {
+    setMode(GameMode.enum.lichessReport)
   }
 
   function startTraining(
@@ -85,6 +92,8 @@ export default function Index() {
         )
       case GameMode.enum.recordMoves:
         return <Record key={gameId} />
+      case GameMode.enum.lichessReport:
+        return <LichessReport></LichessReport>
       case GameMode.enum.explore:
         return (
           <Explore
@@ -102,15 +111,26 @@ export default function Index() {
       <div className="App">
         <Flex height="100vh" direction="column" align="center">
           <Flex direction="row" gap={10} align="center" minWidth="max-content">
-            <Button onClick={() => startExplore(true)}>Explore</Button>
+            <Button
+              leftIcon={<SearchIcon />}
+              onClick={() => startExplore(true)}
+            >
+              Explore
+            </Button>
             <Button onClick={() => startTraining('white', true)}>
               Train with white
             </Button>
             <Button onClick={() => startTraining('black', true)}>
               Train with black
             </Button>
-            <Button onClick={() => startRecordingMoves(true)}>
+            <Button
+              leftIcon={<EditIcon />}
+              onClick={() => startRecordingMoves(true)}
+            >
               Record moves
+            </Button>
+            <Button leftIcon={<BellIcon />} onClick={startLichessReport}>
+              lichess report
             </Button>
           </Flex>
           <Flex grow={1} alignItems="center">

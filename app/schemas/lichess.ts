@@ -2,6 +2,8 @@ import type { Move } from 'chess.js'
 import { Chess } from 'chess.js'
 import { z } from 'zod'
 
+export const LICHESS_USERNAME = 'MaximeCaVaChierGrave'
+
 const LichessGameUserSchema = z.object({
   rating: z.number(),
   ratingDiff: z.number(),
@@ -26,7 +28,7 @@ export const LichessGameSchema = z
       white: LichessGameUserSchema,
       black: LichessGameUserSchema,
     }),
-    winner: z.string(),
+    winner: z.string().optional(),
     opening: z.object({
       eco: z.string(),
       name: z.string(),
