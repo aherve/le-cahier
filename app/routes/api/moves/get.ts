@@ -10,6 +10,5 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   const move = await ChessBookService.getPosition(fen)
-  console.log('got move', move)
   return json(move)
 }

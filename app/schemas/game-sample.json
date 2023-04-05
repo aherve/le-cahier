@@ -1,0 +1,34 @@
+{
+  "id": "P3DJiMVw",
+  "rated": true,
+  "variant": "standard",
+  "speed": "blitz",
+  "perf": "blitz",
+  "createdAt": 1680624715481,
+  "lastMoveAt": 1680625699051,
+  "status": "mate",
+  "players": {
+    "white": {
+      "user": {
+        "name": "MaximeCaVaChierGrave",
+        "patron": true,
+        "id": "maximecavachiergrave"
+      },
+      "rating": 1705,
+      "ratingDiff": 6
+    },
+    "black": {
+      "user": { "name": "Hichemyouss", "id": "hichemyouss" },
+      "rating": 1702,
+      "ratingDiff": -6
+    }
+  },
+  "winner": "white",
+  "opening": {
+    "eco": "C00",
+    "name": "Rat Defense: Small Center Defense",
+    "ply": 4
+  },
+  "moves": "e4 e6 d4 d6",
+  "clock": { "initial": 300, "increment": 3, "totalTime": 420 }
+}
