@@ -8,44 +8,27 @@ import {
   Th,
   Thead,
   Tr,
-} from '@chakra-ui/react'
-import { Heading, Spinner } from '@chakra-ui/react'
-import { useFetcher } from '@remix-run/react'
-import { useEffect, useState } from 'react'
-import type { LichessGame } from '~/schemas/lichess'
-import { LICHESS_USERNAME } from '~/schemas/lichess'
+} from "@chakra-ui/react";
+import { Heading, Spinner } from "@chakra-ui/react";
+import { useFetcher } from "@remix-run/react";
+import { useEffect } from "react";
+import type { LichessGame } from "~/schemas/lichess";
+import { LICHESS_USERNAME } from "~/schemas/lichess";
 
 export default function LichessReport() {
-  const fetcher = useFetcher()
-  const [games, setGames] = useState<LichessGame[]>([])
+  const gameListFetcher = useFetcher();
 
   useEffect(() => {
-    if (fetcher.state === 'idle' && fetcher.data == null) {
-      console.log('fetch here')
-      fetcher.load('/api/lichess/games')
+    if (gameListFetcher.state === "idle" && gameListFetcher.data == null) {
+      gameListFetcher.load("/api/lichess/games");
     }
-    if (fetcher.state === 'idle' && fetcher.data && games.length === 0) {
-      setGames(fetcher.data)
-    }
-  }, [fetcher, games])
+  }, [gameListFetcher]);
 
-  if (fetcher.state === 'loading') {
-    return <Spinner />
+  if (gameListFetcher.state === "loading") {
+    return <Spinner />;
   }
 
-  const gameColor = (game: LichessGame) => {
-    const won =
-      (game.winner === 'white' &&
-        game.players.white.user.name === LICHESS_USERNAME) ||
-      (game.winner === 'black' &&
-        game.players.black.user.name === LICHESS_USERNAME)
-    const drew = game.winner === undefined
-    const lost = !won && !drew
-
-    if (won) return 'green.500'
-    if (lost) return 'red.500'
-    return 'gray.500'
-  }
+  const games: Array<LichessGame> = gameListFetcher.data ?? [];
 
   return (
     <>
@@ -74,12 +57,26 @@ export default function LichessReport() {
                       {game.players.black.rating})
                     </Td>
                   </Tr>
-                )
+                );
               })}
             </Tbody>
           </Table>
         </TableContainer>
       </Flex>
     </>
-  )
+  );
+}
+
+function gameColor(game: LichessGame) {
+  const won =
+    (game.winner === "white" &&
+      game.players.white.user.name === LICHESS_USERNAME) ||
+    (game.winner === "black" &&
+      game.players.black.user.name === LICHESS_USERNAME);
+  const drew = game.winner === undefined;
+  const lost = !won && !drew;
+
+  if (won) return "green.500";
+  if (lost) return "red.500";
+  return "gray.500";
 }
