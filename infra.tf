@@ -9,18 +9,31 @@ provider "aws" {
   region = "eu-west-1"
 }
 
-variable "table_name" {
-  type    = string
-  default = "le-cahier"
-}
 
 resource "aws_dynamodb_table" "db" {
-  name         = var.table_name
+  lifecycle {
+    prevent_destroy = true
+  }
+  deletion_protection_enabled = true
+  point_in_time_recovery {
+    enabled = true
+  }
+  name         = "le-cahier"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "fen"
 
   attribute {
     name = "fen"
+    type = "S"
+  }
+}
+
+resource "aws_dynamodb_table" "games" {
+  name         = "le-cahier-games"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "gameId"
+  attribute {
+    name = "gameId"
     type = "S"
   }
 }
@@ -48,7 +61,7 @@ data "aws_iam_policy_document" "remix_policy" {
       "dynamodb:Query",
       "dynamodb:Scan",
     ]
-    resources = [aws_dynamodb_table.db.arn]
+    resources = [aws_dynamodb_table.db.arn, aws_dynamodb_table.games.arn]
   }
 }
 

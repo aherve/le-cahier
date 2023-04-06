@@ -2,9 +2,7 @@ import type { LoaderFunction } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import type { LichessGame } from '~/schemas/lichess'
 import { LICHESS_USERNAME } from '~/schemas/lichess'
-import { LichessGameSchema } from '~/schemas/lichess'
 
-import cache from 'memory-cache'
 import type { GameReport } from '~/schemas/game-report'
 import { ReportStatusSchema } from '~/schemas/game-report'
 import { ChessBookService } from '~/services/chess-book'
@@ -16,14 +14,10 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Error('Missing id')
   }
 
-  const cachedGame = cache.get(id)
-  if (!cachedGame) {
-    throw new Error('Game not found in cache')
+  const game = await ChessBookService.getGame(id)
+  if (!game) {
+    throw new Error('Game not found')
   }
-
-  const game = LichessGameSchema.parse(cachedGame)
-
-  console.log(`analyzing game ${game.id} for player ${LICHESS_USERNAME}`)
 
   const analysis = await analyzeGame(
     game,

@@ -3,6 +3,7 @@ import { json } from '@remix-run/node'
 import { LichessGameParserSchema, LICHESS_USERNAME } from '~/schemas/lichess'
 
 import cache from 'memory-cache'
+import { ChessBookService } from '~/services/chess-book'
 
 const LICHESS_TOKEN = process.env.LICHESS_TOKEN
 const GAMES_COUNT = 20
@@ -33,10 +34,15 @@ export const loader: LoaderFunction = async () => {
   const rawJSON = data.map((d) => JSON.parse(d))
   try {
     const parsed = LichessGameParserSchema.array().parse(rawJSON)
+
     cache.put('gameList', parsed, 60_000)
-    for (const game of parsed) {
-      cache.put(game.id, game, 1000 * 3600)
-    }
+
+    await Promise.all(
+      parsed.map((g) => {
+        return ChessBookService.setGame(g)
+      })
+    )
+
     return json(parsed)
   } catch (e) {
     console.error('ERROR', e)

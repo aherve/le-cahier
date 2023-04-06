@@ -3,6 +3,8 @@ import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 import { Chess } from 'chess.js'
 import { z } from 'zod'
 import type { SaveMoveInput } from '~/routes/api/moves/create'
+import type { LichessGame } from '~/schemas/lichess'
+import { LichessGameSchema } from '~/schemas/lichess'
 import { stripFEN } from './utils'
 
 export const BookMoveSchema = z.object({
@@ -18,11 +20,13 @@ export type BookPosition = z.infer<typeof BookPositionSchema>
 
 export class ChessBook {
   private tableName: string
+  private gameTableName: string
   private dynCli: DynamoDB
   constructor() {
     const region = process.env.AWS_REGION ?? 'eu-west-1'
     this.dynCli = new DynamoDB({ region })
     this.tableName = process.env.CHESS_BOOK_TABLE ?? 'le-cahier'
+    this.gameTableName = process.env.GAME_TABLE ?? 'le-cahier-games'
   }
 
   public async addMove(input: SaveMoveInput) {
@@ -105,6 +109,31 @@ export class ChessBook {
       move: moveList[randomIndex],
       targetFEN: opponentMoves[moveList[randomIndex]].targetFEN,
     }
+  }
+
+  public async getGame(gameId: string): Promise<LichessGame | null> {
+    const data = await this.dynCli.getItem({
+      TableName: this.gameTableName,
+      Key: marshall({ gameId }),
+    })
+    const result = data.Item
+      ? LichessGameSchema.parse(unmarshall(data.Item).game)
+      : null
+    return result
+  }
+  public async setGame(game: LichessGame) {
+    await this.dynCli.updateItem({
+      Key: marshall({ gameId: game.id }),
+      TableName: this.gameTableName,
+      UpdateExpression: `SET #game = :game`,
+      ExpressionAttributeNames: {
+        '#game': 'game',
+      },
+      ExpressionAttributeValues: {
+        ':game': { M: marshall(game, { removeUndefinedValues: true }) },
+      },
+    })
+    console.log(`game ${game.id} saved`)
   }
 }
 
