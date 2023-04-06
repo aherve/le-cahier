@@ -1,11 +1,21 @@
-import type { ActionFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LoaderFunction } from '@remix-run/node'
+import { json } from '@remix-run/node'
+import { LichessGameSchema } from '~/schemas/lichess'
 
-export const action: ActionFunction = async ({ request }) => {
-  const form = Object.fromEntries(await request.formData());
-  const game = JSON.parse(form.payload as string);
+import cache from 'memory-cache'
 
-  console.log(game.id);
+export const loader: LoaderFunction = async ({ request }) => {
+  const id = new URL(request.url).searchParams.get('id')
+  if (!id) {
+    throw new Error('Missing id')
+  }
 
-  return json({ gameId: game.id });
-};
+  const cachedGame = cache.get(id)
+  if (!cachedGame) {
+    throw new Error('Game not found in cache')
+  }
+
+  const game = LichessGameSchema.parse(cachedGame)
+
+  return json({ gameId: game.id })
+}
