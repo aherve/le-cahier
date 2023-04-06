@@ -25,7 +25,7 @@ export const headers = BasicAuthHeaders
 export const loader = basicAuthLoader
 
 export default function Index() {
-  const [mode, setMode] = useState<GameModeType>(GameMode.enum.lichessReport)
+  const [mode, setMode] = useState<GameModeType>(GameMode.enum.explore)
   const [fromLastMove, setFromLastMove] = useState<Move | undefined>()
   const [gameId, setGameId] = useState(Date.now().toString())
 
