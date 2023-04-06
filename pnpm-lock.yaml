@@ -23,6 +23,7 @@ specifiers:
   isbot: ^3.6.8
   lodash: ^4.17.21
   memory-cache: ^0.2.0
+  moment: ^2.29.4
   node-json-db: ^2.1.5
   react: ^18.2.0
   react-chessboard: ^2.1.2
@@ -46,6 +47,7 @@ dependencies:
   isbot: 3.6.8
   lodash: 4.17.21
   memory-cache: 0.2.0
+  moment: 2.29.4
   node-json-db: 2.1.5
   react: 18.2.0
   react-chessboard: 2.1.2_6hfup3cnntiu7o7txcf7sadj7u
@@ -7889,6 +7891,10 @@ packages:
     resolution: {integrity: sha512-2K9QYubXx/NAjv4VLq1d1Ly8pWNC5L3BrixtdkyTegXWJIqY+zLNDhhX/A+ZwWt70tB1S8H4BE8FLYEFyNoOBw==}
     dependencies:
       obliterator: 1.6.1
+    dev: false
+
+  /moment/2.29.4:
+    resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
     dev: false
 
   /morgan/1.10.0:
