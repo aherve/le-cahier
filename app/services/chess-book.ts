@@ -3,6 +3,8 @@ import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 import { Chess } from 'chess.js'
 import { z } from 'zod'
 import type { SaveMoveInput } from '~/routes/api/moves/create'
+import type { GameReport } from '~/schemas/game-report'
+import { GameReportSchema } from '~/schemas/game-report'
 import type { LichessGame } from '~/schemas/lichess'
 import { LichessGameSchema } from '~/schemas/lichess'
 import { stripFEN } from './utils'
@@ -111,15 +113,37 @@ export class ChessBook {
     }
   }
 
-  public async getGame(gameId: string): Promise<LichessGame | null> {
+  public async getGame(
+    gameId: string
+  ): Promise<{ game?: LichessGame; report?: GameReport } | null> {
     const data = await this.dynCli.getItem({
       TableName: this.gameTableName,
       Key: marshall({ gameId }),
     })
-    const result = data.Item
-      ? LichessGameSchema.parse(unmarshall(data.Item).game)
-      : null
-    return result
+
+    if (!data.Item) {
+      return null
+    }
+    const raw = unmarshall(data.Item)
+
+    return {
+      game: LichessGameSchema.optional().parse(raw.game),
+      report: GameReportSchema.optional().parse(raw.report),
+    }
+  }
+  public async setReport(report: GameReport) {
+    await this.dynCli.updateItem({
+      Key: marshall({ gameId: report.gameId }),
+      TableName: this.gameTableName,
+      UpdateExpression: `SET #report = :report`,
+      ExpressionAttributeNames: {
+        '#report': 'report',
+      },
+      ExpressionAttributeValues: {
+        ':report': { M: marshall(report, { removeUndefinedValues: true }) },
+      },
+    })
+    console.log(`report ${report.gameId} saved`)
   }
   public async setGame(game: LichessGame) {
     await this.dynCli.updateItem({

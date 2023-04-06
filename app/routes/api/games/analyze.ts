@@ -14,17 +14,28 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Error('Missing id')
   }
 
-  const game = await ChessBookService.getGame(id)
-  if (!game) {
-    throw new Error('Game not found')
+  const existing = await ChessBookService.getGame(id)
+  if (!existing) {
+    throw new Error('No entry found in the db')
   }
 
-  const analysis = await analyzeGame(
+  const { game, report } = existing
+  if (!game) {
+    throw new Error('No game found in the db')
+  }
+
+  if (report) {
+    return json(report)
+  }
+
+  const newReport = await analyzeGame(
     game,
     game.players.white.user.name === LICHESS_USERNAME ? 'w' : 'b'
   )
 
-  return json(analysis)
+  await ChessBookService.setReport(newReport)
+
+  return json(newReport)
 }
 
 async function analyzeGame(
