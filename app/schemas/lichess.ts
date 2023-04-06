@@ -71,7 +71,7 @@ const SquareSchema = z.enum([
   'h1',
 ])
 const PieceSymbolSchema = z.enum(['p', 'n', 'b', 'r', 'q', 'k'])
-const MoveSchema = z.object({
+export const MoveSchema = z.object({
   color: z.enum(['w', 'b']),
   from: SquareSchema,
   to: SquareSchema,

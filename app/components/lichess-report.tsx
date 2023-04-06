@@ -13,9 +13,12 @@ import {
 import { Heading, Spinner } from '@chakra-ui/react'
 import { useFetcher } from '@remix-run/react'
 import { useEffect } from 'react'
+import type { GameReport } from '~/schemas/game-report'
+import { MissSchema } from '~/schemas/game-report'
 import type { LichessGame } from '~/schemas/lichess'
 import { LichessGameSchema } from '~/schemas/lichess'
 import { LICHESS_USERNAME } from '~/schemas/lichess'
+import LichessLink from './lichess-link'
 
 export default function LichessReport() {
   const gameListFetcher = useFetcher()
@@ -81,9 +84,69 @@ function GameItem(props: { game: LichessGame }) {
       </Td>
       <Td>
         {fetcher.state === 'loading' && <Spinner size="sm" />}
-        {!!report && <Text>report is {JSON.stringify(report)}</Text>}
+        {!!report && (
+          <GameReportComponent
+            game={game}
+            report={report}
+          ></GameReportComponent>
+        )}
+      </Td>
+      <Td>
+        <LichessLink
+          gameId={game.id}
+          moveIndex={firstFailIndex(report)}
+        ></LichessLink>
       </Td>
     </Tr>
+  )
+}
+
+function firstFailIndex(report?: GameReport) {
+  const found = report?.movesReport.findIndex((m) => m.status === 'failed')
+  return found && found > 1 ? found : undefined
+}
+
+function GameReportComponent(props: { game: LichessGame; report: GameReport }) {
+  const successCount = props.report.movesReport.filter(
+    (m) => m.status === 'success'
+  ).length
+  const failedCount = props.report.movesReport.filter(
+    (m) => m.status === 'failed'
+  ).length
+
+  if (failedCount === 0) {
+    return (
+      <Text color="green.500">{successCount} moves successfully played</Text>
+    )
+  }
+
+  const firstMiss = MissSchema.parse(
+    props.report.movesReport.find((m) => m.status === 'failed')
+  )
+
+  const explanation = props.report.movesReport
+    .filter((m) => m.status === 'failed')
+    .map(
+      (m) =>
+        `${firstMiss.expected.join(', ')} was expected, but ${
+          firstMiss.played
+        } was played`
+    )
+    .join('. ')
+
+  if (failedCount === 1) {
+    return (
+      <Text>
+        {' '}
+        {failedCount} miss. {explanation}
+      </Text>
+    )
+  }
+
+  return (
+    <Text>
+      {failedCount} misses. {explanation}
+    </Text>
   )
 }
 

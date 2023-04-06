@@ -74,14 +74,18 @@ export class ChessBook {
   }
 
   public async getPosition(fen: string): Promise<BookPosition | null> {
+    const key = stripFEN(fen)
+
     const data = await this.dynCli.getItem({
       TableName: this.tableName,
-      Key: marshall({ fen: stripFEN(fen) }),
+      Key: marshall({ fen: key }),
     })
-    if (!data.Item) {
-      return null
-    }
-    return BookPositionSchema.parse(unmarshall(data.Item))
+
+    const result = data.Item
+      ? BookPositionSchema.parse(unmarshall(data.Item))
+      : null
+
+    return result
   }
 
   public async getRandomOpponentMove(
