@@ -7,6 +7,7 @@ import type { GameReport } from '~/schemas/game-report'
 import { ReportStatusSchema } from '~/schemas/game-report'
 import { ChessBookService } from '~/services/chess-book'
 import type { Color } from 'chess.js'
+import { Chess } from 'chess.js'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const id = new URL(request.url).searchParams.get('id')
@@ -65,7 +66,9 @@ async function analyzeGame(
 
       return {
         status: ReportStatusSchema.enum.failed,
-        expected: Object.keys(position.bookMoves),
+        expected: Object.keys(position.bookMoves).map((m) =>
+          toSAN(move.before, m)
+        ),
         played: move.san,
       }
     })
@@ -87,4 +90,9 @@ async function analyzeGame(
     firstOutOfBook:
       firstOutOfBookIndex > -1 ? game.moves[firstOutOfBookIndex] : undefined,
   }
+}
+
+function toSAN(fen: string, move: string) {
+  const m = new Chess(fen).move(move)
+  return m.san
 }

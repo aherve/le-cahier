@@ -1,3 +1,5 @@
+import { GiBulletBill, GiRabbit } from 'react-icons/gi'
+import { SiStackblitz } from 'react-icons/si'
 import { BsCircle, BsCircleFill } from 'react-icons/bs'
 import {
   Text,
@@ -48,7 +50,7 @@ export default function LichessReport() {
             <Thead>
               <Tr>
                 <Th> Date</Th>
-                <Th> Color</Th>
+                <Th> Type</Th>
                 <Th> white</Th>
                 <Th> black</Th>
                 <Th> report</Th>
@@ -83,11 +85,16 @@ function GameItem(props: { game: LichessGame }) {
     <Tr>
       <Td>{moment(game.createdAt).fromNow()}</Td>
       <Td>
-        {game.players.white.user.name === LICHESS_USERNAME ? (
-          <BsCircle />
-        ) : (
-          <BsCircleFill />
-        )}
+        <Flex direction="row" justify="space-between">
+          {game.speed === 'blitz' && <SiStackblitz />}
+          {game.speed === 'bullet' && <GiBulletBill />}
+          {game.speed === 'rapid' && <GiRabbit />}
+          {game.players.white.user.name === LICHESS_USERNAME ? (
+            <BsCircle />
+          ) : (
+            <BsCircleFill />
+          )}
+        </Flex>
       </Td>
       <Td color={gameColor(game)}>
         {game.players.white.user.name} ({game.players.white.rating})
@@ -145,9 +152,7 @@ function GameReportComponent(props: { game: LichessGame; report: GameReport }) {
   const explanation = props.report.movesReport
     .filter((m) => m.status === 'failed')
     .map((m) => MissedMoveSchema.parse(m))
-    .map(
-      (m) => `${m.expected.join(', ')} was expected, but ${m.played} was played`
-    )
+    .map((m) => `expected ${m.expected.join(', ')}, but ${m.played} was played`)
     .join('. ')
 
   if (failedCount === 1) {
