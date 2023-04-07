@@ -1,4 +1,5 @@
-import { DynamoDB } from '@aws-sdk/client-dynamodb'
+import type { AttributeValue } from '@aws-sdk/client-dynamodb'
+import { DynamoDB, ScanCommand } from '@aws-sdk/client-dynamodb'
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 import { Chess } from 'chess.js'
 import type { SaveMoveInput } from '~/routes/api/moves/create'
@@ -6,7 +7,7 @@ import type { GameReport } from '~/schemas/game-report'
 import { GameReportSchema } from '~/schemas/game-report'
 import type { LichessGame } from '~/schemas/lichess'
 import { LichessGameSchema } from '~/schemas/lichess'
-import type { BookPosition} from '~/schemas/position';
+import type { BookPosition } from '~/schemas/position'
 import { BookPositionSchema } from '~/schemas/position'
 import { BookMoveSchema } from '~/schemas/position'
 import { stripFEN } from './utils'
@@ -65,7 +66,6 @@ export class ChessBook {
           ':move': { M: marshall(bookMove, { removeUndefinedValues: true }) },
         },
       }
-      console.log('update', update)
       await this.dynCli.updateItem(update)
     }
   }
@@ -151,7 +151,74 @@ export class ChessBook {
     console.log(`game ${game.id} saved`)
   }
 
-  public async linkGraph() {}
+  public async linkGraph() {
+    // Build map of all moves. Warning, this is expensive $$$
+    let newTransposition = 0
+    let leadsToUnknownPosition = 0
+    let alreadyRegistered = 0
+    const scanner = this.dbScanner()
+    const allPositions: Record<string, BookPosition> = {}
+    const savePromises: Promise<void>[] = []
+    for await (const items of scanner) {
+      if (!items) {
+        continue
+      }
+
+      for (const item of items) {
+        const parsed = BookPositionSchema.parse(unmarshall(item))
+        allPositions[parsed.fen] = parsed
+      }
+    }
+
+    // Find transpositions
+    for (const position of Object.values(allPositions)) {
+      const allOpponentMoves = new Chess(position.fen).moves({ verbose: true })
+      const newOpponentMoves = allOpponentMoves.filter(
+        (m) => !(m.lan in position.opponentMoves)
+      )
+      alreadyRegistered += allOpponentMoves.length - newOpponentMoves.length
+
+      for (const newMove of newOpponentMoves) {
+        const newFen = stripFEN(newMove.after)
+
+        if (
+          newFen in allPositions &&
+          Object.keys(allPositions[newFen].bookMoves).length > 0
+        ) {
+          newTransposition++
+          savePromises.push(
+            this.addMove({
+              fen: stripFEN(position.fen),
+              isOpponentMove: true,
+              move: newMove.lan,
+            })
+          )
+        } else {
+          leadsToUnknownPosition++
+        }
+      }
+    }
+    console.log({
+      newTransposition,
+      leadsToUnknownPosition,
+      alreadyRegistered,
+    })
+    await Promise.all(savePromises)
+  }
+
+  private async *dbScanner() {
+    let lastEvaluatedKey: Record<string, AttributeValue> | undefined
+    do {
+      const { Items, LastEvaluatedKey } = await this.dynCli.send(
+        new ScanCommand({
+          TableName: this.tableName,
+          ExclusiveStartKey: lastEvaluatedKey,
+        })
+      )
+      lastEvaluatedKey = LastEvaluatedKey
+      yield Items
+    } while (lastEvaluatedKey)
+  }
 }
 
 export const ChessBookService = new ChessBook()
