@@ -8,18 +8,19 @@ export const ReportStatusSchema = z.enum([
   'opponentMove',
 ])
 
-export const MissSchema = z.object({
+export const MissedMoveSchema = z.object({
   status: z.literal(ReportStatusSchema.enum.failed),
   played: z.string(),
   expected: z.string().array(),
 })
+export type MissedMove = z.infer<typeof MissedMoveSchema>
 
 export const GameReportSchema = z.object({
   gameId: z.string(),
   movesReport: z
     .discriminatedUnion('status', [
       //
-      MissSchema,
+      MissedMoveSchema,
       z.object({
         status: z.literal(ReportStatusSchema.enum.notFound),
       }),

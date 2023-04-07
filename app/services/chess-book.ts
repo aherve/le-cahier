@@ -1,24 +1,15 @@
 import { DynamoDB } from '@aws-sdk/client-dynamodb'
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 import { Chess } from 'chess.js'
-import { z } from 'zod'
 import type { SaveMoveInput } from '~/routes/api/moves/create'
 import type { GameReport } from '~/schemas/game-report'
 import { GameReportSchema } from '~/schemas/game-report'
 import type { LichessGame } from '~/schemas/lichess'
 import { LichessGameSchema } from '~/schemas/lichess'
+import type { BookPosition} from '~/schemas/position';
+import { BookPositionSchema } from '~/schemas/position'
+import { BookMoveSchema } from '~/schemas/position'
 import { stripFEN } from './utils'
-
-export const BookMoveSchema = z.object({
-  targetFEN: z.string(),
-})
-export type BookMove = z.infer<typeof BookMoveSchema>
-export const BookPositionSchema = z.object({
-  fen: z.string(),
-  bookMoves: z.record(z.string(), BookMoveSchema).default({}),
-  opponentMoves: z.record(z.string(), BookMoveSchema).default({}),
-})
-export type BookPosition = z.infer<typeof BookPositionSchema>
 
 export class ChessBook {
   private tableName: string
@@ -159,6 +150,8 @@ export class ChessBook {
     })
     console.log(`game ${game.id} saved`)
   }
+
+  public async linkGraph() {}
 }
 
 export const ChessBookService = new ChessBook()
