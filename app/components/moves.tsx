@@ -1,4 +1,4 @@
-import { chunk } from 'lodash'
+import { chunk } from "lodash";
 import {
   Card,
   CardBody,
@@ -6,46 +6,74 @@ import {
   Flex,
   List,
   Heading,
-  CardHeader,
   Link,
-} from '@chakra-ui/react'
-import type { Move } from 'chess.js'
+  Stack,
+  StackDivider,
+  Box,
+} from "@chakra-ui/react";
+import type { Move } from "chess.js";
 
 export default function Moves(props: {
-  moves: Array<Move>
-  onNavigate: (move: Move) => void
+  moves: Array<Move>;
+  onNavigate: (move: Move) => void;
+  onPlay?: (move: string) => void;
+  bookMoves?: Array<string>;
+  showBookMoves: boolean;
 }) {
-  const chunks = chunk(props.moves, 2)
+  const chunks = chunk(props.moves, 2);
+  const bookMoves = props.bookMoves ?? [];
 
   return (
     <>
       <Card minWidth="200px">
-        <CardHeader>
-          <Heading size="sm">Moves</Heading>
-        </CardHeader>
         <CardBody>
-          <List>
-            {chunks.map((c, i) => {
-              return (
-                <MoveItem
-                  onNavigate={props.onNavigate}
-                  movePair={c}
-                  moveIndex={i}
-                  key={i}
-                ></MoveItem>
-              )
-            })}
-          </List>
+          <Stack divider={<StackDivider />} spacing="10">
+            {props.showBookMoves && (
+              <Box>
+                <Heading size="xs">Book moves</Heading>
+
+                <Flex
+                  gap="1"
+                  direction="row"
+                  justifyContent="space-between"
+                  wrap="wrap"
+                >
+                  {bookMoves.map((m) => {
+                    return (
+                      <Link onClick={() => props.onPlay?.(m)} key={m}>
+                        {m}
+                      </Link>
+                    );
+                  })}
+                </Flex>
+              </Box>
+            )}
+            <Box>
+              <Heading size="xs">Game moves</Heading>
+              <List>
+                {chunks.map((c, i) => {
+                  return (
+                    <MoveItem
+                      onNavigate={props.onNavigate}
+                      movePair={c}
+                      moveIndex={i}
+                      key={i}
+                    ></MoveItem>
+                  );
+                })}
+              </List>
+            </Box>
+          </Stack>
         </CardBody>
       </Card>
     </>
-  )
+  );
 }
 
 function MoveItem(props: {
-  movePair: Move[]
-  moveIndex: number
-  onNavigate: (m: Move) => void
+  movePair: Move[];
+  moveIndex: number;
+  onNavigate: (m: Move) => void;
 }) {
   return (
     <>
@@ -57,9 +85,9 @@ function MoveItem(props: {
           {props.movePair[0].san}
         </Link>
         <Link flex="2 1 0" onClick={() => props.onNavigate(props.movePair[1])}>
-          {props.movePair[1]?.san ?? ''}
+          {props.movePair[1]?.san ?? ""}
         </Link>
       </Flex>
     </>
-  )
+  );
 }

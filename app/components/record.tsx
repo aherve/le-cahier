@@ -1,59 +1,77 @@
-import { useState } from 'react'
-import type { Move } from 'chess.js'
-import { Chessboard } from 'react-chessboard'
+import { useEffect, useState } from "react";
+import type { Move } from "chess.js";
+import { Chessboard } from "react-chessboard";
 import type {
   BoardOrientation,
   Square,
-} from 'react-chessboard/dist/chessboard/types'
-import { Button, Flex } from '@chakra-ui/react'
-import { SaveMoveInputSchema } from '~/routes/api/moves/create'
-import Moves from './moves'
-import { GameService } from '~/services/gameService'
+} from "react-chessboard/dist/chessboard/types";
+import { Button, Flex } from "@chakra-ui/react";
+import { SaveMoveInputSchema } from "~/routes/api/moves/create";
+import Moves from "./moves";
+import { GameService } from "~/services/gameService";
+import { BookPositionSchema } from "~/schemas/position";
+import { toSAN } from "~/services/utils";
 
 export function Record() {
-  const [fen, setFen] = useState(GameService.fen)
-  const [orientation, setOrientation] = useState<BoardOrientation>('white')
+  const [bookMoves, setBookMoves] = useState<string[]>([]);
+  const [fen, setFen] = useState(GameService.fen);
+  const [orientation, setOrientation] = useState<BoardOrientation>("white");
 
-  const moves = GameService.moves
+  const moves = GameService.moves;
+
+  useEffect(() => {
+    fetch(`/api/moves/get?fen=${encodeURIComponent(fen)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const isPlayerTurn = GameService.turn === orientation[0];
+        const position = BookPositionSchema.nullable().parse(data);
+        setBookMoves(
+          (isPlayerTurn
+            ? Object.keys(position?.bookMoves ?? {})
+            : Object.keys(position?.opponentMoves ?? {})
+          ).map((m) => toSAN(fen, m))
+        );
+      });
+  }, [fen, orientation]);
 
   async function makeMove(move: string | { from: Square; to: Square }) {
     try {
-      const validMove = GameService.makeMove(move)
+      const validMove = GameService.makeMove(move);
 
       const wasOpponentMove =
-        (validMove.color === 'b' && orientation === 'white') ||
-        (validMove.color === 'w' && orientation === 'black')
+        (validMove.color === "b" && orientation === "white") ||
+        (validMove.color === "w" && orientation === "black");
 
-      setFen(GameService.fen)
+      setFen(GameService.fen);
       const payload = SaveMoveInputSchema.parse({
         isOpponentMove: wasOpponentMove,
         fen,
         move: `${validMove.from}${validMove.to}`,
-      })
-      console.log('recording move', payload)
-      await fetch('api/moves/create', {
-        method: 'POST',
+      });
+      console.log("recording move", payload);
+      await fetch("api/moves/create", {
+        method: "POST",
         body: JSON.stringify(payload),
-      })
+      });
 
-      return validMove
+      return validMove;
     } catch (e) {
-      console.error(e)
-      return null
+      console.error(e);
+      return null;
     }
   }
 
   function onDrop(sourceSquare: Square, targetSquare: Square) {
-    return makeMove({ from: sourceSquare, to: targetSquare }) !== null
+    return makeMove({ from: sourceSquare, to: targetSquare }) !== null;
   }
 
   function flip() {
-    setOrientation((o) => (o === 'white' ? 'black' : 'white'))
+    setOrientation((o) => (o === "white" ? "black" : "white"));
   }
 
   function onNavigate(move: Move) {
-    GameService.backTo(move)
-    setFen(GameService.fen)
+    GameService.backTo(move);
+    setFen(GameService.fen);
   }
 
   return (
@@ -68,8 +86,14 @@ export function Record() {
           />
           <Button onClick={flip}>flip board</Button>
         </Flex>
-        <Moves moves={moves} onNavigate={onNavigate}></Moves>
+        <Moves
+          bookMoves={bookMoves}
+          showBookMoves={true}
+          moves={moves}
+          onNavigate={onNavigate}
+          onPlay={makeMove}
+        ></Moves>
       </Flex>
     </>
-  )
+  );
 }

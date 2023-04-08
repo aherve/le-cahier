@@ -1,5 +1,6 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
+import { Chess } from "chess.js";
 
 export function stripFEN(fen: string): string {
   return fen.split(" ").slice(0, 4).join(" ");
@@ -30,3 +31,13 @@ export const basicAuthLoader: LoaderFunction = async ({ request }) => {
   }
   return json({ authorized: true });
 };
+
+export function toSAN(fen: string, move: string) {
+  const g = new Chess(fen);
+  try {
+    const m = g.move(move);
+    return m.san;
+  } catch {
+    return move;
+  }
+}
