@@ -77,6 +77,7 @@ function GameItem(props: { game: LichessGame }) {
   const [reloader, setReloader] = useState(Date.now());
 
   async function cleanGameReport() {
+    fetcher.data = null;
     await fetch("api/games/clean-report", {
       method: "POST",
       body: JSON.stringify({ gameId: game.id }),
