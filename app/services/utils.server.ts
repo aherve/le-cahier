@@ -3,7 +3,7 @@ import { json } from "@remix-run/node";
 export const BasicAuthHeaders = () => ({
   "WWW-Authenticate": "Basic",
 });
-function isAuthorized(request: Request) {
+export function isAuthorized(request: Request) {
   const header = request.headers.get("Authorization");
 
   if (!header) return false;

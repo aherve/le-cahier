@@ -8,8 +8,12 @@ import { ReportStatusSchema } from "~/schemas/game-report";
 import { ChessBookService } from "~/services/chess-book.server";
 import type { Color } from "chess.js";
 import { Chess } from "chess.js";
+import { isAuthorized } from "~/services/utils.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
+  if (!isAuthorized(request)) {
+    return json({ error: "Unauthorized" }, { status: 401 });
+  }
   const id = new URL(request.url).searchParams.get("id");
   if (!id) {
     throw new Error("Missing id");

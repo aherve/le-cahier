@@ -2,6 +2,7 @@ import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { z } from "zod";
 import { ChessBookService } from "~/services/chess-book.server";
+import { isAuthorized } from "~/services/utils.server";
 
 export const GetChallengeOutputSchema = z.object({
   challengeMove: z.string().nullable(),
@@ -10,6 +11,9 @@ export const GetChallengeOutputSchema = z.object({
 export type GetChallengeOutput = z.infer<typeof GetChallengeOutputSchema>;
 
 export const loader: LoaderFunction = async ({ request }) => {
+  if (!isAuthorized(request)) {
+    return json({ error: "Unauthorized" }, { status: 401 });
+  }
   const url = new URL(request.url);
   const fen = url.searchParams.get("fen");
   if (!fen) {
