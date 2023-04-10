@@ -9,7 +9,7 @@ import { isAuthorized } from "~/services/utils.server";
 const LICHESS_TOKEN = process.env.LICHESS_TOKEN;
 const GAMES_COUNT = 20;
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
   if (!isAuthorized(request)) {
     return json({ error: "Unauthorized" }, { status: 401 });
   }
