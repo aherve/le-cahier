@@ -13,13 +13,10 @@ import {
 } from "@remix-run/react";
 import { Amplify } from "aws-amplify";
 
+import { amplifyConfig } from "./services/cognito";
 import { UserContext } from "./user-context";
 
-Amplify.configure({
-  region: "eu-west-1",
-  userPoolId: "eu-west-1_faacPhOAo",
-  userPoolWebClientId: "6h69orr9524ojm3rj0hd688aqu",
-});
+Amplify.configure(amplifyConfig);
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",

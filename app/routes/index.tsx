@@ -30,6 +30,17 @@ export default function Index() {
   const [fromLastMove, setFromLastMove] = useState<Move | undefined>();
   const [gameId, setGameId] = useState(Date.now().toString());
 
+  console.log("signing user session", user?.getSignInUserSession());
+
+  fetch("/api/ping", {
+    headers: {
+      Authorization:
+        "Bearer " + user?.getSignInUserSession()?.getIdToken().getJwtToken(),
+    },
+  })
+    .then((res) => res.json())
+    .then(console.log);
+
   function startLichessReport() {
     setMode(GameMode.enum.lichessReport);
   }

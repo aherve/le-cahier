@@ -21,6 +21,7 @@ specifiers:
   '@types/react': ^18.0.32
   '@types/react-dom': ^18.0.11
   aws-amplify: ^5.0.25
+  aws-jwt-verify: ^4.0.0
   chess.js: 1.0.0-beta.4
   eslint: ^8.37.0
   framer-motion: ^10.10.0
@@ -52,6 +53,7 @@ dependencies:
   '@remix-run/react': 1.15.0_biqbaboplfbrettd7655fr4n2y
   '@remix-run/serve': 1.15.0
   aws-amplify: 5.0.25_react-native@0.71.6
+  aws-jwt-verify: 4.0.0
   chess.js: 1.0.0-beta.4
   framer-motion: 10.10.0_biqbaboplfbrettd7655fr4n2y
   isbot: 3.6.8
@@ -8240,6 +8242,11 @@ packages:
       - debug
       - encoding
       - react-native
+    dev: false
+
+  /aws-jwt-verify/4.0.0:
+    resolution: {integrity: sha512-1kCv+Ub3jBaQ6HnIjfAXswjp7xD0LO4GxwbQZ/o9IoJpb8/ZBUhHu5GQ4k2O7jOVTS/KOz86uw4NV71V3s6V3g==}
+    engines: {node: '>=14.0.0'}
     dev: false
 
   /axe-core/4.6.3:
