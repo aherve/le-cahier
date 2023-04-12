@@ -1,19 +1,18 @@
 import type { LoaderFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import type { LichessGame } from "~/schemas/lichess";
-import { LICHESS_USERNAME } from "~/schemas/lichess";
-
-import type { GameReport } from "~/schemas/game-report";
-import { ReportStatusSchema } from "~/schemas/game-report";
-import { ChessBookService } from "~/services/chess-book.server";
 import type { Color } from "chess.js";
+import type { GameReport } from "~/schemas/game-report";
+import type { LichessGame } from "~/schemas/lichess";
+
+import { json } from "@remix-run/node";
 import { Chess } from "chess.js";
-import { isAuthorized } from "~/services/utils.server";
+
+import { ReportStatusSchema } from "~/schemas/game-report";
+import { LICHESS_USERNAME } from "~/schemas/lichess";
+import { ChessBookService } from "~/services/chess-book.server";
+
+
 
 export const loader: LoaderFunction = async ({ request }) => {
-  if (!isAuthorized(request)) {
-    return json({ error: "Unauthorized" }, { status: 401 });
-  }
   const id = new URL(request.url).searchParams.get("id");
   if (!id) {
     throw new Error("Missing id");

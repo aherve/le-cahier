@@ -1,15 +1,18 @@
-import { useEffect, useState } from "react";
 import type { Move } from "chess.js";
-import { Chessboard } from "react-chessboard";
 import type {
   BoardOrientation,
   Square,
 } from "react-chessboard/dist/chessboard/types";
+
 import { Button, Flex } from "@chakra-ui/react";
-import { SaveMoveInputSchema } from "~/routes/api/moves/create";
+import { useEffect, useState } from "react";
+import { Chessboard } from "react-chessboard";
+
 import Moves from "./moves";
-import { GameService } from "~/services/gameService";
+
+import { SaveMoveInputSchema } from "~/routes/api/moves/create";
 import { BookPositionSchema } from "~/schemas/position";
+import { GameService } from "~/services/gameService";
 import { toSAN } from "~/services/utils";
 
 export function Record() {

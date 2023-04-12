@@ -1,21 +1,28 @@
-import { useEffect, useState } from "react";
-import { Chessboard } from "react-chessboard";
+import type { TrainMessageInputType } from "./train-message";
+import type { Move } from "chess.js";
 import type {
   BoardOrientation,
   Square,
 } from "react-chessboard/dist/chessboard/types";
 import type { GetChallengeOutput } from "~/routes/api/moves/challenge";
-import { GetChallengeOutputSchema } from "~/routes/api/moves/challenge";
-import { Button, Code, Flex } from "@chakra-ui/react";
+
 import { EditIcon, RepeatIcon } from "@chakra-ui/icons";
-import LichessLink from "./lichess-link";
-import type { TrainMessageInputType } from "./train-message";
-import TrainMessage, { TrainMessageInput } from "./train-message";
-import { GameService } from "~/services/gameService";
-import type { Move } from "chess.js";
-import { Chess } from "chess.js";
-import Moves from "./moves";
+import { Button, Code, Flex } from "@chakra-ui/react";
 import { useFetcher } from "@remix-run/react";
+import { Chess } from "chess.js";
+import { useEffect, useState } from "react";
+import { Chessboard } from "react-chessboard";
+
+import LichessLink from "./lichess-link";
+import Moves from "./moves";
+import TrainMessage, { TrainMessageInput } from "./train-message";
+
+import { GetChallengeOutputSchema } from "~/routes/api/moves/challenge";
+import { GameService } from "~/services/gameService";
+
+
+
+
 
 export function Train(props: {
   orientation: BoardOrientation;

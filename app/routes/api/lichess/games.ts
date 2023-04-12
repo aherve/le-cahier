@@ -1,18 +1,15 @@
 import type { LoaderFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { LichessGameParserSchema, LICHESS_USERNAME } from "~/schemas/lichess";
 
+import { json } from "@remix-run/node";
 import cache from "memory-cache";
+
+import { LichessGameParserSchema, LICHESS_USERNAME } from "~/schemas/lichess";
 import { ChessBookService } from "~/services/chess-book.server";
-import { isAuthorized } from "~/services/utils.server";
 
 const LICHESS_TOKEN = process.env.LICHESS_TOKEN;
 const GAMES_COUNT = 20;
 
 export const loader: LoaderFunction = async ({ request }) => {
-  if (!isAuthorized(request)) {
-    return json({ error: "Unauthorized" }, { status: 401 });
-  }
   const cached = cache.get("gameList");
   if (cached) {
     console.log("server is serving from cache");

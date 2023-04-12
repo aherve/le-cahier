@@ -1,4 +1,5 @@
 import type { Move } from 'chess.js'
+
 import { Chess } from 'chess.js'
 import { z } from 'zod'
 

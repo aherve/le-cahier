@@ -1,16 +1,18 @@
 import type { AttributeValue } from "@aws-sdk/client-dynamodb";
+import type { SaveMoveInput } from "~/routes/api/moves/create";
+import type { GameReport } from "~/schemas/game-report";
+import type { LichessGame } from "~/schemas/lichess";
+import type { BookPosition } from "~/schemas/position";
+
 import { DynamoDB, ScanCommand } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { Chess } from "chess.js";
-import type { SaveMoveInput } from "~/routes/api/moves/create";
-import type { GameReport } from "~/schemas/game-report";
-import { GameReportSchema } from "~/schemas/game-report";
-import type { LichessGame } from "~/schemas/lichess";
-import { LichessGameSchema } from "~/schemas/lichess";
-import type { BookPosition } from "~/schemas/position";
-import { BookPositionSchema } from "~/schemas/position";
-import { BookMoveSchema } from "~/schemas/position";
+
 import { stripFEN } from "./utils";
+
+import { GameReportSchema } from "~/schemas/game-report";
+import { LichessGameSchema } from "~/schemas/lichess";
+import { BookPositionSchema , BookMoveSchema } from "~/schemas/position";
 
 export class ChessBook {
   private tableName: string;

@@ -1,14 +1,17 @@
+import type { Move, Square } from "chess.js";
+import type { BoardOrientation } from "react-chessboard/dist/chessboard/types";
+
 import { RepeatIcon } from "@chakra-ui/icons";
 import { Button, Code, Flex, Spacer } from "@chakra-ui/react";
-import type { Move, Square } from "chess.js";
 import { useEffect, useState } from "react";
 import { Chessboard } from "react-chessboard";
-import type { BoardOrientation } from "react-chessboard/dist/chessboard/types";
+
+
 import LichessLink from "./lichess-link";
 import Moves from "./moves";
 
-import { GameService } from "~/services/gameService";
 import { BookPositionSchema } from "~/schemas/position";
+import { GameService } from "~/services/gameService";
 import { toSAN } from "~/services/utils";
 
 export default function Explore(props: {

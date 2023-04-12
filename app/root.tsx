@@ -1,5 +1,8 @@
-import { ChakraProvider } from '@chakra-ui/react'
-import type { MetaFunction } from '@remix-run/node'
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
+
+import { Authenticator } from "@aws-amplify/ui-react";
+import styles from "@aws-amplify/ui-react/styles.css";
+import { ChakraProvider } from "@chakra-ui/react";
 import {
   Links,
   LiveReload,
@@ -7,13 +10,31 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-} from '@remix-run/react'
+} from "@remix-run/react";
+import { Amplify } from "aws-amplify";
+
+import { UserContext } from "./user-context";
+
+Amplify.configure({
+  region: "eu-west-1",
+  userPoolId: "eu-west-1_faacPhOAo",
+  userPoolWebClientId: "6h69orr9524ojm3rj0hd688aqu",
+});
 
 export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  title: 'Le Cahier',
-  viewport: 'width=device-width,initial-scale=1',
-})
+  charset: "utf-8",
+  title: "Le Cahier",
+  viewport: "width=device-width,initial-scale=1",
+});
+
+export const links: LinksFunction = () => {
+  return [
+    {
+      rel: "stylesheet",
+      href: styles,
+    },
+  ];
+};
 
 export default function App() {
   return (
@@ -24,12 +45,18 @@ export default function App() {
       </head>
       <body>
         <ChakraProvider>
-          <Outlet />
+          <Authenticator>
+            {({ signOut, user }) => (
+              <UserContext.Provider value={{ user, signOut }}>
+                <Outlet />
+              </UserContext.Provider>
+            )}
+          </Authenticator>
         </ChakraProvider>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
       </body>
     </html>
-  )
+  );
 }

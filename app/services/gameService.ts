@@ -1,4 +1,5 @@
 import type { Color, Move } from 'chess.js'
+
 import { Chess } from 'chess.js'
 
 export class GameServiceClass {

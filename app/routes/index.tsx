@@ -1,16 +1,18 @@
-import { z } from "zod";
-import { Button, Flex } from "@chakra-ui/react";
-import { useState } from "react";
-import { Train } from "~/components/train";
-import { Record } from "~/components/record";
-import Explore from "~/components/explore";
-import type { BoardOrientation } from "react-chessboard/dist/chessboard/types";
-import { BasicAuthHeaders, basicAuthLoader } from "~/services/utils.server";
-import { useLoaderData } from "@remix-run/react";
-import { GameService } from "~/services/gameService";
 import type { Move } from "chess.js";
+import type { BoardOrientation } from "react-chessboard/dist/chessboard/types";
+
 import { BellIcon, EditIcon, SearchIcon } from "@chakra-ui/icons";
+import { Button, Flex } from "@chakra-ui/react";
+import { useContext, useState } from "react";
+import { FiLogOut } from "react-icons/fi";
+import { z } from "zod";
+
+import Explore from "~/components/explore";
 import LichessReport from "~/components/lichess-report";
+import { Record } from "~/components/record";
+import { Train } from "~/components/train";
+import { GameService } from "~/services/gameService";
+import { UserContext } from "~/user-context";
 
 const GameMode = z.enum([
   "explore",
@@ -21,17 +23,12 @@ const GameMode = z.enum([
 ]);
 type GameModeType = z.infer<typeof GameMode>;
 
-export const headers = BasicAuthHeaders;
-export const loader = basicAuthLoader;
-
 export default function Index() {
+  const { user, signOut } = useContext(UserContext);
+  console.log("user", user?.attributes?.sub);
   const [mode, setMode] = useState<GameModeType>(GameMode.enum.explore);
   const [fromLastMove, setFromLastMove] = useState<Move | undefined>();
   const [gameId, setGameId] = useState(Date.now().toString());
-
-  if (!useLoaderData().authorized) {
-    return <div>Not authorized</div>;
-  }
 
   function startLichessReport() {
     setMode(GameMode.enum.lichessReport);
@@ -131,6 +128,9 @@ export default function Index() {
             </Button>
             <Button leftIcon={<BellIcon />} onClick={startLichessReport}>
               lichess report
+            </Button>
+            <Button variant="outline" leftIcon={<FiLogOut />} onClick={signOut}>
+              Logout
             </Button>
           </Flex>
           <Flex grow={1} alignItems="center">
