@@ -56,9 +56,22 @@ export default function App() {
 }
 
 function withAuth(props: { user: AmplifyUser | undefined }) {
-  new Cookies().set('cognito', {
-    idToken: props.user?.getSignInUserSession()?.getIdToken().getJwtToken(),
-  })
+  console.log('user', props.user)
+  const expiresAtSeconds =
+    props.user?.getSignInUserSession()?.getIdToken().getExpiration() ??
+    Math.round(Date.now() / 1000 + 24 * 3600)
+
+  console.log('expiresAt', expiresAtSeconds)
+
+  new Cookies().set(
+    'cognito',
+    {
+      idToken: props.user?.getSignInUserSession()?.getIdToken().getJwtToken(),
+    },
+    {
+      expires: new Date(1000 * expiresAtSeconds),
+    }
+  )
 
   return (
     <Authenticator.Provider>
