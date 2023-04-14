@@ -3,9 +3,8 @@ import type { BoardOrientation } from "react-chessboard/dist/chessboard/types";
 
 import { RepeatIcon } from "@chakra-ui/icons";
 import { Button, Code, Flex, Spacer } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Chessboard } from "react-chessboard";
-
 
 import LichessLink from "./lichess-link";
 import Moves from "./moves";
@@ -13,11 +12,13 @@ import Moves from "./moves";
 import { BookPositionSchema } from "~/schemas/position";
 import { GameService } from "~/services/gameService";
 import { toSAN } from "~/services/utils";
+import { UserContext } from "~/user-context";
 
 export default function Explore(props: {
   orientation?: BoardOrientation;
   startTraining: (orientation: BoardOrientation, lastMove: Move) => void;
 }) {
+  const { user } = useContext(UserContext);
   const [bookMoves, setBookMoves] = useState<string[]>([]);
   const [fen, setFen] = useState(GameService.fen);
   const [orientation, setOrientation] = useState<BoardOrientation>(
@@ -40,7 +41,7 @@ export default function Explore(props: {
           ).map((m) => toSAN(fen, m))
         );
       });
-  }, [fen, orientation]);
+  }, [fen, orientation, user]);
 
   function flip() {
     setOrientation((o) => (o === "white" ? "black" : "white"));

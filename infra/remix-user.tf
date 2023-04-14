@@ -21,7 +21,11 @@ data "aws_iam_policy_document" "remix_policy" {
       "dynamodb:Query",
       "dynamodb:Scan",
     ]
-    resources = [aws_dynamodb_table.db.arn, aws_dynamodb_table.games.arn]
+    resources = [
+      aws_dynamodb_table.users.arn,
+      aws_dynamodb_table.games.arn,
+      aws_dynamodb_table.positions.arn
+    ]
   }
 }
 

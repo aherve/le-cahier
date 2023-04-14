@@ -30,7 +30,7 @@ export default function Index() {
   const [fromLastMove, setFromLastMove] = useState<Move | undefined>();
   const [gameId, setGameId] = useState(Date.now().toString());
 
-  console.log("signing user session", user?.getSignInUserSession());
+  console.log("user =", user);
 
   fetch("/api/ping", {
     headers: {

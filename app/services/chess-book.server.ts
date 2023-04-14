@@ -12,17 +12,17 @@ import { stripFEN } from "./utils";
 
 import { GameReportSchema } from "~/schemas/game-report";
 import { LichessGameSchema } from "~/schemas/lichess";
-import { BookPositionSchema , BookMoveSchema } from "~/schemas/position";
+import { BookPositionSchema, BookMoveSchema } from "~/schemas/position";
 
 export class ChessBook {
-  private tableName: string;
+  private positionTableName: string;
   private gameTableName: string;
   private dynCli: DynamoDB;
   constructor() {
-    const region = process.env.AWS_REGION ?? "eu-west-1";
+    const region = "eu-west-1";
     this.dynCli = new DynamoDB({ region });
-    this.tableName = process.env.CHESS_BOOK_TABLE ?? "le-cahier";
-    this.gameTableName = process.env.GAME_TABLE ?? "le-cahier-games";
+    this.positionTableName = "le-cahier-positions";
+    this.gameTableName = "le-cahier-games";
   }
 
   public async addMove(input: SaveMoveInput) {
@@ -38,7 +38,7 @@ export class ChessBook {
 
     try {
       await this.dynCli.updateItem({
-        TableName: this.tableName,
+        TableName: this.positionTableName,
         Key: marshall({ fen: stripFEN(fen) }),
         UpdateExpression: `SET #path = :move`,
         ConditionExpression: `attribute_not_exists(#path)`,
@@ -57,7 +57,7 @@ export class ChessBook {
       });
     } catch {
       const update = {
-        TableName: this.tableName,
+        TableName: this.positionTableName,
         Key: marshall({ fen: stripFEN(fen) }),
         UpdateExpression: `SET #path.#move = :move`,
         ExpressionAttributeNames: {
@@ -72,12 +72,15 @@ export class ChessBook {
     }
   }
 
-  public async getPosition(fen: string): Promise<BookPosition | null> {
+  public async getPosition(
+    fen: string,
+    userId: string
+  ): Promise<BookPosition | null> {
     const key = stripFEN(fen);
 
     const data = await this.dynCli.getItem({
-      TableName: this.tableName,
-      Key: marshall({ fen: key }),
+      TableName: this.positionTableName,
+      Key: marshall({ fen: key, userId }),
     });
 
     const result = data.Item
@@ -88,9 +91,10 @@ export class ChessBook {
   }
 
   public async getRandomOpponentMove(
-    fen: string
+    fen: string,
+    userId: string
   ): Promise<{ move: string; targetFEN: string } | null> {
-    const position = await this.getPosition(fen);
+    const position = await this.getPosition(fen, userId);
     if (!position) {
       return null;
     }
@@ -153,12 +157,12 @@ export class ChessBook {
     console.log(`game ${game.id} saved`);
   }
 
-  public async linkGraph() {
+  public async linkGraph(userId: string) {
     // Build map of all moves. Warning, this is expensive $$$
     let newTransposition = 0;
     let leadsToUnknownPosition = 0;
     let alreadyRegistered = 0;
-    const scanner = this.dbScanner();
+    const scanner = this.positionScanner(userId);
     const allPositions: Record<string, BookPosition> = {};
     const savePromises: Promise<void>[] = [];
     for await (const items of scanner) {
@@ -191,6 +195,7 @@ export class ChessBook {
           savePromises.push(
             this.addMove({
               fen: stripFEN(position.fen),
+              userId,
               isOpponentMove: true,
               move: newMove.lan,
             })
@@ -219,13 +224,20 @@ export class ChessBook {
     });
   }
 
-  private async *dbScanner() {
+  private async *positionScanner(userId: string) {
     let lastEvaluatedKey: Record<string, AttributeValue> | undefined;
     do {
       const { Items, LastEvaluatedKey } = await this.dynCli.send(
         new ScanCommand({
-          TableName: this.tableName,
+          TableName: this.positionTableName,
           ExclusiveStartKey: lastEvaluatedKey,
+          FilterExpression: "#userId = :userId",
+          ExpressionAttributeNames: {
+            "#userId": "userId",
+          },
+          ExpressionAttributeValues: {
+            ":userId": { S: userId },
+          },
         })
       );
       lastEvaluatedKey = LastEvaluatedKey;

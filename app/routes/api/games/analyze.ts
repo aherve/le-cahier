@@ -8,11 +8,11 @@ import { Chess } from "chess.js";
 
 import { ReportStatusSchema } from "~/schemas/game-report";
 import { LICHESS_USERNAME } from "~/schemas/lichess";
+import { authenticate } from "~/services/auth.server";
 import { ChessBookService } from "~/services/chess-book.server";
 
-
-
 export const loader: LoaderFunction = async ({ request }) => {
+  const { userId } = await authenticate(request);
   const id = new URL(request.url).searchParams.get("id");
   if (!id) {
     throw new Error("Missing id");
@@ -34,7 +34,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const newReport = await analyzeGame(
     game,
-    game.players.white.user.name === LICHESS_USERNAME ? "w" : "b"
+    game.players.white.user.name === LICHESS_USERNAME ? "w" : "b",
+    userId
   );
 
   await ChessBookService.setReport(newReport);
@@ -44,7 +45,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 async function analyzeGame(
   game: LichessGame,
-  forColor: Color
+  forColor: Color,
+  userId: string
 ): Promise<GameReport> {
   const movesReport = await Promise.all(
     game.moves.map(async (move) => {
@@ -52,7 +54,7 @@ async function analyzeGame(
         return { status: ReportStatusSchema.enum.opponentMove, bookMoves: [] };
       }
 
-      const position = await ChessBookService.getPosition(move.before);
+      const position = await ChessBookService.getPosition(move.before, userId);
       if (
         !position ||
         !position.bookMoves ||

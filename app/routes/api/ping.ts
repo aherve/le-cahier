@@ -2,13 +2,9 @@ import type { LoaderFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
 
-import { verifyAccessToken } from "~/services/cognito.server";
+import { authenticate } from "~/services/auth.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const jwt =
-    request.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
-  console.log("Jwt = ", jwt);
-  const isValid = await verifyAccessToken(jwt);
-
-  return json({ validJWT: isValid, message: "pong" }, { status: 200 });
+  const user = await authenticate(request);
+  return json({ user: user, message: "pong" }, { status: 200 });
 };

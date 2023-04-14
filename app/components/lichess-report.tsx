@@ -16,7 +16,8 @@ import {
   Box,
   Tag,
   Button,
- Spinner } from "@chakra-ui/react";
+  Spinner,
+} from "@chakra-ui/react";
 import { useFetcher } from "@remix-run/react";
 import moment from "moment";
 import { useEffect, useState } from "react";
@@ -24,12 +25,10 @@ import { BsCircle, BsCircleFill } from "react-icons/bs";
 import { GiBulletBill, GiRabbit } from "react-icons/gi";
 import { SiStackblitz } from "react-icons/si";
 
-
 import LichessLink from "./lichess-link";
 
 import { MissedMoveSchema } from "~/schemas/game-report";
-import { LichessGameSchema , LICHESS_USERNAME } from "~/schemas/lichess";
-
+import { LichessGameSchema, LICHESS_USERNAME } from "~/schemas/lichess";
 
 export default function LichessReport() {
   const gameListFetcher = useFetcher();

@@ -13,8 +13,8 @@ import {
 } from "@remix-run/react";
 import { Amplify } from "aws-amplify";
 
-import { amplifyConfig } from "./services/cognito";
 import { UserContext } from "./user-context";
+import amplifyConfig from "../infra/aws-export.json";
 
 Amplify.configure(amplifyConfig);
 
@@ -42,7 +42,7 @@ export default function App() {
       </head>
       <body>
         <ChakraProvider>
-          <Authenticator>
+          <Authenticator signUpAttributes={["email"]}>
             {({ signOut, user }) => (
               <UserContext.Provider value={{ user, signOut }}>
                 <Outlet />
