@@ -29,7 +29,6 @@ export class GameServiceClass {
 
   public reset(fen?: string) {
     this.game = new Chess(fen)
-    console.log('I have been reset', this.game.fen())
   }
 
   public backTo(m: Move) {
