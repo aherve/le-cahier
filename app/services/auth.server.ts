@@ -1,4 +1,4 @@
-import type { CognitoUser} from '~/schemas/user';
+import type { CognitoUser } from '~/schemas/user'
 
 import { CognitoJwtVerifier } from 'aws-jwt-verify'
 import Cookies from 'universal-cookie'

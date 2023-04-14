@@ -56,12 +56,9 @@ export default function App() {
 }
 
 function withAuth(props: { user: AmplifyUser | undefined }) {
-  console.log('user', props.user)
   const expiresAtSeconds =
     props.user?.getSignInUserSession()?.getIdToken().getExpiration() ??
     Math.round(Date.now() / 1000 + 24 * 3600)
-
-  console.log('expiresAt', expiresAtSeconds)
 
   new Cookies().set(
     'cognito',
