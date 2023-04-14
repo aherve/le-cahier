@@ -2,10 +2,25 @@ import type { Move } from 'chess.js'
 import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types'
 
 import { useAuthenticator } from '@aws-amplify/ui-react'
-import { BellIcon, EditIcon, SearchIcon } from '@chakra-ui/icons'
-import { Button, Flex } from '@chakra-ui/react'
+import {
+  Menu,
+  MenuItem,
+  Box,
+  Button,
+  Flex,
+  Heading,
+  MenuButton,
+  MenuList,
+  Link,
+} from '@chakra-ui/react'
+import { useNavigate } from '@remix-run/react'
 import { useState } from 'react'
+import { BsRecordCircle } from 'react-icons/bs'
 import { FiLogOut } from 'react-icons/fi'
+import { GiSecretBook } from 'react-icons/gi'
+import { GoReport } from 'react-icons/go'
+import { MdOutlineSmartToy, MdSettings, MdSmartToy } from 'react-icons/md'
+import { SiLichess } from 'react-icons/si'
 import { z } from 'zod'
 
 import Explore from '~/components/explore'
@@ -28,6 +43,44 @@ export default function Index() {
   const [mode, setMode] = useState<GameModeType>(GameMode.enum.explore)
   const [fromLastMove, setFromLastMove] = useState<Move | undefined>()
   const [gameId, setGameId] = useState(Date.now().toString())
+  const navigate = useNavigate()
+
+  function pageTitle() {
+    switch (mode) {
+      case GameMode.enum.explore:
+        return (
+          <>
+            <Flex direction="row" align="center" gap="5">
+              <GiSecretBook size="40" />
+              <Heading size="lg">Browsing moves</Heading>
+            </Flex>
+          </>
+        )
+      case GameMode.enum.lichessReport:
+        return null
+      case GameMode.enum.recordMoves:
+        return (
+          <>
+            <Flex direction="row" align="center" gap="5">
+              <BsRecordCircle color="red" size="40" />
+              <Heading size="lg">Recording moves</Heading>
+            </Flex>
+          </>
+        )
+      case GameMode.enum.trainWithBlack:
+      case GameMode.enum.trainWithWhite:
+        return (
+          <>
+            <Flex direction="row" align="center" gap="5">
+              <MdOutlineSmartToy size="40" />
+              <Heading size="lg">Training mode</Heading>
+            </Flex>
+          </>
+        )
+      default:
+        return <Box></Box>
+    }
+  }
 
   function startLichessReport() {
     setMode(GameMode.enum.lichessReport)
@@ -108,30 +161,45 @@ export default function Index() {
         <Flex height="100vh" direction="column" align="center">
           <Flex direction="row" gap={10} align="center" minWidth="max-content">
             <Button
-              leftIcon={<SearchIcon />}
+              leftIcon={<GiSecretBook />}
               onClick={() => startExplore(true)}
             >
               Explore
             </Button>
-            <Button onClick={() => startTraining('white', true)}>
+            <Button
+              leftIcon={<MdOutlineSmartToy />}
+              onClick={() => startTraining('white', true)}
+            >
               Train with white
             </Button>
-            <Button onClick={() => startTraining('black', true)}>
+            <Button
+              leftIcon={<MdSmartToy />}
+              onClick={() => startTraining('black', true)}
+            >
               Train with black
             </Button>
             <Button
-              leftIcon={<EditIcon />}
+              leftIcon={<BsRecordCircle />}
               onClick={() => startRecordingMoves(true)}
             >
               Record moves
             </Button>
-            <Button leftIcon={<BellIcon />} onClick={startLichessReport}>
+            <Button leftIcon={<SiLichess />} onClick={startLichessReport}>
               lichess report
             </Button>
-            <Button variant="outline" leftIcon={<FiLogOut />} onClick={signOut}>
-              Logout
-            </Button>
+            <Menu>
+              <MenuButton as={Button}>
+                <MdSettings />
+              </MenuButton>
+              <MenuList>
+                <MenuItem onClick={() => navigate('/settings')}>
+                  Settings
+                </MenuItem>
+                <MenuItem onClick={signOut}>Logout</MenuItem>
+              </MenuList>
+            </Menu>
           </Flex>
+          <Box paddingTop="20">{pageTitle()}</Box>
           <Flex grow={1} alignItems="center">
             {renderSwitch()}
           </Flex>
