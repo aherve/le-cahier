@@ -108,10 +108,10 @@ function GameItem(props: { game: LichessGame }) {
           {game.players.black.user.name === lichessUsername && <BsCircleFill />}
         </Flex>
       </Td>
-      <Td color={gameColor(game)}>
+      <Td>
         {game.players.white.user.name} ({game.players.white.rating})
       </Td>
-      <Td color={gameColor(game)}>
+      <Td>
         {game.players.black.user.name} ({game.players.black.rating})
       </Td>
       <Td>
@@ -174,7 +174,7 @@ function GameReportComponent(props: { game: LichessGame; report: GameReport }) {
 
   if (failedCount === 1) {
     return (
-      <Text>
+      <Text color="red.500">
         {' '}
         {failedCount} miss. {explanation}
       </Text>
@@ -186,20 +186,4 @@ function GameReportComponent(props: { game: LichessGame; report: GameReport }) {
       {failedCount} misses. {explanation}
     </Text>
   )
-}
-
-function gameColor(game: LichessGame, lichessUsername?: string) {
-  if (!lichessUsername) return 'gray.500'
-
-  const won =
-    (game.winner === 'white' &&
-      game.players.white.user.name === lichessUsername) ||
-    (game.winner === 'black' &&
-      game.players.black.user.name === lichessUsername)
-  const drew = game.winner === undefined
-  const lost = !won && !drew
-
-  if (won) return 'green.500'
-  if (lost) return 'red.500'
-  return 'gray.500'
 }
