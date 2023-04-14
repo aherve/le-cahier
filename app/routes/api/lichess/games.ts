@@ -1,18 +1,23 @@
 import type { LoaderFunction } from '@remix-run/node'
 
-import { json } from '@remix-run/node'
-import cache from 'memory-cache'
+import { redirect, json } from '@remix-run/node'
 
-import { LichessGameParserSchema, LICHESS_USERNAME } from '~/schemas/lichess'
+import { LichessGameParserSchema } from '~/schemas/lichess'
+import { authenticate } from '~/services/auth.server'
 import { ChessBookService } from '~/services/chess-book.server'
+import { UserService } from '~/services/users.server'
 
 const LICHESS_TOKEN = process.env.LICHESS_TOKEN
 const GAMES_COUNT = 20
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const cached = cache.get('gameList')
-  if (cached) {
-    return json(cached)
+  const { userId } = await authenticate(request)
+
+  const user = await UserService.getUser(userId)
+  const lichessUsername = user?.lichessUsername
+
+  if (!lichessUsername) {
+    return redirect('/settings')
   }
 
   const headers = {
@@ -21,7 +26,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   const url =
-    `https://lichess.org/api/games/user/${LICHESS_USERNAME}?` +
+    `https://lichess.org/api/games/user/${lichessUsername}?` +
     new URLSearchParams({
       max: GAMES_COUNT.toString(),
       opening: 'true',
@@ -34,11 +39,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   try {
     const parsed = LichessGameParserSchema.array().parse(rawJSON)
 
-    cache.put('gameList', parsed, 60_000)
-
     await Promise.all(
       parsed.map((g) => {
-        return ChessBookService.setGame(g)
+        return ChessBookService.setGame(g, userId)
       })
     )
 

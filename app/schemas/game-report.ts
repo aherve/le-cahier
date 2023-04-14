@@ -35,6 +35,7 @@ export const GameReportSchema = z.object({
     .array(),
   firstError: MoveSchema.optional(),
   firstOutOfBook: MoveSchema.optional(),
+  lichessUsername: z.string(),
 })
 
 export type GameReport = z.infer<typeof GameReportSchema>

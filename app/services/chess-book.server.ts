@@ -117,11 +117,12 @@ export class ChessBook {
   }
 
   public async getGame(
-    gameId: string
+    gameId: string,
+    userId: string
   ): Promise<{ game?: LichessGame; report?: GameReport } | null> {
     const data = await this.dynCli.getItem({
       TableName: this.gameTableName,
-      Key: marshall({ gameId }),
+      Key: marshall({ gameId, userId }),
     })
 
     if (!data.Item) {
@@ -134,9 +135,12 @@ export class ChessBook {
       report: GameReportSchema.optional().parse(raw.report),
     }
   }
-  public async setReport(report: GameReport) {
+  public async setReport(report: GameReport, userId: string) {
     await this.dynCli.updateItem({
-      Key: marshall({ gameId: report.gameId }),
+      Key: marshall({
+        gameId: report.gameId,
+        userId,
+      }),
       TableName: this.gameTableName,
       UpdateExpression: `SET #report = :report`,
       ExpressionAttributeNames: {
@@ -148,9 +152,9 @@ export class ChessBook {
     })
     console.log(`report ${report.gameId} saved`)
   }
-  public async setGame(game: LichessGame) {
+  public async setGame(game: LichessGame, userId: string) {
     await this.dynCli.updateItem({
-      Key: marshall({ gameId: game.id }),
+      Key: marshall({ gameId: game.id, userId }),
       TableName: this.gameTableName,
       UpdateExpression: `SET #game = :game`,
       ExpressionAttributeNames: {
@@ -219,9 +223,9 @@ export class ChessBook {
     await Promise.all(savePromises)
   }
 
-  public async cleanGameReport(gameId: string) {
+  public async cleanGameReport(gameId: string, userId: string) {
     await this.dynCli.updateItem({
-      Key: marshall({ gameId }),
+      Key: marshall({ gameId, userId }),
       TableName: this.gameTableName,
       UpdateExpression: `REMOVE #report`,
       ExpressionAttributeNames: {

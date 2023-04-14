@@ -3,8 +3,6 @@ import type { Move } from 'chess.js'
 import { Chess } from 'chess.js'
 import { z } from 'zod'
 
-export const LICHESS_USERNAME = 'MaximeCaVaChierGrave'
-
 const SquareSchema = z.enum([
   'a8',
   'b8',
