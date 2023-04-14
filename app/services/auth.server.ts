@@ -1,25 +1,33 @@
-import { CognitoJwtVerifier } from "aws-jwt-verify";
+import type { CognitoUser} from '~/schemas/user';
 
-import amplifyConfig from "../../infra/aws-export.json";
+import { CognitoJwtVerifier } from 'aws-jwt-verify'
+import Cookies from 'universal-cookie'
 
-import { CognitoUserSchema } from "~/schemas/user";
+import amplifyConfig from '../../infra/aws-export.json'
+
+import { CognitoUserSchema } from '~/schemas/user'
 
 // Verifier that expects valid access tokens:
 const verifier = CognitoJwtVerifier.create({
   userPoolId: amplifyConfig.userPoolId,
-  tokenUse: "id",
+  tokenUse: 'id',
   clientId: amplifyConfig.userPoolWebClientId,
-});
+})
 
-export async function authenticate(request: Request) {
-  const jwt =
-    request.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
+export async function authenticate(request: Request): Promise<CognitoUser> {
+  const cognitoCookie = await new Cookies(request.headers.get('cookie')).get(
+    'cognito'
+  )
 
-  if (!jwt) {
-    throw new Error("No JWT provided");
+  if (!cognitoCookie) {
+    throw new Error('No cognito cookie found')
   }
 
-  const authenticated = await verifier.verify(jwt);
-  console.log("auth", authenticated);
-  return CognitoUserSchema.parse(authenticated);
+  const { idToken } = cognitoCookie
+  if (!idToken) {
+    throw new Error('No idToken found in cookie')
+  }
+
+  const authenticated = await verifier.verify(idToken)
+  return CognitoUserSchema.parse(authenticated)
 }
