@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { MoveSchema } from './lichess'
 
 export const ReportStatusSchema = z.enum([

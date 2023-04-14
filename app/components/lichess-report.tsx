@@ -1,6 +1,7 @@
-import { GiBulletBill, GiRabbit } from "react-icons/gi";
-import { SiStackblitz } from "react-icons/si";
-import { BsCircle, BsCircleFill } from "react-icons/bs";
+import type { GameReport } from "~/schemas/game-report";
+import type { LichessGame } from "~/schemas/lichess";
+
+import { RepeatIcon } from "@chakra-ui/icons";
 import {
   Text,
   Flex,
@@ -15,18 +16,19 @@ import {
   Box,
   Tag,
   Button,
+  Spinner,
 } from "@chakra-ui/react";
-import { Spinner } from "@chakra-ui/react";
 import { useFetcher } from "@remix-run/react";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import type { GameReport } from "~/schemas/game-report";
-import { MissedMoveSchema } from "~/schemas/game-report";
-import type { LichessGame } from "~/schemas/lichess";
-import { LichessGameSchema } from "~/schemas/lichess";
-import { LICHESS_USERNAME } from "~/schemas/lichess";
+import { BsCircle, BsCircleFill } from "react-icons/bs";
+import { GiBulletBill, GiRabbit } from "react-icons/gi";
+import { SiStackblitz } from "react-icons/si";
+
 import LichessLink from "./lichess-link";
-import { RepeatIcon } from "@chakra-ui/icons";
+
+import { MissedMoveSchema } from "~/schemas/game-report";
+import { LichessGameSchema, LICHESS_USERNAME } from "~/schemas/lichess";
 
 export default function LichessReport() {
   const gameListFetcher = useFetcher();

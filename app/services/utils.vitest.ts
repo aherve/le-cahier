@@ -1,5 +1,6 @@
 import { Chess } from "chess.js";
 import { it, expect, describe } from "vitest";
+
 import { stripFEN } from "./utils";
 
 describe("stripFEN", () => {

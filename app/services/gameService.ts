@@ -1,4 +1,5 @@
 import type { Color, Move } from 'chess.js'
+
 import { Chess } from 'chess.js'
 
 export class GameServiceClass {
@@ -28,7 +29,6 @@ export class GameServiceClass {
 
   public reset(fen?: string) {
     this.game = new Chess(fen)
-    console.log('I have been reset', this.game.fen())
   }
 
   public backTo(m: Move) {

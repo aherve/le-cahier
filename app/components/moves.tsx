@@ -1,4 +1,5 @@
-import { chunk } from "lodash";
+import type { Move } from "chess.js";
+
 import {
   Card,
   CardBody,
@@ -11,7 +12,7 @@ import {
   StackDivider,
   Box,
 } from "@chakra-ui/react";
-import type { Move } from "chess.js";
+import { chunk } from "lodash";
 
 export default function Moves(props: {
   moves: Array<Move>;

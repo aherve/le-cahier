@@ -1,4 +1,5 @@
 import { it, describe, expect } from 'vitest'
+
 import { LichessGameSchema } from './lichess'
 
 describe('lichess schema', () => {
