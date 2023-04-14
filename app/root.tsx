@@ -12,6 +12,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react'
+import { Analytics } from '@vercel/analytics/react'
 import { Amplify } from 'aws-amplify'
 import Cookies from 'universal-cookie'
 
@@ -48,6 +49,7 @@ export default function App() {
           </Authenticator>
         </ChakraProvider>
         <ScrollRestoration />
+        <Analytics />
         <Scripts />
         <LiveReload />
       </body>
