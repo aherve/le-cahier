@@ -11,14 +11,11 @@ import {
   Heading,
   MenuButton,
   MenuList,
-  Link,
 } from '@chakra-ui/react'
 import { useNavigate } from '@remix-run/react'
 import { useState } from 'react'
 import { BsRecordCircle } from 'react-icons/bs'
-import { FiLogOut } from 'react-icons/fi'
 import { GiSecretBook } from 'react-icons/gi'
-import { GoReport } from 'react-icons/go'
 import { MdOutlineSmartToy, MdSettings, MdSmartToy } from 'react-icons/md'
 import { SiLichess } from 'react-icons/si'
 import { z } from 'zod'
@@ -44,43 +41,6 @@ export default function Index() {
   const [fromLastMove, setFromLastMove] = useState<Move | undefined>()
   const [gameId, setGameId] = useState(Date.now().toString())
   const navigate = useNavigate()
-
-  function pageTitle() {
-    switch (mode) {
-      case GameMode.enum.explore:
-        return (
-          <>
-            <Flex direction="row" align="center" gap="5">
-              <GiSecretBook size="40" />
-              <Heading size="lg">Browsing moves</Heading>
-            </Flex>
-          </>
-        )
-      case GameMode.enum.lichessReport:
-        return null
-      case GameMode.enum.recordMoves:
-        return (
-          <>
-            <Flex direction="row" align="center" gap="5">
-              <BsRecordCircle color="red" size="40" />
-              <Heading size="lg">Recording moves</Heading>
-            </Flex>
-          </>
-        )
-      case GameMode.enum.trainWithBlack:
-      case GameMode.enum.trainWithWhite:
-        return (
-          <>
-            <Flex direction="row" align="center" gap="5">
-              <MdOutlineSmartToy size="40" />
-              <Heading size="lg">Training mode</Heading>
-            </Flex>
-          </>
-        )
-      default:
-        return <Box></Box>
-    }
-  }
 
   function startLichessReport() {
     setMode(GameMode.enum.lichessReport)
@@ -199,7 +159,7 @@ export default function Index() {
               </MenuList>
             </Menu>
           </Flex>
-          <Box paddingTop="20">{pageTitle()}</Box>
+          <Box paddingTop="20">{pageTitle(mode)}</Box>
           <Flex grow={1} alignItems="center">
             {renderSwitch()}
           </Flex>
@@ -207,4 +167,41 @@ export default function Index() {
       </div>
     </>
   )
+}
+
+function pageTitle(mode: GameModeType) {
+  switch (mode) {
+    case GameMode.enum.explore:
+      return (
+        <>
+          <Flex direction="row" align="center" gap="5">
+            <GiSecretBook size="40" />
+            <Heading size="lg">Browsing moves</Heading>
+          </Flex>
+        </>
+      )
+    case GameMode.enum.lichessReport:
+      return null
+    case GameMode.enum.recordMoves:
+      return (
+        <>
+          <Flex direction="row" align="center" gap="5">
+            <BsRecordCircle color="red" size="40" />
+            <Heading size="lg">Recording moves</Heading>
+          </Flex>
+        </>
+      )
+    case GameMode.enum.trainWithBlack:
+    case GameMode.enum.trainWithWhite:
+      return (
+        <>
+          <Flex direction="row" align="center" gap="5">
+            <MdOutlineSmartToy size="40" />
+            <Heading size="lg">Training mode</Heading>
+          </Flex>
+        </>
+      )
+    default:
+      return <Box></Box>
+  }
 }
