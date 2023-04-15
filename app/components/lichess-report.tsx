@@ -1,7 +1,7 @@
-import type { GameReport } from '~/schemas/game-report'
-import type { LichessGame } from '~/schemas/lichess'
+import type { GameReport } from '~/schemas/game-report';
+import type { LichessGame } from '~/schemas/lichess';
 
-import { RepeatIcon } from '@chakra-ui/icons'
+import { RepeatIcon } from '@chakra-ui/icons';
 import {
   Text,
   Flex,
@@ -17,32 +17,32 @@ import {
   Tag,
   Button,
   Spinner,
-} from '@chakra-ui/react'
-import { useFetcher } from '@remix-run/react'
-import moment from 'moment'
-import { useEffect, useState } from 'react'
-import { BsCircle, BsCircleFill } from 'react-icons/bs'
-import { GiBulletBill, GiRabbit } from 'react-icons/gi'
-import { SiStackblitz } from 'react-icons/si'
+} from '@chakra-ui/react';
+import { useFetcher } from '@remix-run/react';
+import moment from 'moment';
+import { useEffect, useState } from 'react';
+import { BsCircle, BsCircleFill } from 'react-icons/bs';
+import { GiBulletBill, GiRabbit } from 'react-icons/gi';
+import { SiStackblitz } from 'react-icons/si';
 
-import LichessLink from './lichess-link'
+import LichessLink from './lichess-link';
 
-import { GameReportSchema, MissedMoveSchema } from '~/schemas/game-report'
-import { LichessGameSchema } from '~/schemas/lichess'
+import { GameReportSchema, MissedMoveSchema } from '~/schemas/game-report';
+import { LichessGameSchema } from '~/schemas/lichess';
 
 export default function LichessReport() {
-  const gameListFetcher = useFetcher()
+  const gameListFetcher = useFetcher();
 
   useEffect(() => {
     if (gameListFetcher.state === 'idle' && gameListFetcher.data == null) {
-      gameListFetcher.load('/api/lichess/games')
+      gameListFetcher.load('/api/lichess/games');
     }
-  }, [gameListFetcher])
+  }, [gameListFetcher]);
 
-  const games = LichessGameSchema.array().parse(gameListFetcher.data ?? [])
+  const games = LichessGameSchema.array().parse(gameListFetcher.data ?? []);
 
   if (gameListFetcher.state === 'loading' && games.length === 0) {
-    return <Spinner />
+    return <Spinner />;
   }
 
   return (
@@ -70,31 +70,31 @@ export default function LichessReport() {
         </TableContainer>
       </Flex>
     </>
-  )
+  );
 }
 
 function GameItem(props: { game: LichessGame }) {
-  const { game } = props
-  const fetcher = useFetcher()
-  const [reloader, setReloader] = useState(Date.now())
+  const { game } = props;
+  const fetcher = useFetcher();
+  const [reloader, setReloader] = useState(Date.now());
 
   async function cleanGameReport() {
-    fetcher.data = null
+    fetcher.data = null;
     await fetch('api/games/clean-report', {
       method: 'POST',
       body: JSON.stringify({ gameId: game.id }),
-    })
-    setReloader(Date.now())
+    });
+    setReloader(Date.now());
   }
 
   useEffect(() => {
     if (fetcher.state === 'idle' && fetcher.data == null) {
-      fetcher.load(`/api/games/analyze?id=${game.id}`)
+      fetcher.load(`/api/games/analyze?id=${game.id}`);
     }
-  }, [fetcher, game, reloader])
+  }, [fetcher, game, reloader]);
 
-  const report = GameReportSchema.nullable().optional().parse(fetcher.data)
-  const lichessUsername = report?.lichessUsername
+  const report = GameReportSchema.nullable().optional().parse(fetcher.data);
+  const lichessUsername = report?.lichessUsername;
 
   return (
     <Tr>
@@ -135,21 +135,21 @@ function GameItem(props: { game: LichessGame }) {
         </Button>
       </Td>
     </Tr>
-  )
+  );
 }
 
 function firstFailIndex(report?: GameReport) {
-  const found = report?.movesReport.findIndex((m) => m.status === 'failed')
-  return found && found > 1 ? found : undefined
+  const found = report?.movesReport.findIndex((m) => m.status === 'failed');
+  return found && found > 1 ? found : undefined;
 }
 
 function GameReportComponent(props: { game: LichessGame; report: GameReport }) {
   const successCount = props.report.movesReport.filter(
     (m) => m.status === 'success'
-  ).length
+  ).length;
   const failedCount = props.report.movesReport.filter(
     (m) => m.status === 'failed'
-  ).length
+  ).length;
 
   if (failedCount === 0) {
     return (
@@ -163,14 +163,14 @@ function GameReportComponent(props: { game: LichessGame; report: GameReport }) {
           )}
         </Flex>
       </>
-    )
+    );
   }
 
   const explanation = props.report.movesReport
     .filter((m) => m.status === 'failed')
     .map((m) => MissedMoveSchema.parse(m))
     .map((m) => `expected ${m.expected.join(', ')}, but ${m.played} was played`)
-    .join('. ')
+    .join('. ');
 
   if (failedCount === 1) {
     return (
@@ -178,12 +178,12 @@ function GameReportComponent(props: { game: LichessGame; report: GameReport }) {
         {' '}
         {failedCount} miss. {explanation}
       </Text>
-    )
+    );
   }
 
   return (
     <Text>
       {failedCount} misses. {explanation}
     </Text>
-  )
+  );
 }

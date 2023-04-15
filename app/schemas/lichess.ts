@@ -1,7 +1,7 @@
-import type { Move } from 'chess.js'
+import type { Move } from 'chess.js';
 
-import { Chess } from 'chess.js'
-import { z } from 'zod'
+import { Chess } from 'chess.js';
+import { z } from 'zod';
 
 const SquareSchema = z.enum([
   'a8',
@@ -68,8 +68,8 @@ const SquareSchema = z.enum([
   'f1',
   'g1',
   'h1',
-])
-const PieceSymbolSchema = z.enum(['p', 'n', 'b', 'r', 'q', 'k'])
+]);
+const PieceSymbolSchema = z.enum(['p', 'n', 'b', 'r', 'q', 'k']);
 export const MoveSchema = z.object({
   color: z.enum(['w', 'b']),
   from: SquareSchema,
@@ -82,7 +82,7 @@ export const MoveSchema = z.object({
   lan: z.string(),
   before: z.string(),
   after: z.string(),
-})
+});
 const LichessGameUserSchema = z.object({
   rating: z.number(),
   ratingDiff: z.number(),
@@ -91,7 +91,7 @@ const LichessGameUserSchema = z.object({
     patron: z.boolean().optional(),
     id: z.string(),
   }),
-})
+});
 
 const LichessGameCommonSchema = z.object({
   id: z.string(),
@@ -117,26 +117,26 @@ const LichessGameCommonSchema = z.object({
     increment: z.number(),
     totalTime: z.number(),
   }),
-})
+});
 
 export const LichessGameParserSchema = LichessGameCommonSchema.extend({
   moves: z.string(),
 }).transform((game) => {
-  const g = new Chess()
-  const newMoves: Move[] = []
+  const g = new Chess();
+  const newMoves: Move[] = [];
   for (const move of game.moves.split(' ')) {
-    const m = g.move(move)
-    newMoves.push(m)
+    const m = g.move(move);
+    newMoves.push(m);
   }
 
   return {
     ...game,
     moves: MoveSchema.array().parse(newMoves),
-  }
-})
+  };
+});
 
 export const LichessGameSchema = LichessGameCommonSchema.extend({
   moves: MoveSchema.array(),
-})
+});
 
 export type LichessGame = z.infer<typeof LichessGameSchema>

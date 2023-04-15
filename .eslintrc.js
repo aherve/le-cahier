@@ -5,6 +5,7 @@ module.exports = {
   extends: ["@remix-run/eslint-config", "@remix-run/eslint-config/node"],
   ignorePatterns: ["**/node_modules/**", "**/dist/**", "**/build/**"],
   rules: {
+    semi: [ERROR, "always"],
     "import/no-duplicates": ERROR,
     "import/order": [
       ERROR,

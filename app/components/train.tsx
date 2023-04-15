@@ -1,119 +1,119 @@
-import type { TrainMessageInputType } from './train-message'
-import type { Move } from 'chess.js'
+import type { TrainMessageInputType } from './train-message';
+import type { Move } from 'chess.js';
 import type {
   BoardOrientation,
   Square,
-} from 'react-chessboard/dist/chessboard/types'
-import type { GetChallengeOutput } from '~/routes/api/moves/challenge'
+} from 'react-chessboard/dist/chessboard/types';
+import type { GetChallengeOutput } from '~/routes/api/moves/challenge';
 
-import { EditIcon, RepeatIcon } from '@chakra-ui/icons'
-import { Button, Code, Flex } from '@chakra-ui/react'
-import { useFetcher } from '@remix-run/react'
-import { Chess } from 'chess.js'
-import { useEffect, useState } from 'react'
-import { Chessboard } from 'react-chessboard'
+import { EditIcon, RepeatIcon } from '@chakra-ui/icons';
+import { Button, Code, Flex } from '@chakra-ui/react';
+import { useFetcher } from '@remix-run/react';
+import { Chess } from 'chess.js';
+import { useEffect, useState } from 'react';
+import { Chessboard } from 'react-chessboard';
 
-import LichessLink from './lichess-link'
-import Moves from './moves'
-import TrainMessage, { TrainMessageInput } from './train-message'
+import LichessLink from './lichess-link';
+import Moves from './moves';
+import TrainMessage, { TrainMessageInput } from './train-message';
 
-import { GetChallengeOutputSchema } from '~/routes/api/moves/challenge'
-import { GameService } from '~/services/gameService'
+import { GetChallengeOutputSchema } from '~/routes/api/moves/challenge';
+import { GameService } from '~/services/gameService';
 
 export function Train(props: {
   orientation: BoardOrientation
   startRecording: (fen: string) => void
   startingMove?: Move
 }) {
-  const [fen, setFen] = useState(GameService.fen)
-  const [msg, setMsg] = useState<TrainMessageInputType>('empty')
-  const [challenge, setChallenge] = useState<GetChallengeOutput | null>(null)
+  const [fen, setFen] = useState(GameService.fen);
+  const [msg, setMsg] = useState<TrainMessageInputType>('empty');
+  const [challenge, setChallenge] = useState<GetChallengeOutput | null>(null);
 
-  const turn = GameService.turn
+  const turn = GameService.turn;
   const isPlayerTurn =
     (props.orientation === 'white' && turn === 'w') ||
-    (props.orientation === 'black' && turn === 'b')
+    (props.orientation === 'black' && turn === 'b');
 
-  const fetcher = useFetcher()
-  const moves = GameService.moves
+  const fetcher = useFetcher();
+  const moves = GameService.moves;
 
   const hints = (challenge?.expectedMoves ?? [])
     .map((m) => {
       try {
-        const g = new Chess(fen)
-        const move = g.move(m)
-        return move.san
+        const g = new Chess(fen);
+        const move = g.move(m);
+        return move.san;
       } catch {
-        return null
+        return null;
       }
     })
-    .filter(Boolean) as string[]
+    .filter(Boolean) as string[];
 
   useEffect(() => {
     if (!isPlayerTurn && fetcher.state === 'idle' && fetcher.data == null) {
-      fetcher.load(`/api/moves/challenge?fen=${encodeURIComponent(fen)}`)
+      fetcher.load(`/api/moves/challenge?fen=${encodeURIComponent(fen)}`);
     }
 
     if (!isPlayerTurn && fetcher.state === 'idle' && fetcher.data) {
-      const data = GetChallengeOutputSchema.parse(fetcher.data)
+      const data = GetChallengeOutputSchema.parse(fetcher.data);
       if (!data.challengeMove) {
-        setMsg(TrainMessageInput.enum.noMoreData)
+        setMsg(TrainMessageInput.enum.noMoreData);
       } else {
-        GameService.makeMove(data.challengeMove)
-        fetcher.data = null
-        setChallenge(data)
-        setMsg(TrainMessageInput.enum.yourTurn)
-        setFen(GameService.fen)
+        GameService.makeMove(data.challengeMove);
+        fetcher.data = null;
+        setChallenge(data);
+        setMsg(TrainMessageInput.enum.yourTurn);
+        setFen(GameService.fen);
       }
     }
-  }, [fen, fetcher, props.orientation, turn, isPlayerTurn])
+  }, [fen, fetcher, props.orientation, turn, isPlayerTurn]);
 
   function onNavigate(move: Move) {
-    GameService.backTo(move)
-    fetcher.data = null
-    setChallenge(null)
-    setFen(GameService.fen)
+    GameService.backTo(move);
+    fetcher.data = null;
+    setChallenge(null);
+    setFen(GameService.fen);
   }
 
   function makeMove(move: string | { from: Square; to: Square }): boolean {
     try {
-      GameService.makeMove(move)
-      setFen(GameService.fen)
-      return true
+      GameService.makeMove(move);
+      setFen(GameService.fen);
+      return true;
     } catch {
-      return false
+      return false;
     }
   }
 
   function onDrop(sourceSquare: Square, targetSquare: Square) {
     if (!challenge || challenge.expectedMoves.length === 0) {
-      return makeMove({ from: sourceSquare, to: targetSquare })
+      return makeMove({ from: sourceSquare, to: targetSquare });
     } else if (
       challenge.expectedMoves.includes(`${sourceSquare}${targetSquare}`)
     ) {
-      return makeMove({ from: sourceSquare, to: targetSquare })
+      return makeMove({ from: sourceSquare, to: targetSquare });
     } else {
-      setMsg(TrainMessageInput.enum.nope)
-      return false
+      setMsg(TrainMessageInput.enum.nope);
+      return false;
     }
   }
 
   function again() {
     if (props.startingMove) {
-      GameService.backTo(props.startingMove)
+      GameService.backTo(props.startingMove);
     } else {
-      GameService.reset()
+      GameService.reset();
     }
-    fetcher.data = null
-    setChallenge(null)
-    setFen(GameService.fen)
+    fetcher.data = null;
+    setChallenge(null);
+    setFen(GameService.fen);
   }
 
   function showHint() {
     if (hints.length === 0) {
-      return
+      return;
     }
-    setMsg(TrainMessageInput.enum.hint)
+    setMsg(TrainMessageInput.enum.hint);
   }
 
   return (
@@ -149,5 +149,5 @@ export function Train(props: {
         <Code>{fen}</Code>
       </Flex>
     </>
-  )
+  );
 }

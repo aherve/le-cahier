@@ -1,16 +1,16 @@
-import { DynamoDB } from '@aws-sdk/client-dynamodb'
-import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
+import { DynamoDB } from '@aws-sdk/client-dynamodb';
+import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 
-import AmplifyConfig from '../../infra/aws-export.json'
+import AmplifyConfig from '../../infra/aws-export.json';
 
-import { UserSchema } from '~/schemas/user'
+import { UserSchema } from '~/schemas/user';
 
 export class UserServiceClass {
-  private dynCli: DynamoDB
-  private userTableName = 'le-cahier-users'
+  private dynCli: DynamoDB;
+  private userTableName = 'le-cahier-users';
   constructor() {
-    const region = AmplifyConfig.region
-    this.dynCli = new DynamoDB({ region })
+    const region = AmplifyConfig.region;
+    this.dynCli = new DynamoDB({ region });
   }
 
   public async setLichessUsername(userId: string, lichessUsername: string) {
@@ -21,7 +21,7 @@ export class UserServiceClass {
       ExpressionAttributeValues: marshall({
         ':lichessUsername': lichessUsername,
       }),
-    })
+    });
   }
 
   public async getUser(userId: string) {
@@ -32,12 +32,12 @@ export class UserServiceClass {
           S: userId,
         },
       },
-    })
+    });
     if (!user.Item) {
-      return undefined
+      return undefined;
     }
-    return UserSchema.parse(unmarshall(user.Item))
+    return UserSchema.parse(unmarshall(user.Item));
   }
 }
 
-export const UserService = new UserServiceClass()
+export const UserService = new UserServiceClass();

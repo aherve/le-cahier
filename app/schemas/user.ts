@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 export const CognitoUserSchema = z
   .object({
@@ -14,11 +14,11 @@ export const CognitoUserSchema = z
     email: user.email,
     emailVerified: user.email_verified,
     userId: user.sub,
-  }))
+  }));
 
 export type CognitoUser = z.infer<typeof CognitoUserSchema>
 
 export const UserSchema = z.object({
   userId: z.string().uuid(),
   lichessUsername: z.string().optional(),
-})
+});

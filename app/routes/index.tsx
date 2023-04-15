@@ -1,7 +1,7 @@
-import type { Move } from 'chess.js'
-import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types'
+import type { Move } from 'chess.js';
+import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 
-import { useAuthenticator } from '@aws-amplify/ui-react'
+import { useAuthenticator } from '@aws-amplify/ui-react';
 import {
   Menu,
   MenuItem,
@@ -11,20 +11,20 @@ import {
   Heading,
   MenuButton,
   MenuList,
-} from '@chakra-ui/react'
-import { useNavigate } from '@remix-run/react'
-import { useState } from 'react'
-import { BsRecordCircle } from 'react-icons/bs'
-import { GiSecretBook } from 'react-icons/gi'
-import { MdOutlineSmartToy, MdSettings, MdSmartToy } from 'react-icons/md'
-import { SiLichess } from 'react-icons/si'
-import { z } from 'zod'
+} from '@chakra-ui/react';
+import { useNavigate } from '@remix-run/react';
+import { useState } from 'react';
+import { BsRecordCircle } from 'react-icons/bs';
+import { GiSecretBook } from 'react-icons/gi';
+import { MdOutlineSmartToy, MdSettings, MdSmartToy } from 'react-icons/md';
+import { SiLichess } from 'react-icons/si';
+import { z } from 'zod';
 
-import Explore from '~/components/explore'
-import LichessReport from '~/components/lichess-report'
-import { Record } from '~/components/record'
-import { Train } from '~/components/train'
-import { GameService } from '~/services/gameService'
+import Explore from '~/components/explore';
+import LichessReport from '~/components/lichess-report';
+import { Record } from '~/components/record';
+import { Train } from '~/components/train';
+import { GameService } from '~/services/gameService';
 
 const GameMode = z.enum([
   'explore',
@@ -32,18 +32,18 @@ const GameMode = z.enum([
   'recordMoves',
   'trainWithBlack',
   'trainWithWhite',
-])
+]);
 type GameModeType = z.infer<typeof GameMode>
 
 export default function Index() {
-  const { signOut } = useAuthenticator()
-  const [mode, setMode] = useState<GameModeType>(GameMode.enum.explore)
-  const [fromLastMove, setFromLastMove] = useState<Move | undefined>()
-  const [gameId, setGameId] = useState(Date.now().toString())
-  const navigate = useNavigate()
+  const { signOut } = useAuthenticator();
+  const [mode, setMode] = useState<GameModeType>(GameMode.enum.explore);
+  const [fromLastMove, setFromLastMove] = useState<Move | undefined>();
+  const [gameId, setGameId] = useState(Date.now().toString());
+  const navigate = useNavigate();
 
   function startLichessReport() {
-    setMode(GameMode.enum.lichessReport)
+    setMode(GameMode.enum.lichessReport);
   }
 
   function startTraining(
@@ -52,31 +52,31 @@ export default function Index() {
     lastMove?: Move
   ) {
     if (resetBoard) {
-      GameService.reset()
+      GameService.reset();
     }
-    setFromLastMove(lastMove)
-    setGameId(Date.now().toString())
+    setFromLastMove(lastMove);
+    setGameId(Date.now().toString());
     switch (orientation) {
       case 'black':
-        return setMode(GameMode.enum.trainWithBlack)
+        return setMode(GameMode.enum.trainWithBlack);
       default:
-        return setMode(GameMode.enum.trainWithWhite)
+        return setMode(GameMode.enum.trainWithWhite);
     }
   }
 
   function startRecordingMoves(resetBoard: boolean) {
-    setGameId(Date.now().toString())
+    setGameId(Date.now().toString());
     if (resetBoard) {
-      GameService.reset()
+      GameService.reset();
     }
-    setMode(GameMode.enum.recordMoves)
+    setMode(GameMode.enum.recordMoves);
   }
   function startExplore(resetBoard: boolean) {
-    setGameId(Date.now().toString())
+    setGameId(Date.now().toString());
     if (resetBoard) {
-      GameService.reset()
+      GameService.reset();
     }
-    setMode(GameMode.enum.explore)
+    setMode(GameMode.enum.explore);
   }
 
   function renderSwitch() {
@@ -89,7 +89,7 @@ export default function Index() {
             startRecording={() => startRecordingMoves(false)}
             startingMove={fromLastMove}
           />
-        )
+        );
       case GameMode.enum.trainWithBlack:
         return (
           <Train
@@ -98,11 +98,11 @@ export default function Index() {
             startRecording={() => startRecordingMoves(false)}
             startingMove={fromLastMove}
           />
-        )
+        );
       case GameMode.enum.recordMoves:
-        return <Record key={gameId} />
+        return <Record key={gameId} />;
       case GameMode.enum.lichessReport:
-        return <LichessReport></LichessReport>
+        return <LichessReport></LichessReport>;
       case GameMode.enum.explore:
         return (
           <Explore
@@ -111,7 +111,7 @@ export default function Index() {
               startTraining(orientation, false, lastMove)
             }
           ></Explore>
-        )
+        );
     }
   }
 
@@ -166,7 +166,7 @@ export default function Index() {
         </Flex>
       </div>
     </>
-  )
+  );
 }
 
 function pageTitle(mode: GameModeType) {
@@ -179,9 +179,9 @@ function pageTitle(mode: GameModeType) {
             <Heading size="lg">Browsing moves</Heading>
           </Flex>
         </>
-      )
+      );
     case GameMode.enum.lichessReport:
-      return null
+      return null;
     case GameMode.enum.recordMoves:
       return (
         <>
@@ -190,7 +190,7 @@ function pageTitle(mode: GameModeType) {
             <Heading size="lg">Recording moves</Heading>
           </Flex>
         </>
-      )
+      );
     case GameMode.enum.trainWithBlack:
     case GameMode.enum.trainWithWhite:
       return (
@@ -200,8 +200,8 @@ function pageTitle(mode: GameModeType) {
             <Heading size="lg">Training mode</Heading>
           </Flex>
         </>
-      )
+      );
     default:
-      return <Box></Box>
+      return <Box></Box>;
   }
 }

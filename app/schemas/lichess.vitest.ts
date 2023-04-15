@@ -1,12 +1,12 @@
-import { it, describe, expect } from 'vitest'
+import { it, describe, expect } from 'vitest';
 
-import { LichessGameSchema } from './lichess'
+import { LichessGameSchema } from './lichess';
 
 describe('lichess schema', () => {
   it('can parse a game', () => {
-    const sample = require('./game-sample.json')
+    const sample = require('./game-sample.json');
 
-    expect(LichessGameSchema.safeParse(sample).success).toBe(true)
+    expect(LichessGameSchema.safeParse(sample).success).toBe(true);
     expect(LichessGameSchema.parse(sample)).toEqual({
       id: 'P3DJiMVw',
       rated: true,
@@ -90,6 +90,6 @@ describe('lichess schema', () => {
         },
       ],
       clock: { initial: 300, increment: 3, totalTime: 420 },
-    })
-  })
-})
+    });
+  });
+});

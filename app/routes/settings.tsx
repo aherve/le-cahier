@@ -1,4 +1,4 @@
-import type { ActionFunction } from '@remix-run/node'
+import type { ActionFunction } from '@remix-run/node';
 
 import {
   Button,
@@ -7,29 +7,29 @@ import {
   FormLabel,
   Heading,
   Input,
-} from '@chakra-ui/react'
-import { redirect } from '@remix-run/node'
-import { Form } from '@remix-run/react'
+} from '@chakra-ui/react';
+import { redirect } from '@remix-run/node';
+import { Form } from '@remix-run/react';
 
-import { authenticate } from '~/services/auth.server'
-import { UserService } from '~/services/users.server'
+import { authenticate } from '~/services/auth.server';
+import { UserService } from '~/services/users.server';
 
-const LICHESS_USERNAME = 'lichessUsername'
+const LICHESS_USERNAME = 'lichessUsername';
 
 export const action: ActionFunction = async ({ request }) => {
   const [userId, lichessUsername] = await Promise.all([
     //
     authenticate(request).then((u) => u.userId),
     request.formData().then((f) => f.get(LICHESS_USERNAME)),
-  ])
+  ]);
 
   if (!lichessUsername) {
-    throw new Error('lichess username is required')
+    throw new Error('lichess username is required');
   }
 
-  await UserService.setLichessUsername(userId, lichessUsername as string)
-  return redirect('/')
-}
+  await UserService.setLichessUsername(userId, lichessUsername as string);
+  return redirect('/');
+};
 
 export default function Settings() {
   return (
@@ -47,5 +47,5 @@ export default function Settings() {
         </Form>
       </Flex>
     </>
-  )
+  );
 }
