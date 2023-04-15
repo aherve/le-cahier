@@ -7,6 +7,6 @@ import { ChessBookService } from '~/services/chess-book.server';
 
 export const action: ActionFunction = async ({ request }) => {
   const { userId } = await authenticate(request);
-  await ChessBookService.linkGraph(userId);
-  return json({ success: true });
+  const res = await ChessBookService.linkGraph(userId);
+  return json(res);
 };

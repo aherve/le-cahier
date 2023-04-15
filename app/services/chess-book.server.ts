@@ -218,13 +218,15 @@ export class ChessBook {
         }
       }
     }
-    console.log({
+    await Promise.all(savePromises);
+    const res = {
       newTransposition,
       leadsToUnknownPosition: deadEnds,
       alreadyRegistered,
       positionScanned,
-    });
-    await Promise.all(savePromises);
+    };
+    console.log(res);
+    return res;
   }
 
   public async cleanGameReport(gameId: string, userId: string) {
