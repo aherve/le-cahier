@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const BookMoveSchema = z.object({
   targetFEN: z.string(),

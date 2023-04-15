@@ -2,18 +2,19 @@
 const ERROR = 2;
 
 module.exports = {
-  extends: ["@remix-run/eslint-config", "@remix-run/eslint-config/node"],
-  ignorePatterns: ["**/node_modules/**", "**/dist/**", "**/build/**"],
+  extends: ['@remix-run/eslint-config', '@remix-run/eslint-config/node'],
+  ignorePatterns: ['**/node_modules/**', '**/dist/**', '**/build/**'],
   rules: {
-    semi: [ERROR, "always"],
-    "import/no-duplicates": ERROR,
-    "import/order": [
+    quotes: [ERROR, 'single'],
+    semi: [ERROR, 'always'],
+    'import/no-duplicates': ERROR,
+    'import/order': [
       ERROR,
       {
-        "newlines-between": "always",
-        groups: ["type", "builtin", "external", ["parent", "sibling"], "index"],
+        'newlines-between': 'always',
+        groups: ['type', 'builtin', 'external', ['parent', 'sibling'], 'index'],
         alphabetize: {
-          order: "asc",
+          order: 'asc',
           caseInsensitive: true,
         },
       },

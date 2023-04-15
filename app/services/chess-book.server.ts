@@ -1,41 +1,41 @@
-import type { AttributeValue } from "@aws-sdk/client-dynamodb";
-import type { SaveMoveInput } from "~/routes/api/moves/create";
-import type { GameReport } from "~/schemas/game-report";
-import type { LichessGame } from "~/schemas/lichess";
-import type { BookPosition } from "~/schemas/position";
+import type { AttributeValue } from '@aws-sdk/client-dynamodb';
+import type { SaveMoveInput } from '~/routes/api/moves/create';
+import type { GameReport } from '~/schemas/game-report';
+import type { LichessGame } from '~/schemas/lichess';
+import type { BookPosition } from '~/schemas/position';
 
-import { DynamoDB, ScanCommand } from "@aws-sdk/client-dynamodb";
-import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
-import { Chess } from "chess.js";
-import cache from "memory-cache";
+import { DynamoDB, ScanCommand } from '@aws-sdk/client-dynamodb';
+import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
+import { Chess } from 'chess.js';
+import cache from 'memory-cache';
 
-import { stripFEN } from "./utils";
+import { stripFEN } from './utils';
 
-import { GameReportSchema } from "~/schemas/game-report";
-import { LichessGameSchema } from "~/schemas/lichess";
-import { BookPositionSchema, BookMoveSchema } from "~/schemas/position";
+import { GameReportSchema } from '~/schemas/game-report';
+import { LichessGameSchema } from '~/schemas/lichess';
+import { BookPositionSchema, BookMoveSchema } from '~/schemas/position';
 
 export class ChessBook {
   private positionTableName: string;
   private gameTableName: string;
   private dynCli: DynamoDB;
   constructor() {
-    const region = "eu-west-1";
+    const region = 'eu-west-1';
     this.dynCli = new DynamoDB({ region });
-    this.positionTableName = "le-cahier-positions";
-    this.gameTableName = "le-cahier-games";
+    this.positionTableName = 'le-cahier-positions';
+    this.gameTableName = 'le-cahier-games';
   }
 
   public async addMove(input: SaveMoveInput & { userId: string }) {
     const { isOpponentMove, fen, move } = input;
-    console.log("adding move", input);
+    console.log('adding move', input);
 
     const game = new Chess(fen);
     game.move(move);
     const bookMove = BookMoveSchema.parse({
       targetFEN: stripFEN(game.fen()),
     });
-    const path = isOpponentMove ? "opponentMoves" : "bookMoves";
+    const path = isOpponentMove ? 'opponentMoves' : 'bookMoves';
 
     try {
       await this.dynCli.updateItem({
@@ -44,13 +44,13 @@ export class ChessBook {
           fen: stripFEN(fen),
           userId: input.userId,
         }),
-        UpdateExpression: `SET #path = :move`,
-        ConditionExpression: `attribute_not_exists(#path)`,
+        UpdateExpression: 'SET #path = :move',
+        ConditionExpression: 'attribute_not_exists(#path)',
         ExpressionAttributeNames: {
-          "#path": path,
+          '#path': path,
         },
         ExpressionAttributeValues: {
-          ":move": {
+          ':move': {
             M: {
               [move]: {
                 M: marshall(bookMove, { removeUndefinedValues: true }),
@@ -66,13 +66,13 @@ export class ChessBook {
           fen: stripFEN(fen),
           userId: input.userId,
         }),
-        UpdateExpression: `SET #path.#move = :move`,
+        UpdateExpression: 'SET #path.#move = :move',
         ExpressionAttributeNames: {
-          "#path": path,
-          "#move": move,
+          '#path': path,
+          '#move': move,
         },
         ExpressionAttributeValues: {
-          ":move": { M: marshall(bookMove, { removeUndefinedValues: true }) },
+          ':move': { M: marshall(bookMove, { removeUndefinedValues: true }) },
         },
       };
       await this.dynCli.updateItem(update);
@@ -87,7 +87,7 @@ export class ChessBook {
     const cacheKey = `position-${key}-${userId}`;
     const cached = cache.get(cacheKey);
     if (cached) {
-      console.log("position cache hit");
+      console.log('position cache hit');
       return cached;
     }
 
@@ -150,12 +150,12 @@ export class ChessBook {
         userId,
       }),
       TableName: this.gameTableName,
-      UpdateExpression: `SET #report = :report`,
+      UpdateExpression: 'SET #report = :report',
       ExpressionAttributeNames: {
-        "#report": "report",
+        '#report': 'report',
       },
       ExpressionAttributeValues: {
-        ":report": { M: marshall(report, { removeUndefinedValues: true }) },
+        ':report': { M: marshall(report, { removeUndefinedValues: true }) },
       },
     });
     console.log(`report ${report.gameId} saved`);
@@ -164,12 +164,12 @@ export class ChessBook {
     await this.dynCli.updateItem({
       Key: marshall({ gameId: game.id, userId }),
       TableName: this.gameTableName,
-      UpdateExpression: `SET #game = :game`,
+      UpdateExpression: 'SET #game = :game',
       ExpressionAttributeNames: {
-        "#game": "game",
+        '#game': 'game',
       },
       ExpressionAttributeValues: {
-        ":game": { M: marshall(game, { removeUndefinedValues: true }) },
+        ':game': { M: marshall(game, { removeUndefinedValues: true }) },
       },
     });
     console.log(`game ${game.id} saved`);
@@ -178,17 +178,19 @@ export class ChessBook {
   public async linkGraph(userId: string) {
     // Build map of all moves. Warning, this is expensive $$$
     let newTransposition = 0;
-    let leadsToUnknownPosition = 0;
+    let deadEnds = 0;
     let alreadyRegistered = 0;
+    let positionScanned = 0;
     const scanner = this.positionScanner(userId);
     const allPositions: Record<string, BookPosition> = {};
     const savePromises: Promise<void>[] = [];
     for await (const item of scanner) {
-      allPositions[item.fen] = item;
+      allPositions[stripFEN(item.fen)] = item;
     }
 
     // Find transpositions
     for (const position of Object.values(allPositions)) {
+      positionScanned++;
       const allOpponentMoves = new Chess(position.fen).moves({ verbose: true });
       const newOpponentMoves = allOpponentMoves.filter(
         (m) => !(m.lan in position.opponentMoves)
@@ -212,14 +214,15 @@ export class ChessBook {
             })
           );
         } else {
-          leadsToUnknownPosition++;
+          deadEnds++;
         }
       }
     }
     console.log({
       newTransposition,
-      leadsToUnknownPosition,
+      leadsToUnknownPosition: deadEnds,
       alreadyRegistered,
+      positionScanned,
     });
     await Promise.all(savePromises);
   }
@@ -228,9 +231,9 @@ export class ChessBook {
     await this.dynCli.updateItem({
       Key: marshall({ gameId, userId }),
       TableName: this.gameTableName,
-      UpdateExpression: `REMOVE #report`,
+      UpdateExpression: 'REMOVE #report',
       ExpressionAttributeNames: {
-        "#report": "report",
+        '#report': 'report',
       },
     });
   }
@@ -242,12 +245,12 @@ export class ChessBook {
         new ScanCommand({
           TableName: this.positionTableName,
           ExclusiveStartKey: lastEvaluatedKey,
-          FilterExpression: "#userId = :userId",
+          FilterExpression: '#userId = :userId',
           ExpressionAttributeNames: {
-            "#userId": "userId",
+            '#userId': 'userId',
           },
           ExpressionAttributeValues: {
-            ":userId": { S: userId },
+            ':userId': { S: userId },
           },
         })
       );

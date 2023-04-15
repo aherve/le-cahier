@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   esbuild: {
@@ -10,6 +10,6 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["**/*.vitest.ts", "**/*.vitest.tsx"],
+    include: ['**/*.vitest.ts', '**/*.vitest.tsx'],
   },
 });

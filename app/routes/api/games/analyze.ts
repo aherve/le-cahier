@@ -1,37 +1,37 @@
-import type { LoaderFunction } from "@remix-run/node";
-import type { Color } from "chess.js";
-import type { GameReport } from "~/schemas/game-report";
-import type { LichessGame } from "~/schemas/lichess";
+import type { LoaderFunction } from '@remix-run/node';
+import type { Color } from 'chess.js';
+import type { GameReport } from '~/schemas/game-report';
+import type { LichessGame } from '~/schemas/lichess';
 
-import { redirect, json } from "@remix-run/node";
-import { Chess } from "chess.js";
+import { redirect, json } from '@remix-run/node';
+import { Chess } from 'chess.js';
 
-import { ReportStatusSchema } from "~/schemas/game-report";
-import { authenticate } from "~/services/auth.server";
-import { ChessBookService } from "~/services/chess-book.server";
-import { UserService } from "~/services/users.server";
+import { ReportStatusSchema } from '~/schemas/game-report';
+import { authenticate } from '~/services/auth.server';
+import { ChessBookService } from '~/services/chess-book.server';
+import { UserService } from '~/services/users.server';
 
 export const loader: LoaderFunction = async ({ request }) => {
   const { userId } = await authenticate(request);
   const user = await UserService.getUser(userId);
   const lichessUsername = user?.lichessUsername;
   if (!lichessUsername) {
-    return redirect("/settings");
+    return redirect('/settings');
   }
 
-  const id = new URL(request.url).searchParams.get("id");
+  const id = new URL(request.url).searchParams.get('id');
   if (!id) {
-    throw new Error("Missing id");
+    throw new Error('Missing id');
   }
 
   const existing = await ChessBookService.getGame(id, userId);
   if (!existing) {
-    throw new Error("No entry found in the db");
+    throw new Error('No entry found in the db');
   }
 
   const { game, report } = existing;
   if (!game) {
-    throw new Error("No game found in the db");
+    throw new Error('No game found in the db');
   }
 
   if (report) {
@@ -40,7 +40,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const newReport = await analyzeGame(
     game,
-    game.players.white.user.name === lichessUsername ? "w" : "b",
+    game.players.white.user.name === lichessUsername ? 'w' : 'b',
     userId,
     lichessUsername
   );

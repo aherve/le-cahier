@@ -1,4 +1,4 @@
-import type { Move } from "chess.js";
+import type { Move } from 'chess.js';
 
 import {
   Card,
@@ -11,8 +11,8 @@ import {
   Stack,
   StackDivider,
   Box,
-} from "@chakra-ui/react";
-import { chunk } from "lodash";
+} from '@chakra-ui/react';
+import { chunk } from 'lodash';
 
 export default function Moves(props: {
   moves: Array<Move>;
@@ -86,7 +86,7 @@ function MoveItem(props: {
           {props.movePair[0].san}
         </Link>
         <Link flex="2 1 0" onClick={() => props.onNavigate(props.movePair[1])}>
-          {props.movePair[1]?.san ?? ""}
+          {props.movePair[1]?.san ?? ''}
         </Link>
       </Flex>
     </>

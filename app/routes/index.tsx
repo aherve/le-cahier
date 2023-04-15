@@ -33,7 +33,7 @@ const GameMode = z.enum([
   'trainWithBlack',
   'trainWithWhite',
 ]);
-type GameModeType = z.infer<typeof GameMode>
+type GameModeType = z.infer<typeof GameMode>;
 
 export default function Index() {
   const { signOut } = useAuthenticator();
