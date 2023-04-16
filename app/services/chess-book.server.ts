@@ -9,7 +9,7 @@ import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { Chess } from 'chess.js';
 import cache from 'memory-cache';
 
-import { stripFEN } from './utils';
+import { inOneMonthUnix, stripFEN } from './utils';
 
 import { GameReportSchema } from '~/schemas/game-report';
 import { LichessGameSchema } from '~/schemas/lichess';
@@ -150,12 +150,14 @@ export class ChessBook {
         userId,
       }),
       TableName: this.gameTableName,
-      UpdateExpression: 'SET #report = :report',
+      UpdateExpression: 'SET #report = :report, #TTL = :TTL',
       ExpressionAttributeNames: {
         '#report': 'report',
+        '#TTL': 'TTL',
       },
       ExpressionAttributeValues: {
         ':report': { M: marshall(report, { removeUndefinedValues: true }) },
+        ':TTL': { N: inOneMonthUnix().toString() },
       },
     });
     console.log(`report ${report.gameId} saved`);
@@ -164,12 +166,14 @@ export class ChessBook {
     await this.dynCli.updateItem({
       Key: marshall({ gameId: game.id, userId }),
       TableName: this.gameTableName,
-      UpdateExpression: 'SET #game = :game',
+      UpdateExpression: 'SET #game = :game, #TTL = :TTL',
       ExpressionAttributeNames: {
         '#game': 'game',
+        '#TTL': 'TTL',
       },
       ExpressionAttributeValues: {
         ':game': { M: marshall(game, { removeUndefinedValues: true }) },
+        ':TTL': { N: inOneMonthUnix().toString() },
       },
     });
     console.log(`game ${game.id} saved`);

@@ -36,6 +36,10 @@ resource "aws_dynamodb_table" "games" {
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "gameId"
   range_key    = "userId"
+  ttl {
+    attribute_name = "TTL"
+    enabled        = true
+  }
 
   attribute {
     name = "gameId"

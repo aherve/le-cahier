@@ -13,3 +13,7 @@ export function toSAN(fen: string, move: string) {
     return move;
   }
 }
+
+export function inOneMonthUnix() {
+  return Math.round(Date.now() / 1000 + 30 * 24 * 3600);
+}
