@@ -19,6 +19,16 @@ export class GameServiceClass {
     return this.game.fen();
   }
 
+  public isValidMove(move: string | { from: string; to: string }) {
+    try {
+      const gg = new Chess(this.fen);
+      gg.move(move);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   public get moves(): Move[] {
     return this.game.history({ verbose: true });
   }

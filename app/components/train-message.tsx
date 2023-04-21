@@ -7,6 +7,7 @@ export const TrainMessageInput = z.enum([
   'noMoreData',
   'empty',
   'hint',
+  'success',
 ]);
 export type TrainMessageInputType = z.infer<typeof TrainMessageInput>;
 export default function TrainMessage(props: {
@@ -16,6 +17,8 @@ export default function TrainMessage(props: {
   const hintsStr = props.hints?.join(', ') ?? '';
 
   switch (props.type) {
+    case TrainMessageInput.enum.success:
+      return <Alert status="success">Well done !</Alert>;
     case TrainMessageInput.enum.yourTurn:
       return <Alert status="success">It's your turn</Alert>;
     case TrainMessageInput.enum.nope:

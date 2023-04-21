@@ -16,10 +16,16 @@ import { useNavigate } from '@remix-run/react';
 import { useState } from 'react';
 import { BsRecordCircle } from 'react-icons/bs';
 import { GiSecretBook } from 'react-icons/gi';
-import { MdOutlineSmartToy, MdSettings, MdSmartToy } from 'react-icons/md';
+import {
+  MdOutlineSmartToy,
+  MdOutlineSmsFailed,
+  MdSettings,
+  MdSmartToy,
+} from 'react-icons/md';
 import { SiLichess } from 'react-icons/si';
 import { z } from 'zod';
 
+import Anki from '~/components/anki';
 import Explore from '~/components/explore';
 import LichessReport from '~/components/lichess-report';
 import { Record } from '~/components/record';
@@ -32,6 +38,7 @@ const GameMode = z.enum([
   'recordMoves',
   'trainWithBlack',
   'trainWithWhite',
+  'anki',
 ]);
 type GameModeType = z.infer<typeof GameMode>;
 
@@ -78,6 +85,10 @@ export default function Index() {
     }
     setMode(GameMode.enum.explore);
   }
+  function startAnki() {
+    setGameId(Date.now().toString());
+    setMode(GameMode.enum.anki);
+  }
 
   function renderSwitch() {
     switch (mode) {
@@ -103,6 +114,8 @@ export default function Index() {
         return <Record key={gameId} />;
       case GameMode.enum.lichessReport:
         return <LichessReport></LichessReport>;
+      case GameMode.enum.anki:
+        return <Anki></Anki>;
       case GameMode.enum.explore:
         return (
           <Explore
@@ -136,6 +149,9 @@ export default function Index() {
             onClick={() => startTraining('black', true)}
           >
             Train with black
+          </Button>
+          <Button onClick={startAnki} leftIcon={<MdOutlineSmsFailed />}>
+            Review mistakes
           </Button>
           <Button
             leftIcon={<BsRecordCircle />}

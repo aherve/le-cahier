@@ -85,14 +85,30 @@ export function Train(props: {
     }
   }
 
+  function ankiUpdate(isSuccess: boolean) {
+    fetch('/api/moves/update-anki', {
+      method: 'POST',
+      body: JSON.stringify({ fen, isSuccess }),
+    }).then(() => {
+      console.log('anki updated');
+    });
+  }
+
   function onDrop(sourceSquare: Square, targetSquare: Square) {
+    // Discard invalid moves
+    if (!GameService.isValidMove({ from: sourceSquare, to: targetSquare })) {
+      return false;
+    }
+
     if (!challenge || challenge.expectedMoves.length === 0) {
       return makeMove({ from: sourceSquare, to: targetSquare });
     } else if (
       challenge.expectedMoves.includes(`${sourceSquare}${targetSquare}`)
     ) {
+      ankiUpdate(true);
       return makeMove({ from: sourceSquare, to: targetSquare });
     } else {
+      ankiUpdate(false);
       setMsg(TrainMessageInput.enum.nope);
       return false;
     }

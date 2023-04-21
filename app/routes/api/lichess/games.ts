@@ -16,8 +16,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   const until =
     new URL(request.url).searchParams.get('until') ?? Date.now().toString();
 
-  console.log('FETCHING GAMES SINCE', until);
-
   const user = await UserService.getUser(userId);
   const lichessUsername = user?.lichessUsername;
 

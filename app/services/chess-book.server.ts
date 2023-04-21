@@ -19,11 +19,13 @@ export class ChessBook {
   private positionTableName: string;
   private gameTableName: string;
   private dynCli: DynamoDB;
+  private ankiIndexName: string;
   constructor() {
     const region = 'eu-west-1';
     this.dynCli = new DynamoDB({ region });
     this.positionTableName = 'le-cahier-positions';
     this.gameTableName = 'le-cahier-games';
+    this.ankiIndexName = 'ankiScoreIndex';
   }
 
   public async addMove(input: SaveMoveInput & { userId: string }) {
@@ -104,6 +106,23 @@ export class ChessBook {
 
     cache.put(cacheKey, result, 10_000);
     return result;
+  }
+
+  public async getAnki(userId: string) {
+    const data = await this.dynCli.query({
+      TableName: this.positionTableName,
+      IndexName: this.ankiIndexName,
+      KeyConditionExpression: 'userId = :userId',
+      ExpressionAttributeValues: {
+        ':userId': { S: userId },
+      },
+      Limit: 1,
+    });
+
+    if (!data.Items || data.Items.length === 0) {
+      return undefined;
+    }
+    return BookPositionSchema.parse(unmarshall(data.Items[0]));
   }
 
   public async updateAnki(input: {
