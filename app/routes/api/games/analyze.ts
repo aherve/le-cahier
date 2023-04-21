@@ -72,11 +72,21 @@ async function analyzeGame(
       }
 
       if (move.lan in position.bookMoves) {
+        await ChessBookService.updateAnki({
+          fen: position.fen,
+          userId,
+          isSuccess: true,
+        });
         return {
           status: ReportStatusSchema.enum.success,
         };
       }
 
+      await ChessBookService.updateAnki({
+        fen: position.fen,
+        userId,
+        isSuccess: false,
+      });
       return {
         status: ReportStatusSchema.enum.failed,
         expected: Object.keys(position.bookMoves).map((m) =>

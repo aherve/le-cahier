@@ -44,12 +44,14 @@ export class ChessBook {
           fen: stripFEN(fen),
           userId: input.userId,
         }),
-        UpdateExpression: 'SET #path = :move',
+        UpdateExpression: 'SET #path = :move, #ankiScore = :zero',
         ConditionExpression: 'attribute_not_exists(#path)',
         ExpressionAttributeNames: {
           '#path': path,
+          '#ankiScore': 'ankiScore',
         },
         ExpressionAttributeValues: {
+          ':zero': { N: '0' },
           ':move': {
             M: {
               [move]: {
@@ -102,6 +104,27 @@ export class ChessBook {
 
     cache.put(cacheKey, result, 10_000);
     return result;
+  }
+
+  public async updateAnki(input: {
+    fen: string;
+    userId: string;
+    isSuccess: boolean;
+  }) {
+    await this.dynCli.updateItem({
+      TableName: this.positionTableName,
+      Key: marshall({
+        fen: stripFEN(input.fen),
+        userId: input.userId,
+      }),
+      ConditionExpression: 'attribute_exists(fen)',
+      UpdateExpression: input.isSuccess
+        ? 'ADD ankiScore :two'
+        : 'SET ankiScore = :minusOne',
+      ExpressionAttributeValues: input.isSuccess
+        ? { ':two': { N: '2' } }
+        : { ':minusOne': { N: '-1' } },
+    });
   }
 
   public async getRandomOpponentMove(

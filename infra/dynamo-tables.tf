@@ -29,6 +29,21 @@ resource "aws_dynamodb_table" "positions" {
     name = "userId"
     type = "S"
   }
+  attribute {
+    name = "ankiScore"
+    type = "N"
+  }
+
+  global_secondary_index {
+    name            = "ankiScoreIndex"
+    hash_key        = "userId"
+    range_key       = "ankiScore"
+    projection_type = "INCLUDE"
+    non_key_attributes = [
+      "fen",
+      "bookMoves",
+    ]
+  }
 }
 
 resource "aws_dynamodb_table" "games" {

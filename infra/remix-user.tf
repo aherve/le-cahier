@@ -24,7 +24,8 @@ data "aws_iam_policy_document" "remix_policy" {
     resources = [
       aws_dynamodb_table.users.arn,
       aws_dynamodb_table.games.arn,
-      aws_dynamodb_table.positions.arn
+      aws_dynamodb_table.positions.arn,
+      "${aws_dynamodb_table.positions.arn}/index/*",
     ]
   }
 }

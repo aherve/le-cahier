@@ -5,8 +5,9 @@ export const BookMoveSchema = z.object({
 });
 export type BookMove = z.infer<typeof BookMoveSchema>;
 export const BookPositionSchema = z.object({
-  fen: z.string(),
+  ankiScore: z.number().default(0),
   bookMoves: z.record(z.string(), BookMoveSchema).default({}),
+  fen: z.string(),
   opponentMoves: z.record(z.string(), BookMoveSchema).default({}),
   userId: z.string().uuid(),
 });
