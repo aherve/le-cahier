@@ -11,7 +11,7 @@ export const SaveMoveInputSchema = z.object({
   isOpponentMove: z.boolean(),
   move: z.string(),
 });
-export type SaveMoveInput = z.infer<typeof SaveMoveInputSchema>
+export type SaveMoveInput = z.infer<typeof SaveMoveInputSchema>;
 
 export const action: ActionFunction = async ({ request }) => {
   const { userId } = await authenticate(request);

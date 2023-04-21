@@ -21,9 +21,9 @@ import { GetChallengeOutputSchema } from '~/routes/api/moves/challenge';
 import { GameService } from '~/services/gameService';
 
 export function Train(props: {
-  orientation: BoardOrientation
-  startRecording: (fen: string) => void
-  startingMove?: Move
+  orientation: BoardOrientation;
+  startRecording: (fen: string) => void;
+  startingMove?: Move;
 }) {
   const [fen, setFen] = useState(GameService.fen);
   const [msg, setMsg] = useState<TrainMessageInputType>('empty');

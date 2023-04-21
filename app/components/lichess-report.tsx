@@ -6,7 +6,6 @@ import {
   Text,
   Flex,
   Table,
-  TableCaption,
   TableContainer,
   Tbody,
   Td,
@@ -32,25 +31,38 @@ import { LichessGameSchema } from '~/schemas/lichess';
 
 export default function LichessReport() {
   const gameListFetcher = useFetcher();
+  const [games, setGames] = useState<LichessGame[]>([]);
 
   useEffect(() => {
+    console.log('u1', gameListFetcher.state, gameListFetcher.data);
     if (gameListFetcher.state === 'idle' && gameListFetcher.data == null) {
       gameListFetcher.load('/api/lichess/games');
     }
   }, [gameListFetcher]);
 
-  const games = LichessGameSchema.array().parse(gameListFetcher.data ?? []);
+  useEffect(() => {
+    if (gameListFetcher.data) {
+      setGames((prev) => [
+        ...prev,
+        ...LichessGameSchema.array().parse(gameListFetcher.data),
+      ]);
+    }
+  }, [gameListFetcher.data]);
 
   if (gameListFetcher.state === 'loading' && games.length === 0) {
     return <Spinner />;
   }
 
+  function LoadMore() {
+    const oldTimestamp = Math.min(...games.map((g) => g.createdAt));
+    gameListFetcher.load(`/api/lichess/games?until=${oldTimestamp}`);
+  }
+
   return (
     <>
-      <Flex direction="column" justify="center">
+      <Flex direction="column" align="center" justifyContent="start">
         <TableContainer>
           <Table size="sm" variant="simple">
-            <TableCaption>Recent games</TableCaption>
             <Thead>
               <Tr>
                 <Th> Date</Th>
@@ -68,6 +80,10 @@ export default function LichessReport() {
             </Tbody>
           </Table>
         </TableContainer>
+        {gameListFetcher.state !== 'idle' && <Spinner />}
+        {gameListFetcher.state === 'idle' && (
+          <Button onClick={LoadMore}>Load More</Button>
+        )}
       </Flex>
     </>
   );
@@ -145,10 +161,10 @@ function firstFailIndex(report?: GameReport) {
 
 function GameReportComponent(props: { game: LichessGame; report: GameReport }) {
   const successCount = props.report.movesReport.filter(
-    (m) => m.status === 'success'
+    (m) => m.status === 'success',
   ).length;
   const failedCount = props.report.movesReport.filter(
-    (m) => m.status === 'failed'
+    (m) => m.status === 'failed',
   ).length;
 
   if (failedCount === 0) {

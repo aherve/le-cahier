@@ -9,7 +9,7 @@ export class GameServiceClass {
   }
 
   public makeMove(
-    move: string | { from: string; to: string; promotion?: string }
+    move: string | { from: string; to: string; promotion?: string },
   ) {
     const m = this.game.move(move);
     return m;

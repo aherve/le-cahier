@@ -42,7 +42,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     game,
     game.players.white.user.name === lichessUsername ? 'w' : 'b',
     userId,
-    lichessUsername
+    lichessUsername,
   );
 
   await ChessBookService.setReport(newReport, userId);
@@ -54,7 +54,7 @@ async function analyzeGame(
   game: LichessGame,
   forColor: Color,
   userId: string,
-  lichessUsername: string
+  lichessUsername: string,
 ): Promise<GameReport> {
   const movesReport = await Promise.all(
     game.moves.map(async (move) => {
@@ -80,25 +80,25 @@ async function analyzeGame(
       return {
         status: ReportStatusSchema.enum.failed,
         expected: Object.keys(position.bookMoves).map((m) =>
-          toSAN(move.before, m)
+          toSAN(move.before, m),
         ),
         played: move.san,
       };
-    })
+    }),
   );
 
   const firstErrorIndex = movesReport.findIndex(
-    (r) => r.status === ReportStatusSchema.enum.failed
+    (r) => r.status === ReportStatusSchema.enum.failed,
   );
   const firstOutOfBookIndex = movesReport.findIndex(
-    (r) => r.status === ReportStatusSchema.enum.notFound
+    (r) => r.status === ReportStatusSchema.enum.notFound,
   );
 
   return {
     lichessUsername,
     gameId: game.id,
     movesReport: movesReport.filter(
-      (r) => r.status !== ReportStatusSchema.enum.notFound
+      (r) => r.status !== ReportStatusSchema.enum.notFound,
     ),
     firstError: firstErrorIndex > -1 ? game.moves[firstErrorIndex] : undefined,
     firstOutOfBook:

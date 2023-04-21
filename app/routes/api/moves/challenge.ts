@@ -10,7 +10,7 @@ export const GetChallengeOutputSchema = z.object({
   challengeMove: z.string().nullable(),
   expectedMoves: z.string().array(),
 });
-export type GetChallengeOutput = z.infer<typeof GetChallengeOutputSchema>
+export type GetChallengeOutput = z.infer<typeof GetChallengeOutputSchema>;
 
 export const loader: LoaderFunction = async ({ request }) => {
   const { userId } = await authenticate(request);

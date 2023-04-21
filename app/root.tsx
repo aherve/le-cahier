@@ -69,7 +69,7 @@ function withAuth(props: { user: AmplifyUser | undefined }) {
     },
     {
       expires: new Date(1000 * expiresAtSeconds),
-    }
+    },
   );
 
   return (

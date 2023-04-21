@@ -8,10 +8,15 @@ import { ChessBookService } from '~/services/chess-book.server';
 import { UserService } from '~/services/users.server';
 
 const LICHESS_TOKEN = process.env.LICHESS_TOKEN;
-const GAMES_COUNT = 20;
+const GAMES_COUNT = 5;
 
 export const loader: LoaderFunction = async ({ request }) => {
   const { userId } = await authenticate(request);
+
+  const until =
+    new URL(request.url).searchParams.get('until') ?? Date.now().toString();
+
+  console.log('FETCHING GAMES SINCE', until);
 
   const user = await UserService.getUser(userId);
   const lichessUsername = user?.lichessUsername;
@@ -29,8 +34,9 @@ export const loader: LoaderFunction = async ({ request }) => {
     `https://lichess.org/api/games/user/${lichessUsername}?` +
     new URLSearchParams({
       max: GAMES_COUNT.toString(),
-      opening: 'true',
       ongoing: 'false',
+      opening: 'true',
+      until,
     });
 
   const apiRes = await fetch(url, { headers });
@@ -42,7 +48,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     await Promise.all(
       parsed.map((g) => {
         return ChessBookService.setGame(g, userId);
-      })
+      }),
     );
 
     return json(parsed);

@@ -2,7 +2,7 @@ import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { Link } from '@chakra-ui/react';
 
 export default function LichessLink(
-  props: { fen: string } | { gameId: string; moveIndex?: number }
+  props: { fen: string } | { gameId: string; moveIndex?: number },
 ) {
   const link =
     'fen' in props

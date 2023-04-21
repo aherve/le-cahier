@@ -8,10 +8,10 @@ export const TrainMessageInput = z.enum([
   'empty',
   'hint',
 ]);
-export type TrainMessageInputType = z.infer<typeof TrainMessageInput>
+export type TrainMessageInputType = z.infer<typeof TrainMessageInput>;
 export default function TrainMessage(props: {
-  type: TrainMessageInputType
-  hints?: string[]
+  type: TrainMessageInputType;
+  hints?: string[];
 }) {
   const hintsStr = props.hints?.join(', ') ?? '';
 

@@ -49,7 +49,7 @@ export default function Index() {
   function startTraining(
     orientation: BoardOrientation,
     resetBoard: boolean,
-    lastMove?: Move
+    lastMove?: Move,
   ) {
     if (resetBoard) {
       GameService.reset();
@@ -160,7 +160,7 @@ export default function Index() {
             </Menu>
           </Flex>
           <Box paddingTop="20">{pageTitle(mode)}</Box>
-          <Flex grow={1} alignItems="center">
+          <Flex grow={1} alignItems="center" direction="column">
             {renderSwitch()}
           </Flex>
         </Flex>

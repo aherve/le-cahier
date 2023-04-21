@@ -14,7 +14,7 @@ export const MissedMoveSchema = z.object({
   played: z.string(),
   expected: z.string().array(),
 });
-export type MissedMove = z.infer<typeof MissedMoveSchema>
+export type MissedMove = z.infer<typeof MissedMoveSchema>;
 
 export const GameReportSchema = z.object({
   gameId: z.string(),
@@ -38,4 +38,4 @@ export const GameReportSchema = z.object({
   lichessUsername: z.string(),
 });
 
-export type GameReport = z.infer<typeof GameReportSchema>
+export type GameReport = z.infer<typeof GameReportSchema>;

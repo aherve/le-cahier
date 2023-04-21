@@ -139,4 +139,4 @@ export const LichessGameSchema = LichessGameCommonSchema.extend({
   moves: MoveSchema.array(),
 });
 
-export type LichessGame = z.infer<typeof LichessGameSchema>
+export type LichessGame = z.infer<typeof LichessGameSchema>;

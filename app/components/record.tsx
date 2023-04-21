@@ -46,7 +46,7 @@ export function Record() {
           (isPlayerTurn
             ? Object.keys(position?.bookMoves ?? {})
             : Object.keys(position?.opponentMoves ?? {})
-          ).map((m) => toSAN(fen, m))
+          ).map((m) => toSAN(fen, m)),
         );
       });
   }, [fen, orientation]);
@@ -100,7 +100,7 @@ export function Record() {
       status: 'info',
     });
     const scanRes = await fetch('/api/link-graph', { method: 'POST' }).then(
-      (r) => r.json()
+      (r) => r.json(),
     );
     toast({
       title: 'Scan complete',

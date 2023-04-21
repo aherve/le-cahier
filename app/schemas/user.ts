@@ -16,7 +16,7 @@ export const CognitoUserSchema = z
     userId: user.sub,
   }));
 
-export type CognitoUser = z.infer<typeof CognitoUserSchema>
+export type CognitoUser = z.infer<typeof CognitoUserSchema>;
 
 export const UserSchema = z.object({
   userId: z.string().uuid(),

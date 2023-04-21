@@ -14,13 +14,13 @@ import { GameService } from '~/services/gameService';
 import { toSAN } from '~/services/utils';
 
 export default function Explore(props: {
-  orientation?: BoardOrientation
-  startTraining: (orientation: BoardOrientation, lastMove: Move) => void
+  orientation?: BoardOrientation;
+  startTraining: (orientation: BoardOrientation, lastMove: Move) => void;
 }) {
   const [bookMoves, setBookMoves] = useState<string[]>([]);
   const [fen, setFen] = useState(GameService.fen);
   const [orientation, setOrientation] = useState<BoardOrientation>(
-    props.orientation ?? 'white'
+    props.orientation ?? 'white',
   );
 
   const moves = GameService.moves;
@@ -36,7 +36,7 @@ export default function Explore(props: {
           (isPlayerTurn
             ? Object.keys(position?.bookMoves ?? {})
             : Object.keys(position?.opponentMoves ?? {})
-          ).map((m) => toSAN(fen, m))
+          ).map((m) => toSAN(fen, m)),
         );
       });
   }, [fen, orientation]);

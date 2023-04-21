@@ -81,7 +81,7 @@ export class ChessBook {
 
   public async getPosition(
     fen: string,
-    userId: string
+    userId: string,
   ): Promise<BookPosition | null> {
     const key = stripFEN(fen);
     const cacheKey = `position-${key}-${userId}`;
@@ -106,7 +106,7 @@ export class ChessBook {
 
   public async getRandomOpponentMove(
     fen: string,
-    userId: string
+    userId: string,
   ): Promise<{ move: string; targetFEN: string } | null> {
     const position = await this.getPosition(fen, userId);
     if (!position) {
@@ -126,7 +126,7 @@ export class ChessBook {
 
   public async getGame(
     gameId: string,
-    userId: string
+    userId: string,
   ): Promise<{ game?: LichessGame; report?: GameReport } | null> {
     const data = await this.dynCli.getItem({
       TableName: this.gameTableName,
@@ -197,7 +197,7 @@ export class ChessBook {
       positionScanned++;
       const allOpponentMoves = new Chess(position.fen).moves({ verbose: true });
       const newOpponentMoves = allOpponentMoves.filter(
-        (m) => !(m.lan in position.opponentMoves)
+        (m) => !(m.lan in position.opponentMoves),
       );
       alreadyRegistered += allOpponentMoves.length - newOpponentMoves.length;
 
@@ -215,7 +215,7 @@ export class ChessBook {
               userId,
               isOpponentMove: true,
               move: newMove.lan,
-            })
+            }),
           );
         } else {
           deadEnds++;
@@ -258,7 +258,7 @@ export class ChessBook {
           ExpressionAttributeValues: {
             ':userId': { S: userId },
           },
-        })
+        }),
       );
       lastEvaluatedKey = LastEvaluatedKey;
       for (const item of Items ?? []) {

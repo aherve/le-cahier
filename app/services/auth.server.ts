@@ -16,7 +16,7 @@ const verifier = CognitoJwtVerifier.create({
 
 export async function authenticate(request: Request): Promise<CognitoUser> {
   const cognitoCookie = await new Cookies(request.headers.get('cookie')).get(
-    'cognito'
+    'cognito',
   );
 
   if (!cognitoCookie) {
