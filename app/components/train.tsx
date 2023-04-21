@@ -10,7 +10,7 @@ import { EditIcon, RepeatIcon } from '@chakra-ui/icons';
 import { Button, Code, Flex } from '@chakra-ui/react';
 import { useFetcher } from '@remix-run/react';
 import { Chess } from 'chess.js';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 
 import LichessLink from './lichess-link';
@@ -85,14 +85,17 @@ export function Train(props: {
     }
   }
 
-  function ankiUpdate(isSuccess: boolean) {
-    fetch('/api/moves/update-anki', {
-      method: 'POST',
-      body: JSON.stringify({ fen, isSuccess }),
-    }).then(() => {
-      console.log('anki updated');
-    });
-  }
+  const ankiUpdate = useCallback(
+    (isSuccess: boolean) => {
+      fetch('/api/moves/update-anki', {
+        method: 'POST',
+        body: JSON.stringify({ fen, isSuccess }),
+      }).then(() => {
+        console.log('anki updated');
+      });
+    },
+    [fen],
+  );
 
   function onDrop(sourceSquare: Square, targetSquare: Square) {
     // Discard invalid moves

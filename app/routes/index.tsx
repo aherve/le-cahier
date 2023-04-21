@@ -15,13 +15,8 @@ import {
 import { useNavigate } from '@remix-run/react';
 import { useState } from 'react';
 import { BsRecordCircle } from 'react-icons/bs';
-import { GiSecretBook } from 'react-icons/gi';
-import {
-  MdOutlineSmartToy,
-  MdOutlineSmsFailed,
-  MdSettings,
-  MdSmartToy,
-} from 'react-icons/md';
+import { GiFalling, GiSecretBook } from 'react-icons/gi';
+import { MdOutlineSmartToy, MdSettings, MdSmartToy } from 'react-icons/md';
 import { SiLichess } from 'react-icons/si';
 import { z } from 'zod';
 
@@ -150,7 +145,7 @@ export default function Index() {
           >
             Train with black
           </Button>
-          <Button onClick={startAnki} leftIcon={<MdOutlineSmsFailed />}>
+          <Button onClick={startAnki} leftIcon={<GiFalling />}>
             Review mistakes
           </Button>
           <Button
@@ -185,6 +180,15 @@ export default function Index() {
 
 function pageTitle(mode: GameModeType) {
   switch (mode) {
+    case GameMode.enum.anki:
+      return (
+        <>
+          <Flex direction="row" align="center" gap="5">
+            <GiFalling size="40" />
+            <Heading size="lg">Reviewing failed moves</Heading>
+          </Flex>
+        </>
+      );
     case GameMode.enum.explore:
       return (
         <>

@@ -34,7 +34,6 @@ export default function LichessReport() {
   const [games, setGames] = useState<LichessGame[]>([]);
 
   useEffect(() => {
-    console.log('u1', gameListFetcher.state, gameListFetcher.data);
     if (gameListFetcher.state === 'idle' && gameListFetcher.data == null) {
       gameListFetcher.load('/api/lichess/games');
     }
