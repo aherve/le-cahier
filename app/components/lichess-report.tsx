@@ -60,7 +60,7 @@ export default function LichessReport() {
 
   return (
     <>
-      <Flex direction="column" align="center" justifyContent="start">
+      <Flex direction="column" align="center" justifyContent="start" gap="5">
         <TableContainer>
           <Table size="sm" variant="simple">
             <Thead>

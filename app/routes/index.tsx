@@ -117,54 +117,52 @@ export default function Index() {
 
   return (
     <>
-      <div className="App">
-        <Flex height="100vh" direction="column" align="center">
-          <Flex direction="row" gap={10} align="center" minWidth="max-content">
-            <Button
-              leftIcon={<GiSecretBook />}
-              onClick={() => startExplore(true)}
-            >
-              Explore
-            </Button>
-            <Button
-              leftIcon={<MdOutlineSmartToy />}
-              onClick={() => startTraining('white', true)}
-            >
-              Train with white
-            </Button>
-            <Button
-              leftIcon={<MdSmartToy />}
-              onClick={() => startTraining('black', true)}
-            >
-              Train with black
-            </Button>
-            <Button
-              leftIcon={<BsRecordCircle />}
-              onClick={() => startRecordingMoves(true)}
-            >
-              Record moves
-            </Button>
-            <Button leftIcon={<SiLichess />} onClick={startLichessReport}>
-              lichess report
-            </Button>
-            <Menu>
-              <MenuButton as={Button}>
-                <MdSettings />
-              </MenuButton>
-              <MenuList>
-                <MenuItem onClick={() => navigate('/settings')}>
-                  Settings
-                </MenuItem>
-                <MenuItem onClick={signOut}>Logout</MenuItem>
-              </MenuList>
-            </Menu>
-          </Flex>
-          <Box paddingTop="20">{pageTitle(mode)}</Box>
-          <Flex grow={1} alignItems="center" direction="column">
-            {renderSwitch()}
-          </Flex>
+      <Flex height="100vh" direction="column" align="center" gap="10">
+        <Flex direction="row" gap={10} align="center" minWidth="max-content">
+          <Button
+            leftIcon={<GiSecretBook />}
+            onClick={() => startExplore(true)}
+          >
+            Explore
+          </Button>
+          <Button
+            leftIcon={<MdOutlineSmartToy />}
+            onClick={() => startTraining('white', true)}
+          >
+            Train with white
+          </Button>
+          <Button
+            leftIcon={<MdSmartToy />}
+            onClick={() => startTraining('black', true)}
+          >
+            Train with black
+          </Button>
+          <Button
+            leftIcon={<BsRecordCircle />}
+            onClick={() => startRecordingMoves(true)}
+          >
+            Record moves
+          </Button>
+          <Button leftIcon={<SiLichess />} onClick={startLichessReport}>
+            lichess report
+          </Button>
+          <Menu>
+            <MenuButton as={Button}>
+              <MdSettings />
+            </MenuButton>
+            <MenuList>
+              <MenuItem onClick={() => navigate('/settings')}>
+                Settings
+              </MenuItem>
+              <MenuItem onClick={signOut}>Logout</MenuItem>
+            </MenuList>
+          </Menu>
         </Flex>
-      </div>
+        <Flex>{pageTitle(mode)}</Flex>
+        <Flex grow={1} alignItems="center" direction="column">
+          {renderSwitch()}
+        </Flex>
+      </Flex>
     </>
   );
 }

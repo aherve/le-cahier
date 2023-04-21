@@ -34,14 +34,14 @@ export const action: ActionFunction = async ({ request }) => {
 export default function Settings() {
   return (
     <>
-      <Flex textAlign="center" direction="column" align="center">
+      <Flex textAlign="center" direction="column" align="center" gap="10">
         <Heading>Settings</Heading>
         <Form method="post">
           <FormControl>
             <FormLabel>Your lichess account</FormLabel>
             <Input type="text" name={LICHESS_USERNAME} />
           </FormControl>
-          <Button type="submit" formMethod="post">
+          <Button type="submit" formMethod="post" margin="5">
             save
           </Button>
         </Form>
