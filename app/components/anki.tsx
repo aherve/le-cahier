@@ -2,7 +2,7 @@ import type { TrainMessageInputType } from './train-message';
 import type { Square } from 'chess.js';
 import type { BookPosition } from '~/schemas/position';
 
-import { Button, Code, Flex, Spinner } from '@chakra-ui/react';
+import { Box, Button, Code, Flex, Spinner } from '@chakra-ui/react';
 import { useFetcher } from '@remix-run/react';
 import { Chess } from 'chess.js';
 import { useCallback, useEffect, useState } from 'react';
@@ -99,6 +99,15 @@ export default function Anki() {
 
   return (
     <>
+      {(position?.ankiScore ?? -1) > 0 && (
+        <Box>Let's review this position again !</Box>
+      )}
+      {(position?.ankiScore ?? 1) < 0 && (
+        <Box>You failed to find this move last time. Can you find it now ?</Box>
+      )}
+      {(position?.ankiScore ?? -1) === 0 && (
+        <Box>This is a book position you didn't yet trained on or played</Box>
+      )}
       <Flex direction="column" align="center" gap="5">
         <TrainMessage type={msg} hints={hints} />
         {fetcher.state === 'loading' && <Spinner />}

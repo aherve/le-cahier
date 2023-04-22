@@ -108,8 +108,9 @@ export class ChessBook {
     return result;
   }
 
-  public async getAnki(userId: string) {
-    const data = await this.dynCli.query({
+  public async getAnki(userId: string, skipNovelties: boolean) {
+    // find positions with ankiScore >= -1
+    const anyPosition = await this.dynCli.query({
       TableName: this.positionTableName,
       IndexName: this.ankiIndexName,
       KeyConditionExpression: 'userId = :userId',
@@ -119,10 +120,29 @@ export class ChessBook {
       Limit: 1,
     });
 
-    if (!data.Items || data.Items.length === 0) {
+    if (!anyPosition.Items || anyPosition.Items.length === 0) {
       return undefined;
     }
-    return BookPositionSchema.parse(unmarshall(data.Items[0]));
+    const found = BookPositionSchema.parse(unmarshall(anyPosition.Items[0]));
+    if (found.ankiScore !== 0 || !skipNovelties) {
+      return found;
+    }
+
+    // We didn't return => found is 0 and we want to skip novelties. Next item to find has to be > 0
+    const playedPosition = await this.dynCli.query({
+      TableName: this.positionTableName,
+      IndexName: this.ankiIndexName,
+      KeyConditionExpression: 'userId = :userId AND ankiScore > :zero',
+      ExpressionAttributeValues: {
+        ':userId': { S: userId },
+        ':zero': { N: '0' },
+      },
+      Limit: 1,
+    });
+    if (!playedPosition.Items || playedPosition.Items.length === 0) {
+      return undefined;
+    }
+    return BookPositionSchema.parse(unmarshall(playedPosition.Items[0]));
   }
 
   public async updateAnki(input: {

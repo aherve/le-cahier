@@ -5,5 +5,5 @@ import { ChessBookService } from '~/services/chess-book.server';
 
 export const loader: LoaderFunction = async ({ request }) => {
   const { userId } = await authenticate(request);
-  return ChessBookService.getAnki(userId);
+  return ChessBookService.getAnki(userId, true);
 };
