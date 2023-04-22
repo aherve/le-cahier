@@ -2,7 +2,7 @@ import type { TrainMessageInputType } from './train-message';
 import type { Square } from 'chess.js';
 import type { BookPosition } from '~/schemas/position';
 
-import { Box, Button, Code, Flex, Spinner } from '@chakra-ui/react';
+import { Button, Checkbox, Code, Flex, Spinner, Text } from '@chakra-ui/react';
 import { useFetcher } from '@remix-run/react';
 import { Chess } from 'chess.js';
 import { useCallback, useEffect, useState } from 'react';
@@ -18,6 +18,7 @@ export default function Anki() {
   const [msg, setMsg] = useState<TrainMessageInputType>('empty');
   const [hints, setHints] = useState<string[]>([]);
   const fetcher = useFetcher<BookPosition>();
+  const [includeNovelties, setIncludeNovelties] = useState(true);
 
   const ankiUpdate = useCallback(
     async (isSuccess: boolean) => {
@@ -44,15 +45,15 @@ export default function Anki() {
       'no book move available. Flagging success and getting next position',
     );
     ankiUpdate(true).then(() => {
-      fetcher.load('/api/moves/get-anki');
+      fetcher.load(`/api/moves/get-anki?skipNovelties=${!includeNovelties}`);
     });
   }
 
   useEffect(() => {
     if (fetcher.state === 'idle' && fetcher.data == null) {
-      fetcher.load('/api/moves/get-anki');
+      fetcher.load(`/api/moves/get-anki?skipNovelties=${!includeNovelties}`);
     }
-  }, [fetcher]);
+  }, [fetcher, includeNovelties]);
 
   useEffect(() => {
     if (!fetcher.data) {
@@ -87,7 +88,7 @@ export default function Anki() {
       GameService.makeMove(move);
       setMsg(TrainMessageInput.enum.yourTurn);
       ankiUpdate(true).then(() => {
-        fetcher.load('/api/moves/get-anki');
+        fetcher.load(`/api/moves/get-anki?skipNovelties=${!includeNovelties}`);
       });
       return true;
     } else {
@@ -97,19 +98,41 @@ export default function Anki() {
     }
   }
 
+  function Context() {
+    const score = position?.ankiScore ?? null;
+    if (score === null) {
+      return <></>;
+    }
+
+    if (score > 0) {
+      return <Text> Let's review this position again !</Text>;
+    }
+    if (score < 0) {
+      return (
+        <Text>
+          You failed to find this move last time. Can you find it now ?
+        </Text>
+      );
+    }
+    return (
+      <Text>This is a book position you didn't yet trained on or played</Text>
+    );
+  }
+
+  function toggleNovelties(evt: any) {
+    const newValue = evt.target.checked;
+    setIncludeNovelties(newValue);
+    fetcher.load(`/api/moves/get-anki?skipNovelties=${!newValue}`);
+  }
+
   return (
     <>
-      {(position?.ankiScore ?? -1) > 0 && (
-        <Box>Let's review this position again !</Box>
-      )}
-      {(position?.ankiScore ?? 1) < 0 && (
-        <Box>You failed to find this move last time. Can you find it now ?</Box>
-      )}
-      {(position?.ankiScore ?? -1) === 0 && (
-        <Box>This is a book position you didn't yet trained on or played</Box>
-      )}
       <Flex direction="column" align="center" gap="5">
+        <Checkbox isChecked={includeNovelties} onChange={toggleNovelties}>
+          Include novelties
+        </Checkbox>
         <TrainMessage type={msg} hints={hints} />
+        <Context />
         {fetcher.state === 'loading' && <Spinner />}
         <Flex direction="row" gap="20">
           <Chessboard

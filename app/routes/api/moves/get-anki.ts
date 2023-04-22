@@ -5,5 +5,15 @@ import { ChessBookService } from '~/services/chess-book.server';
 
 export const loader: LoaderFunction = async ({ request }) => {
   const { userId } = await authenticate(request);
-  return ChessBookService.getAnki(userId, true);
+
+  // get skipNovelties from url query parameters
+  const skipNovelties =
+    new URL(request.url).searchParams.get('skipNovelties') === 'true';
+  console.log(
+    'DEBUG, skip = ',
+    new URL(request.url).searchParams.get('skipNovelties'),
+    skipNovelties,
+  );
+
+  return ChessBookService.getAnki(userId, skipNovelties);
 };
