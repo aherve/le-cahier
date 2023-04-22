@@ -6,6 +6,7 @@ import type {
 
 import { RepeatIcon } from '@chakra-ui/icons';
 import {
+  Alert,
   AlertDialog,
   AlertDialogBody,
   AlertDialogContent,
@@ -14,6 +15,7 @@ import {
   AlertDialogOverlay,
   Button,
   Flex,
+  Spinner,
   Textarea,
   useDisclosure,
   useToast,
@@ -145,24 +147,37 @@ export function Record() {
 }
 
 function LoadPGNButton(props: { orientation: BoardOrientation }) {
-  const fetcher = useFetcher();
-  const [pgn, setPgn] = useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [pgn, setPgn] = useState('');
   const cancelRef = useRef();
+  const toast = useToast();
   const onConfirm = () => {
     console.log('submitting', pgn);
-    try {
-      fetcher.submit(
-        { pgn },
-        {
-          action: 'api/moves/create-from-pgn',
-          method: 'POST',
-        },
-      );
-    } catch (e) {
-      console.error('error', e);
-    }
-    onClose();
+    setIsLoading(true);
+    fetch('api/moves/create-from-pgn', {
+      method: 'POST',
+      body: JSON.stringify({
+        pgn,
+        orientation: props.orientation,
+      }),
+    }).then((resp) => {
+      if (resp.ok) {
+        setPgn('');
+        onClose();
+        toast({
+          title: 'PGN loaded',
+          description: `Successfully saved moves from PGN for ${props.orientation}`,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        resp.json().then((t) => setError(`Error: ${t['error']}`));
+      }
+      setIsLoading(false);
+    });
   };
 
   // listen to text area changes
@@ -184,11 +199,15 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Load PGN file
+              Load PGN file for {props.orientation}
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              <Textarea onChange={onChange}></Textarea>
+              {isLoading && <Spinner />}
+              {!isLoading && (
+                <Textarea value={pgn} onChange={onChange}></Textarea>
+              )}
+              {error && <Alert status="error">{error}</Alert>}
             </AlertDialogBody>
 
             <AlertDialogFooter>
@@ -196,7 +215,7 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
                 Cancel
               </Button>
               <Button colorScheme="blue" onClick={onConfirm} ml={3}>
-                Upload PGN as repertoire for {props.orientation}
+                Upload & save
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
