@@ -14,11 +14,14 @@ import {
   AlertDialogOverlay,
   Button,
   Flex,
+  Textarea,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
+import { useFetcher } from '@remix-run/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
+import { BiCloudUpload } from 'react-icons/bi';
 import { MdYoutubeSearchedFor } from 'react-icons/md';
 
 import Moves from './moves';
@@ -126,6 +129,7 @@ export function Record() {
               flip board
             </Button>
             {FindTranspositionsButton({ onScan })}
+            {LoadPGNButton({ orientation })}
           </Flex>
         </Flex>
         <Moves
@@ -140,6 +144,67 @@ export function Record() {
   );
 }
 
+function LoadPGNButton(props: { orientation: BoardOrientation }) {
+  const fetcher = useFetcher();
+  const [pgn, setPgn] = useState('');
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef();
+  const onConfirm = () => {
+    console.log('submitting', pgn);
+    try {
+      fetcher.submit(
+        { pgn },
+        {
+          action: 'api/moves/create-from-pgn',
+          method: 'POST',
+        },
+      );
+    } catch (e) {
+      console.error('error', e);
+    }
+    onClose();
+  };
+
+  // listen to text area changes
+  function onChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    setPgn(e.target.value);
+  }
+
+  return (
+    <>
+      <Button leftIcon={<BiCloudUpload />} onClick={onOpen}>
+        Load PGN
+      </Button>
+
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef as any}
+        onClose={onClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Load PGN file
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              <Textarea onChange={onChange}></Textarea>
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef as any} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button colorScheme="blue" onClick={onConfirm} ml={3}>
+                Upload PGN as repertoire for {props.orientation}
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+    </>
+  );
+}
 function FindTranspositionsButton(props: { onScan: () => void }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef();
