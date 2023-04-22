@@ -188,7 +188,7 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
   return (
     <>
       <Button leftIcon={<BiCloudUpload />} onClick={onOpen}>
-        Load PGN
+        Upload PGN
       </Button>
 
       <AlertDialog

@@ -10,5 +10,7 @@ export const BookPositionSchema = z.object({
   fen: z.string(),
   opponentMoves: z.record(z.string(), BookMoveSchema).default({}),
   userId: z.string().uuid(),
+  commentForPlayer: z.string().optional(),
+  commentForOpponent: z.string().optional(),
 });
 export type BookPosition = z.infer<typeof BookPositionSchema>;

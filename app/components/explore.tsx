@@ -2,7 +2,7 @@ import type { Move, Square } from 'chess.js';
 import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 
 import { RepeatIcon } from '@chakra-ui/icons';
-import { Button, Code, Flex, Spacer } from '@chakra-ui/react';
+import { Box, Button, Code, Flex, Spacer } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 
@@ -17,6 +17,7 @@ export default function Explore(props: {
   orientation?: BoardOrientation;
   startTraining: (orientation: BoardOrientation, lastMove: Move) => void;
 }) {
+  const [comment, setComment] = useState<string>('');
   const [bookMoves, setBookMoves] = useState<string[]>([]);
   const [fen, setFen] = useState(GameService.fen);
   const [orientation, setOrientation] = useState<BoardOrientation>(
@@ -38,6 +39,11 @@ export default function Explore(props: {
             : Object.keys(position?.opponentMoves ?? {})
           ).map((m) => toSAN(fen, m)),
         );
+        if (isPlayerTurn) {
+          setComment(position?.commentForPlayer ?? '');
+        } else {
+          setComment(position?.commentForOpponent ?? '');
+        }
       });
   }, [fen, orientation]);
 
@@ -88,6 +94,7 @@ export default function Explore(props: {
               }}
             ></Moves>
           </Flex>
+          <Box>{comment}</Box>
           <Flex direction="row" gap="5" align="center">
             <Button leftIcon={<RepeatIcon />} onClick={flip}>
               flip board

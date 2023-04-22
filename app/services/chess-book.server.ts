@@ -29,7 +29,9 @@ export class ChessBook {
   }
 
   public async addMove(input: SaveMoveInput & { userId: string }) {
-    const { isOpponentMove, fen, move } = input;
+    let { isOpponentMove, fen, move, comment } = input;
+    comment = stripComment(fen, comment);
+
     console.log('adding move', input);
 
     const game = new Chess(fen);
@@ -40,44 +42,65 @@ export class ChessBook {
     const path = isOpponentMove ? 'opponentMoves' : 'bookMoves';
 
     try {
+      let updateExpr = 'SET #path = :move, #ankiScore = :zero';
+      const attrNames: Record<string, string> = {
+        '#path': path,
+        '#ankiScore': 'ankiScore',
+      };
+      const attrValues: Record<string, AttributeValue> = {
+        ':zero': { N: '0' },
+        ':move': {
+          M: {
+            [move]: {
+              M: marshall(bookMove, { removeUndefinedValues: true }),
+            },
+          },
+        },
+      };
+      if (comment && comment.length > 0) {
+        updateExpr += ', #comment = :comment';
+        attrNames['#comment'] = isOpponentMove
+          ? 'commentForOpponent'
+          : 'commentForPlayer';
+        attrValues[':comment'] = { S: comment };
+      }
       await this.dynCli.updateItem({
         TableName: this.positionTableName,
         Key: marshall({
           fen: stripFEN(fen),
           userId: input.userId,
         }),
-        UpdateExpression: 'SET #path = :move, #ankiScore = :zero',
+        UpdateExpression: updateExpr,
         ConditionExpression: 'attribute_not_exists(#path)',
-        ExpressionAttributeNames: {
-          '#path': path,
-          '#ankiScore': 'ankiScore',
-        },
-        ExpressionAttributeValues: {
-          ':zero': { N: '0' },
-          ':move': {
-            M: {
-              [move]: {
-                M: marshall(bookMove, { removeUndefinedValues: true }),
-              },
-            },
-          },
-        },
+        ExpressionAttributeNames: attrNames,
+        ExpressionAttributeValues: attrValues,
       });
     } catch {
+      let updateExpr = 'SET #path.#move = :move';
+      const attrNames: Record<string, string> = {
+        '#path': path,
+        '#move': move,
+      };
+      const attrValues: Record<string, AttributeValue> = {
+        ':move': { M: marshall(bookMove, { removeUndefinedValues: true }) },
+      };
+
+      if (comment && comment.length > 0) {
+        updateExpr += ', #comment = :comment';
+        attrNames['#comment'] = isOpponentMove
+          ? 'commentForOpponent'
+          : 'commentForPlayer';
+        attrValues[':comment'] = { S: comment };
+      }
       const update = {
         TableName: this.positionTableName,
         Key: marshall({
           fen: stripFEN(fen),
           userId: input.userId,
         }),
-        UpdateExpression: 'SET #path.#move = :move',
-        ExpressionAttributeNames: {
-          '#path': path,
-          '#move': move,
-        },
-        ExpressionAttributeValues: {
-          ':move': { M: marshall(bookMove, { removeUndefinedValues: true }) },
-        },
+        UpdateExpression: updateExpr,
+        ExpressionAttributeNames: attrNames,
+        ExpressionAttributeValues: attrValues,
       };
       await this.dynCli.updateItem(update);
     }
@@ -331,3 +354,21 @@ export class ChessBook {
 }
 
 export const ChessBookService = new ChessBook();
+
+function stripComment(fen: string, comment: string | undefined) {
+  // No comment on starting position
+  if (fen === new Chess().fen()) {
+    return undefined;
+  }
+  if (!comment) {
+    return undefined;
+  }
+
+  // Remove diagram references
+  let stripped = comment.replaceAll('[diagram]', '');
+  if (!stripped.length) {
+    return undefined;
+  }
+
+  return stripped;
+}

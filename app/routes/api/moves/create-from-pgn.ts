@@ -10,7 +10,7 @@ export const action: ActionFunction = async ({ request }) => {
   const { userId } = await authenticate(request);
 
   const { orientation, pgn } = await request.json();
-  const color = orientation === 'white' ? 'w' : 'b';
+  const myColor = orientation === 'white' ? 'w' : 'b';
   if (!orientation) {
     return json({ error: 'Missing orientation' }, { status: 400 });
   }
@@ -22,18 +22,25 @@ export const action: ActionFunction = async ({ request }) => {
   try {
     const game = new Chess();
     game.loadPgn(pgn);
-    const toRecord = game
-      .history({ verbose: true })
-      .filter((m) => m.color === color);
+    const allComments = game.getComments().reduce((acc, moveComment) => {
+      const { fen, comment } = moveComment;
+      if (comment && comment.length > 0) {
+        acc.set(fen, comment);
+      }
+      return acc;
+    }, new Map<string, string>());
 
-    const promises = [];
+    const toRecord = game.history({ verbose: true });
+
+    const promises: Array<Promise<void>> = [];
     for (const move of toRecord) {
       promises.push(
         ChessBookService.addMove({
           userId,
           fen: move.before,
-          isOpponentMove: false,
+          isOpponentMove: move.color !== myColor,
           move: move.lan,
+          comment: allComments.get(move.before),
         }),
       );
     }
