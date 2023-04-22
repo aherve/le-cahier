@@ -153,7 +153,7 @@ function GameItem(props: { game: LichessGame }) {
   );
 }
 
-function firstFailIndex(report?: GameReport) {
+function firstFailIndex(report?: GameReport | null) {
   const found = report?.movesReport.findIndex((m) => m.status === 'failed');
   return found && found > 1 ? found : undefined;
 }

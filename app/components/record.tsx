@@ -20,7 +20,6 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { useFetcher } from '@remix-run/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { BiCloudUpload } from 'react-icons/bi';
