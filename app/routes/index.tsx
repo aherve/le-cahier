@@ -15,9 +15,10 @@ import {
 import { useNavigate } from '@remix-run/react';
 import { useState } from 'react';
 import { BsRecordCircle } from 'react-icons/bs';
-import { GiFalling, GiSecretBook } from 'react-icons/gi';
-import { MdOutlineSmartToy, MdSettings, MdSmartToy } from 'react-icons/md';
+import { GiFalling } from 'react-icons/gi';
+import { MdOutlineSmartToy, MdSettings } from 'react-icons/md';
 import { SiLichess } from 'react-icons/si';
+import { VscBook } from 'react-icons/vsc';
 import { z } from 'zod';
 
 import Anki from '~/components/anki';
@@ -94,6 +95,7 @@ export default function Index() {
             key={gameId}
             startRecording={() => startRecordingMoves(false)}
             startingMove={fromLastMove}
+            startTraining={startTraining}
           />
         );
       case GameMode.enum.trainWithBlack:
@@ -103,12 +105,17 @@ export default function Index() {
             key={gameId}
             startRecording={() => startRecordingMoves(false)}
             startingMove={fromLastMove}
+            startTraining={startTraining}
           />
         );
       case GameMode.enum.recordMoves:
         return <Record key={gameId} />;
       case GameMode.enum.lichessReport:
-        return <LichessReport></LichessReport>;
+        return (
+          <LichessReport
+            startExplore={() => startExplore(false)}
+          ></LichessReport>
+        );
       case GameMode.enum.anki:
         return <Anki></Anki>;
       case GameMode.enum.explore:
@@ -127,23 +134,14 @@ export default function Index() {
     <>
       <Flex height="100vh" direction="column" align="center" gap="10">
         <Flex direction="row" gap={10} align="center" minWidth="max-content">
-          <Button
-            leftIcon={<GiSecretBook />}
-            onClick={() => startExplore(true)}
-          >
+          <Button leftIcon={<VscBook />} onClick={() => startExplore(true)}>
             Explore
           </Button>
           <Button
             leftIcon={<MdOutlineSmartToy />}
             onClick={() => startTraining('white', true)}
           >
-            Train with white
-          </Button>
-          <Button
-            leftIcon={<MdSmartToy />}
-            onClick={() => startTraining('black', true)}
-          >
-            Train with black
+            Train
           </Button>
           <Button onClick={startAnki} leftIcon={<GiFalling />}>
             Review mistakes
@@ -193,7 +191,7 @@ function pageTitle(mode: GameModeType) {
       return (
         <>
           <Flex direction="row" align="center" gap="5">
-            <GiSecretBook size="40" />
+            <VscBook size="40" />
             <Heading size="lg">Browsing moves</Heading>
           </Flex>
         </>

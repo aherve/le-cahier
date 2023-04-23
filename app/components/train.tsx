@@ -21,6 +21,7 @@ import { GetChallengeOutputSchema } from '~/routes/api/moves/challenge';
 import { GameService } from '~/services/gameService';
 
 export function Train(props: {
+  startTraining: (orientation: BoardOrientation, resetBoard: boolean) => void;
   orientation: BoardOrientation;
   startRecording: (fen: string) => void;
   startingMove?: Move;
@@ -135,6 +136,13 @@ export function Train(props: {
     setMsg(TrainMessageInput.enum.hint);
   }
 
+  function flip() {
+    props.startTraining(
+      props.orientation === 'white' ? 'black' : 'white',
+      true,
+    );
+  }
+
   return (
     <>
       <Flex direction="column" align="center" gap="5">
@@ -153,11 +161,14 @@ export function Train(props: {
           ></Moves>
         </Flex>
         <Flex direction="row" gap="5" align="center">
+          <Button leftIcon={<RepeatIcon />} onClick={flip}>
+            flip board
+          </Button>
           <Button
             leftIcon={<EditIcon />}
             onClick={() => props.startRecording(fen)}
           >
-            Add move from this position
+            Record more moves
           </Button>
           <Button leftIcon={<RepeatIcon />} onClick={again}>
             Again

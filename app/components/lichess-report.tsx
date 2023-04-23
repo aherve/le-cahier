@@ -23,13 +23,15 @@ import { useEffect, useState } from 'react';
 import { BsCircle, BsCircleFill } from 'react-icons/bs';
 import { GiBulletBill, GiRabbit } from 'react-icons/gi';
 import { SiStackblitz } from 'react-icons/si';
+import { VscBook } from 'react-icons/vsc';
 
 import LichessLink from './lichess-link';
 
 import { GameReportSchema, MissedMoveSchema } from '~/schemas/game-report';
 import { LichessGameSchema } from '~/schemas/lichess';
+import { GameService } from '~/services/gameService';
 
-export default function LichessReport() {
+export default function LichessReport(props: { startExplore: () => void }) {
   const gameListFetcher = useFetcher();
   const [games, setGames] = useState<LichessGame[]>([]);
 
@@ -74,7 +76,11 @@ export default function LichessReport() {
             </Thead>
             <Tbody>
               {games.map((game) => (
-                <GameItem game={game} key={game.id}></GameItem>
+                <GameItem
+                  game={game}
+                  key={game.id}
+                  startExplore={props.startExplore}
+                ></GameItem>
               ))}
             </Tbody>
           </Table>
@@ -88,7 +94,7 @@ export default function LichessReport() {
   );
 }
 
-function GameItem(props: { game: LichessGame }) {
+function GameItem(props: { game: LichessGame; startExplore: () => void }) {
   const { game } = props;
   const fetcher = useFetcher();
   const [reloader, setReloader] = useState(Date.now());
@@ -144,6 +150,7 @@ function GameItem(props: { game: LichessGame }) {
           moveIndex={firstFailIndex(report)}
         ></LichessLink>
       </Td>
+      <Td>{ExploreButton({ report, startExplore: props.startExplore })}</Td>
       <Td>
         <Button size="xs" onClick={cleanGameReport}>
           <RepeatIcon />
@@ -200,5 +207,28 @@ function GameReportComponent(props: { game: LichessGame; report: GameReport }) {
     <Text>
       {failedCount} misses. {explanation}
     </Text>
+  );
+}
+
+function ExploreButton(props: {
+  report?: GameReport | null;
+  startExplore: () => void;
+}) {
+  const fen = props.report?.firstError?.before;
+  if (!fen) {
+    return <></>;
+  }
+
+  function explore() {
+    GameService.reset(fen);
+    props.startExplore();
+  }
+
+  return (
+    <>
+      <Button onClick={explore} variant="link">
+        <VscBook />
+      </Button>
+    </>
   );
 }

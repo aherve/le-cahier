@@ -1,5 +1,5 @@
-import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { Link } from '@chakra-ui/react';
+import { SiLichess } from 'react-icons/si';
 
 export default function LichessLink(
   props: { fen: string } | { gameId: string; moveIndex?: number },
@@ -11,7 +11,7 @@ export default function LichessLink(
   return (
     <>
       <Link href={link} isExternal>
-        view on lichess <ExternalLinkIcon mx="2px" />
+        <SiLichess />
       </Link>
     </>
   );
