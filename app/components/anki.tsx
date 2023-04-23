@@ -18,7 +18,7 @@ export default function Anki() {
   const [msg, setMsg] = useState<TrainMessageInputType>('empty');
   const [hints, setHints] = useState<string[]>([]);
   const fetcher = useFetcher<BookPosition>();
-  const [includeNovelties, setIncludeNovelties] = useState(true);
+  const [includeNovelties, setIncludeNovelties] = useState(false);
 
   const ankiUpdate = useCallback(
     async (isSuccess: boolean) => {
