@@ -7,13 +7,14 @@ import { useFetcher } from '@remix-run/react';
 import { Chess } from 'chess.js';
 import { useCallback, useEffect, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
+import { VscBook } from 'react-icons/vsc';
 
 import LichessLink from './lichess-link';
 import TrainMessage, { TrainMessageInput } from './train-message';
 
 import { GameService } from '~/services/gameService';
 
-export default function Anki() {
+export default function Anki(props: { startExplore: () => void }) {
   const [position, setPosition] = useState<BookPosition | null>(null);
   const [msg, setMsg] = useState<TrainMessageInputType>('empty');
   const [hints, setHints] = useState<string[]>([]);
@@ -143,6 +144,9 @@ export default function Anki() {
           />
         </Flex>
         <Flex direction="row" gap="5" align="center">
+          <Button onClick={props.startExplore} variant="link">
+            <VscBook />
+          </Button>
           <LichessLink fen={fen}></LichessLink>
           <Button onClick={showHint}>get hint</Button>
         </Flex>

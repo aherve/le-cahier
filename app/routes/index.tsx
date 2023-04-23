@@ -117,7 +117,7 @@ export default function Index() {
           ></LichessReport>
         );
       case GameMode.enum.anki:
-        return <Anki></Anki>;
+        return <Anki startExplore={() => startExplore(false)}></Anki>;
       case GameMode.enum.explore:
         return (
           <Explore
