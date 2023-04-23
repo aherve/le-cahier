@@ -1,4 +1,3 @@
-import type { Move } from 'chess.js';
 import type {
   BoardOrientation,
   Square,
@@ -15,36 +14,36 @@ import {
   AlertDialogOverlay,
   Button,
   Flex,
+  Heading,
   Spinner,
   Textarea,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { BiCloudUpload } from 'react-icons/bi';
+import { BsRecordCircle } from 'react-icons/bs';
 import { MdYoutubeSearchedFor } from 'react-icons/md';
 
-import Moves from './moves';
+import Moves from '../components/moves';
 
 import { SaveMoveInputSchema } from '~/routes/api/moves/create';
 import { BookPositionSchema } from '~/schemas/position';
-import { GameService } from '~/services/gameService';
 import { toSAN } from '~/services/utils';
+import { GameContext } from '~/with-game';
 
-export function Record() {
+export default function Record() {
+  const { fen, moves, turn, makeMove, backTo, orientation, setOrientation } =
+    useContext(GameContext);
   const [bookMoves, setBookMoves] = useState<string[]>([]);
-  const [fen, setFen] = useState(GameService.fen);
-  const [orientation, setOrientation] = useState<BoardOrientation>('white');
   const toast = useToast();
-
-  const moves = GameService.moves;
 
   useEffect(() => {
     fetch(`/api/moves/get?fen=${encodeURIComponent(fen)}`)
       .then((res) => res.json())
       .then((data) => {
-        const isPlayerTurn = GameService.turn === orientation[0];
+        const isPlayerTurn = turn === orientation[0];
         const position = BookPositionSchema.nullable().parse(data);
         setBookMoves(
           (isPlayerTurn
@@ -53,17 +52,16 @@ export function Record() {
           ).map((m) => toSAN(fen, m)),
         );
       });
-  }, [fen, orientation]);
+  }, [fen, orientation, turn]);
 
-  async function makeMove(move: string | { from: Square; to: Square }) {
+  async function LocalMakeMove(move: string | { from: Square; to: Square }) {
     try {
-      const validMove = GameService.makeMove(move);
+      const validMove = makeMove(move);
 
       const wasOpponentMove =
         (validMove.color === 'b' && orientation === 'white') ||
         (validMove.color === 'w' && orientation === 'black');
 
-      setFen(GameService.fen);
       const payload = SaveMoveInputSchema.parse({
         isOpponentMove: wasOpponentMove,
         fen,
@@ -83,16 +81,11 @@ export function Record() {
   }
 
   function onDrop(sourceSquare: Square, targetSquare: Square) {
-    return makeMove({ from: sourceSquare, to: targetSquare }) !== null;
+    return LocalMakeMove({ from: sourceSquare, to: targetSquare }) !== null;
   }
 
   function flip() {
-    setOrientation((o) => (o === 'white' ? 'black' : 'white'));
-  }
-
-  function onNavigate(move: Move) {
-    GameService.backTo(move);
-    setFen(GameService.fen);
+    setOrientation(orientation === 'white' ? 'black' : 'white');
   }
 
   const onScan = useCallback(async () => {
@@ -117,29 +110,35 @@ export function Record() {
 
   return (
     <>
-      <Flex direction="row" gap="20">
-        <Flex direction="column" align="center" gap="10">
-          <Chessboard
-            position={fen}
-            onPieceDrop={onDrop}
-            boardWidth={400}
-            boardOrientation={orientation}
-          />
-          <Flex direction="row" align="center" gap="5">
-            <Button leftIcon={<RepeatIcon />} onClick={flip}>
-              flip board
-            </Button>
-            {FindTranspositionsButton({ onScan })}
-            {LoadPGNButton({ orientation })}
-          </Flex>
+      <Flex direction="column" align="center" gap="5">
+        <Flex direction="row" align="center" gap="5">
+          <BsRecordCircle color="red" size="40" />
+          <Heading size="lg">Recording moves</Heading>
         </Flex>
-        <Moves
-          bookMoves={bookMoves}
-          showBookMoves={true}
-          moves={moves}
-          onNavigate={onNavigate}
-          onPlay={makeMove}
-        ></Moves>
+        <Flex direction="row" gap="20">
+          <Flex direction="column" align="center" gap="10">
+            <Chessboard
+              position={fen}
+              onPieceDrop={onDrop}
+              boardWidth={400}
+              boardOrientation={orientation}
+            />
+            <Flex direction="row" align="center" gap="5">
+              <Button leftIcon={<RepeatIcon />} onClick={flip}>
+                flip board
+              </Button>
+              {FindTranspositionsButton({ onScan })}
+              {LoadPGNButton({ orientation })}
+            </Flex>
+          </Flex>
+          <Moves
+            bookMoves={bookMoves}
+            showBookMoves={true}
+            moves={moves}
+            onNavigate={(m) => backTo(m.after)}
+            onPlay={LocalMakeMove}
+          ></Moves>
+        </Flex>
       </Flex>
     </>
   );

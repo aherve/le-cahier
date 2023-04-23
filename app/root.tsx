@@ -1,4 +1,3 @@
-import type { AmplifyUser } from '@aws-amplify/ui';
 import type { LinksFunction, MetaFunction } from '@remix-run/node';
 
 import { Authenticator } from '@aws-amplify/ui-react';
@@ -8,14 +7,13 @@ import {
   Links,
   LiveReload,
   Meta,
-  Outlet,
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react';
 import { Analytics } from '@vercel/analytics/react';
 import { Amplify } from 'aws-amplify';
-import Cookies from 'universal-cookie';
 
+import { LCLayout } from './components/layout';
 import amplifyConfig from '../infra/aws-export.json';
 
 Amplify.configure(amplifyConfig);
@@ -45,7 +43,7 @@ export default function App() {
       <body>
         <ChakraProvider>
           <Authenticator signUpAttributes={['email']}>
-            {({ user }) => withAuth({ user })}
+            {({ user }) => LCLayout({ user })}
           </Authenticator>
         </ChakraProvider>
         <ScrollRestoration />
@@ -54,27 +52,5 @@ export default function App() {
         <LiveReload />
       </body>
     </html>
-  );
-}
-
-function withAuth(props: { user: AmplifyUser | undefined }) {
-  const expiresAtSeconds =
-    props.user?.getSignInUserSession()?.getIdToken().getExpiration() ??
-    Math.round(Date.now() / 1000 + 24 * 3600);
-
-  new Cookies().set(
-    'cognito',
-    {
-      idToken: props.user?.getSignInUserSession()?.getIdToken().getJwtToken(),
-    },
-    {
-      expires: new Date(1000 * expiresAtSeconds),
-    },
-  );
-
-  return (
-    <Authenticator.Provider>
-      <Outlet />
-    </Authenticator.Provider>
   );
 }
