@@ -1,37 +1,31 @@
 import type { Move, Square } from 'chess.js';
-import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 
 import { RepeatIcon } from '@chakra-ui/icons';
-import { Box, Button, Code, Flex, Spacer } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { Box, Button, Code, Flex, Heading, Spacer } from '@chakra-ui/react';
+import { useNavigate } from '@remix-run/react';
+import { useContext, useEffect, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
+import { VscBook } from 'react-icons/vsc';
 
-import LichessLink from './lichess-link';
-import Moves from './moves';
+import LichessLink from '../components/lichess-link';
+import Moves from '../components/moves';
 
 import { BookPositionSchema } from '~/schemas/position';
-import { GameService } from '~/services/gameService';
 import { toSAN } from '~/services/utils';
+import { GameContext } from '~/with-game';
 
-export default function Explore(props: {
-  orientation?: BoardOrientation;
-  startTraining: (orientation: BoardOrientation, lastMove: Move) => void;
-}) {
+export default function Explore() {
+  const navigate = useNavigate();
+  const { fen, moves, turn, backTo, makeMove, orientation, setOrientation } =
+    useContext(GameContext);
   const [comment, setComment] = useState<string>('');
   const [bookMoves, setBookMoves] = useState<string[]>([]);
-  const [fen, setFen] = useState(GameService.fen);
-  const [orientation, setOrientation] = useState<BoardOrientation>(
-    props.orientation ?? 'white',
-  );
-
-  const moves = GameService.moves;
-  const lastMove = moves[moves.length - 1];
 
   useEffect(() => {
     fetch(`/api/moves/get?fen=${encodeURIComponent(fen)}`)
       .then((res) => res.json())
       .then((data) => {
-        const isPlayerTurn = GameService.turn === orientation[0];
+        const isPlayerTurn = turn === orientation[0];
         const position = BookPositionSchema.nullable().parse(data);
         setBookMoves(
           (isPlayerTurn
@@ -45,30 +39,36 @@ export default function Explore(props: {
           setComment(position?.commentForOpponent ?? '');
         }
       });
-  }, [fen, orientation]);
+  }, [fen, orientation, turn]);
 
   function flip() {
-    setOrientation((o) => (o === 'white' ? 'black' : 'white'));
+    setOrientation(orientation === 'white' ? 'black' : 'white');
   }
 
   function onNavigate(move: Move) {
-    GameService.backTo(move);
-    setFen(GameService.fen);
+    backTo(move.after);
   }
 
   function onDrop(from: Square, to: Square) {
     try {
-      GameService.makeMove({ from, to });
-      setFen(GameService.fen);
+      makeMove({ from, to });
       return true;
     } catch {
       return false;
     }
   }
 
+  function startTraining() {
+    navigate('/train?' + new URLSearchParams({ from: fen }));
+  }
+
   return (
     <>
       <Flex direction="column" align="center" gap="5">
+        <Flex direction="row" align="center" gap="5">
+          <VscBook size="40" />
+          <Heading size="lg">Browsing moves</Heading>
+        </Flex>
         <Flex
           direction="column"
           align="center"
@@ -88,10 +88,7 @@ export default function Explore(props: {
               moves={moves}
               onNavigate={onNavigate}
               showBookMoves={true}
-              onPlay={(move) => {
-                GameService.makeMove(move);
-                setFen(GameService.fen);
-              }}
+              onPlay={makeMove}
             ></Moves>
           </Flex>
           <Box>{comment}</Box>
@@ -99,9 +96,7 @@ export default function Explore(props: {
             <Button leftIcon={<RepeatIcon />} onClick={flip}>
               flip board
             </Button>
-            <Button onClick={() => props.startTraining(orientation, lastMove)}>
-              Train from this position
-            </Button>
+            <Button onClick={startTraining}>Train from this position</Button>
             <LichessLink fen={fen}></LichessLink>
           </Flex>
         </Flex>

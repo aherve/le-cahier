@@ -1,20 +1,32 @@
-import type { TrainMessageInputType } from './train-message';
+import type { TrainMessageInputType } from '../components/train-message';
 import type { Square } from 'chess.js';
 import type { BookPosition } from '~/schemas/position';
 
-import { Button, Checkbox, Code, Flex, Spinner, Text } from '@chakra-ui/react';
-import { useFetcher } from '@remix-run/react';
+import {
+  Button,
+  Checkbox,
+  Code,
+  Flex,
+  Heading,
+  Spinner,
+  Text,
+} from '@chakra-ui/react';
+import { useFetcher, useNavigate } from '@remix-run/react';
 import { Chess } from 'chess.js';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
+import { GiFalling } from 'react-icons/gi';
 import { VscBook } from 'react-icons/vsc';
 
-import LichessLink from './lichess-link';
-import TrainMessage, { TrainMessageInput } from './train-message';
+import LichessLink from '../components/lichess-link';
+import TrainMessage, { TrainMessageInput } from '../components/train-message';
 
-import { GameService } from '~/services/gameService';
+import { GameContext } from '~/with-game';
 
-export default function Anki(props: { startExplore: () => void }) {
+export default function Anki() {
+  const navigate = useNavigate();
+  const { fen, turn, makeMove, reset, orientation, setOrientation } =
+    useContext(GameContext);
   const [position, setPosition] = useState<BookPosition | null>(null);
   const [msg, setMsg] = useState<TrainMessageInputType>('empty');
   const [hints, setHints] = useState<string[]>([]);
@@ -34,8 +46,7 @@ export default function Anki(props: { startExplore: () => void }) {
     [position?.fen],
   );
 
-  const orientation = GameService.turn === 'b' ? 'black' : 'white';
-  const fen = GameService.fen;
+  setOrientation(turn === 'b' ? 'black' : 'white');
 
   if (
     position &&
@@ -60,9 +71,9 @@ export default function Anki(props: { startExplore: () => void }) {
     if (!fetcher.data) {
       return;
     }
-    GameService.reset(fetcher.data.fen);
+    reset(fetcher.data.fen);
     setPosition(fetcher.data);
-  }, [fetcher.data]);
+  }, [fetcher.data, reset]);
 
   function showHint() {
     const hints = Object.keys(position?.bookMoves ?? [])
@@ -86,7 +97,7 @@ export default function Anki(props: { startExplore: () => void }) {
     const move = `${sourceSquare}${targetSquare}`;
 
     if (expectedMoves.includes(move)) {
-      GameService.makeMove(move);
+      makeMove(move);
       setMsg(TrainMessageInput.enum.yourTurn);
       ankiUpdate(true).then(() => {
         fetcher.load(`/api/moves/get-anki?skipNovelties=${!includeNovelties}`);
@@ -126,9 +137,17 @@ export default function Anki(props: { startExplore: () => void }) {
     fetcher.load(`/api/moves/get-anki?skipNovelties=${!newValue}`);
   }
 
+  function explore() {
+    navigate('/explore');
+  }
+
   return (
     <>
       <Flex direction="column" align="center" gap="5">
+        <Flex direction="row" align="center" gap="5">
+          <GiFalling size="40" />
+          <Heading size="lg">Reviewing failed moves</Heading>
+        </Flex>
         <Checkbox isChecked={includeNovelties} onChange={toggleNovelties}>
           Include novelties
         </Checkbox>
@@ -144,7 +163,7 @@ export default function Anki(props: { startExplore: () => void }) {
           />
         </Flex>
         <Flex direction="row" gap="5" align="center">
-          <Button onClick={props.startExplore} variant="link">
+          <Button onClick={explore} variant="link">
             <VscBook />
           </Button>
           <LichessLink fen={fen}></LichessLink>

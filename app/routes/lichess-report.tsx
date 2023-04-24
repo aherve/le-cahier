@@ -17,21 +17,22 @@ import {
   Button,
   Spinner,
 } from '@chakra-ui/react';
-import { useFetcher } from '@remix-run/react';
+import { useFetcher, useNavigate } from '@remix-run/react';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { BsCircle, BsCircleFill } from 'react-icons/bs';
 import { GiBulletBill, GiRabbit } from 'react-icons/gi';
 import { SiStackblitz } from 'react-icons/si';
 import { VscBook } from 'react-icons/vsc';
 
-import LichessLink from './lichess-link';
+import LichessLink from '../components/lichess-link';
 
 import { GameReportSchema, MissedMoveSchema } from '~/schemas/game-report';
 import { LichessGameSchema } from '~/schemas/lichess';
-import { GameService } from '~/services/gameService';
+import { GameContext } from '~/with-game';
 
-export default function LichessReport(props: { startExplore: () => void }) {
+export default function LichessReport() {
+  const navigate = useNavigate();
   const gameListFetcher = useFetcher();
   const [games, setGames] = useState<LichessGame[]>([]);
 
@@ -59,6 +60,10 @@ export default function LichessReport(props: { startExplore: () => void }) {
     gameListFetcher.load(`/api/lichess/games?until=${oldTimestamp}`);
   }
 
+  function explore() {
+    navigate('/explore');
+  }
+
   return (
     <>
       <Flex direction="column" align="center" justifyContent="start" gap="5">
@@ -79,7 +84,7 @@ export default function LichessReport(props: { startExplore: () => void }) {
                 <GameItem
                   game={game}
                   key={game.id}
-                  startExplore={props.startExplore}
+                  startExplore={explore}
                 ></GameItem>
               ))}
             </Tbody>
@@ -214,13 +219,14 @@ function ExploreButton(props: {
   report?: GameReport | null;
   startExplore: () => void;
 }) {
+  const { reset } = useContext(GameContext);
   const fen = props.report?.firstError?.before;
   if (!fen) {
     return <></>;
   }
 
   function explore() {
-    GameService.reset(fen);
+    reset(fen);
     props.startExplore();
   }
 
