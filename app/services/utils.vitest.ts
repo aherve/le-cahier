@@ -14,7 +14,7 @@ describe('stripFEN', () => {
     expect(output).toEqual(expected);
   });
 
-  it("doesn't strip twice", () => {
+  it('doesn\'t strip twice', () => {
     const fen = new Chess().fen();
 
     expect(stripFEN(fen)).toEqual(stripFEN(stripFEN(fen)));

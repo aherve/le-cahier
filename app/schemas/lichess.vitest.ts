@@ -1,13 +1,13 @@
 import { it, describe, expect } from 'vitest';
 
-import { LichessGameSchema } from './lichess';
+import { LichessGameParserSchema } from './lichess';
 
 describe('lichess schema', () => {
   it('can parse a game', () => {
     const sample = require('./game-sample.json');
 
-    expect(LichessGameSchema.safeParse(sample).success).toBe(true);
-    expect(LichessGameSchema.parse(sample)).toEqual({
+    expect(LichessGameParserSchema.safeParse(sample).success).toBe(true);
+    expect(LichessGameParserSchema.parse(sample)).toEqual({
       id: 'P3DJiMVw',
       rated: true,
       variant: 'standard',

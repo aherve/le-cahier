@@ -16,6 +16,8 @@ import {
   Tag,
   Button,
   Spinner,
+  VStack,
+  SkeletonText,
 } from '@chakra-ui/react';
 import { useFetcher, useNavigate } from '@remix-run/react';
 import moment from 'moment';
@@ -52,7 +54,45 @@ export default function LichessReport() {
   }, [gameListFetcher.data]);
 
   if (gameListFetcher.state === 'loading' && games.length === 0) {
-    return <Spinner />;
+    return (
+      <VStack spacing={5} paddingTop="10">
+        <TableContainer>
+          <Table size="sm" variant="simple">
+            <Thead>
+              <Tr>
+                <Th> Date</Th>
+                <Th> Type</Th>
+                <Th> white</Th>
+                <Th> black</Th>
+                <Th> report</Th>
+                <Th> </Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Tr key={i}>
+                  <Td>
+                    <SkeletonText width="5em" />
+                  </Td>
+                  <Td>
+                    <SkeletonText width="3em" />
+                  </Td>
+                  <Td>
+                    <SkeletonText width="18em" />
+                  </Td>
+                  <Td>
+                    <SkeletonText width="18em" />
+                  </Td>
+                  <Td>
+                    <SkeletonText width="4em" />
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </TableContainer>
+      </VStack>
+    );
   }
 
   function LoadMore() {
@@ -66,7 +106,7 @@ export default function LichessReport() {
 
   return (
     <>
-      <Flex direction="column" align="center" justifyContent="start" gap="5">
+      <VStack spacing={5} paddingTop="10">
         <TableContainer>
           <Table size="sm" variant="simple">
             <Thead>
@@ -90,11 +130,13 @@ export default function LichessReport() {
             </Tbody>
           </Table>
         </TableContainer>
-        {gameListFetcher.state !== 'idle' && <Spinner />}
-        {gameListFetcher.state === 'idle' && (
-          <Button onClick={LoadMore}>Load More</Button>
-        )}
-      </Flex>
+        <Box>
+          {gameListFetcher.state !== 'idle' && <Spinner />}
+          {gameListFetcher.state === 'idle' && (
+            <Button onClick={LoadMore}>Load More</Button>
+          )}
+        </Box>
+      </VStack>
     </>
   );
 }
