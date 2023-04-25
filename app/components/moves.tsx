@@ -10,7 +10,7 @@ import {
   Link,
   Stack,
   StackDivider,
-  Box,
+  StackItem,
 } from '@chakra-ui/react';
 import { chunk } from 'lodash';
 
@@ -20,17 +20,18 @@ export default function Moves(props: {
   onPlay?: (move: string) => void;
   bookMoves?: Array<string>;
   showBookMoves: boolean;
+  comments?: string;
 }) {
   const chunks = chunk(props.moves, 2);
   const bookMoves = props.bookMoves ?? [];
 
   return (
     <>
-      <Card minWidth="200px">
+      <Card h="100%">
         <CardBody>
           <Stack divider={<StackDivider />} spacing="10">
             {props.showBookMoves && (
-              <Box>
+              <StackItem>
                 <Heading size="xs">Book moves</Heading>
 
                 <Flex
@@ -47,9 +48,9 @@ export default function Moves(props: {
                     );
                   })}
                 </Flex>
-              </Box>
+              </StackItem>
             )}
-            <Box>
+            <StackItem>
               <Heading size="xs">Game moves</Heading>
               <List>
                 {chunks.map((c, i) => {
@@ -63,7 +64,19 @@ export default function Moves(props: {
                   );
                 })}
               </List>
-            </Box>
+            </StackItem>
+            {props.comments && (
+              <StackItem>
+                <Flex
+                  gap="1"
+                  direction="row"
+                  justifyContent="space-between"
+                  wrap="wrap"
+                >
+                  {props.comments}
+                </Flex>
+              </StackItem>
+            )}
           </Stack>
         </CardBody>
       </Card>

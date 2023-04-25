@@ -1,9 +1,19 @@
 import type { Move, Square } from 'chess.js';
 
 import { RepeatIcon } from '@chakra-ui/icons';
-import { Box, Button, Code, Flex, Heading, Spacer } from '@chakra-ui/react';
+import {
+  Button,
+  Text,
+  Code,
+  Flex,
+  Grid,
+  GridItem,
+  Heading,
+  Spacer,
+  Wrap,
+} from '@chakra-ui/react';
 import { useNavigate } from '@remix-run/react';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { VscBook } from 'react-icons/vsc';
 
@@ -20,6 +30,14 @@ export default function Explore() {
     useContext(GameContext);
   const [comment, setComment] = useState<string>('');
   const [bookMoves, setBookMoves] = useState<string[]>([]);
+  const boardRef = useRef<any>();
+  const [boardWidthContainer, setBoardWidthContainer] = useState(400);
+
+  useEffect(() => {
+    setBoardWidthContainer(
+      Math.min(boardRef?.current?.clientWidth, boardRef?.current?.clientHeight),
+    );
+  }, [boardRef?.current?.clientWidth, boardRef?.current?.clientHeight]);
 
   useEffect(() => {
     fetch(`/api/moves/get?fen=${encodeURIComponent(fen)}`)
@@ -62,7 +80,7 @@ export default function Explore() {
     navigate('/train?' + new URLSearchParams({ from: fen }));
   }
 
-  return (
+  const _ = (
     <>
       <Flex direction="column" align="center" gap="5">
         <Flex direction="row" align="center" gap="5">
@@ -91,7 +109,10 @@ export default function Explore() {
               onPlay={makeMove}
             ></Moves>
           </Flex>
-          <Box>{comment}</Box>
+          <Text>
+            comment lolilol hahahacomment lolilol hahahacomment lolilol
+            hahahahhhcomment lolilol hahahah {comment}
+          </Text>
           <Flex direction="row" gap="5" align="center">
             <Button leftIcon={<RepeatIcon />} onClick={flip}>
               flip board
@@ -104,5 +125,60 @@ export default function Explore() {
         <Code>{fen}</Code>
       </Flex>
     </>
+  );
+
+  return (
+    <Grid
+      templateAreas={`"header header"
+        "board moves"
+        "actions actions"
+        `}
+      gridTemplateRows="50px 1fr auto auto"
+      gridTemplateColumns="2fr 1fr"
+      columnGap="8"
+      rowGap="8"
+      h="100%"
+    >
+      <GridItem
+        gridArea="header"
+        alignSelf="center"
+        justifySelf="center"
+        paddingTop="5"
+      >
+        <Wrap>
+          <VscBook size="40" />
+          <Heading size="lg">Browsing moves</Heading>
+        </Wrap>
+      </GridItem>
+      <GridItem gridArea="board" ref={boardRef} minW="200px">
+        <Flex>
+          <Chessboard
+            position={fen}
+            onPieceDrop={onDrop}
+            boardWidth={boardWidthContainer}
+            boardOrientation={orientation}
+          />
+        </Flex>
+      </GridItem>
+      <GridItem gridArea="moves" maxW="300px">
+        <Moves
+          bookMoves={bookMoves}
+          moves={moves}
+          onNavigate={onNavigate}
+          showBookMoves={true}
+          onPlay={makeMove}
+          comments={comment}
+        ></Moves>
+      </GridItem>
+      <GridItem gridArea="actions">
+        <Wrap align="center" justify="center">
+          <Button leftIcon={<RepeatIcon />} onClick={flip}>
+            flip board
+          </Button>
+          <Button onClick={startTraining}>Train from this position</Button>
+          <LichessLink fen={fen}></LichessLink>
+        </Wrap>
+      </GridItem>
+    </Grid>
   );
 }
