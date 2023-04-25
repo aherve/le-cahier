@@ -1,7 +1,7 @@
 import type { AmplifyUser } from '@aws-amplify/ui';
 
 import { Authenticator } from '@aws-amplify/ui-react';
-import { Grid, GridItem } from '@chakra-ui/react';
+import { Grid, GridItem, Link } from '@chakra-ui/react';
 import { Outlet } from '@remix-run/react';
 import Cookies from 'universal-cookie';
 
@@ -41,7 +41,8 @@ export function LCLayout(props: { user: AmplifyUser | undefined }) {
             <Outlet />
           </GridItem>
           <GridItem gridArea="footer" justifySelf="center">
-            &copy; {new Date().getFullYear()} Aurélien Hervé
+            &copy; {new Date().getFullYear()}{' '}
+            <Link href="mailto:mail@aurelien-herve.com">Aurélien Hervé</Link>
           </GridItem>
         </Grid>
       </WithGame>
