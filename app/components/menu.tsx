@@ -12,8 +12,8 @@ import {
 import { useNavigate } from '@remix-run/react';
 import { useContext } from 'react';
 import { BsRecordCircle } from 'react-icons/bs';
-import { GiFalling } from 'react-icons/gi';
-import { MdOutlineSmartToy, MdSettings } from 'react-icons/md';
+import { GiFalling, GiHamburgerMenu } from 'react-icons/gi';
+import { MdLogout, MdOutlineSmartToy, MdSettings } from 'react-icons/md';
 import { SiLichess } from 'react-icons/si';
 import { VscBook } from 'react-icons/vsc';
 
@@ -83,12 +83,20 @@ export function LCMenu() {
 
         <WrapItem>
           <Menu>
-            <MenuButton as={Button}>
-              <MdSettings />
+            <MenuButton as={Button} variant="outline">
+              <GiHamburgerMenu />
             </MenuButton>
             <MenuList>
-              <MenuItem onClick={settings}>Settings</MenuItem>
-              <MenuItem onClick={signOut}>Logout</MenuItem>
+              <MenuItem onClick={settings}>
+                <Wrap align="center">
+                  <MdSettings /> <WrapItem>Settings</WrapItem>
+                </Wrap>
+              </MenuItem>
+              <MenuItem onClick={signOut}>
+                <Wrap align="center">
+                  <MdLogout /> <WrapItem>Logout</WrapItem>
+                </Wrap>
+              </MenuItem>
             </MenuList>
           </Menu>
         </WrapItem>
