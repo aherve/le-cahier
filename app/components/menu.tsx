@@ -1,12 +1,13 @@
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import {
   Button,
-  Flex,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Spacer,
+  Wrap,
+  WrapItem,
 } from '@chakra-ui/react';
 import { useNavigate } from '@remix-run/react';
 import { useContext } from 'react';
@@ -48,33 +49,50 @@ export function LCMenu() {
 
   return (
     <>
-      <Flex direction="row" align="center" justifyContent="center" gap="5">
-        <Button leftIcon={<VscBook />} onClick={explore}>
-          Explore
-        </Button>
-        <Button leftIcon={<MdOutlineSmartToy />} onClick={train}>
-          Train
-        </Button>
-        <Button onClick={anki} leftIcon={<GiFalling />}>
-          Review mistakes
-        </Button>
-        <Button leftIcon={<BsRecordCircle />} onClick={record}>
-          Record moves
-        </Button>
-        <Button leftIcon={<SiLichess />} onClick={lichessReport}>
-          lichess report
-        </Button>
-        <Menu>
-          <MenuButton as={Button}>
-            <MdSettings />
-          </MenuButton>
-          <MenuList>
-            <MenuItem onClick={settings}>Settings</MenuItem>
-            <MenuItem onClick={signOut}>Logout</MenuItem>
-          </MenuList>
-        </Menu>
-      </Flex>
-      ;
+      <Wrap justify="center">
+        <Spacer />
+        <WrapItem>
+          <Button leftIcon={<VscBook />} onClick={explore}>
+            Explore
+          </Button>
+        </WrapItem>
+        <WrapItem>
+          <Button leftIcon={<MdOutlineSmartToy />} onClick={train}>
+            Train
+          </Button>
+        </WrapItem>
+        <WrapItem>
+          <Button onClick={anki} leftIcon={<GiFalling />}>
+            Review mistakes
+          </Button>
+        </WrapItem>
+
+        <WrapItem>
+          <Button leftIcon={<BsRecordCircle />} onClick={record}>
+            Record moves
+          </Button>
+        </WrapItem>
+
+        <WrapItem>
+          <Button leftIcon={<SiLichess />} onClick={lichessReport}>
+            lichess report
+          </Button>
+        </WrapItem>
+
+        <Spacer />
+
+        <WrapItem>
+          <Menu>
+            <MenuButton as={Button}>
+              <MdSettings />
+            </MenuButton>
+            <MenuList>
+              <MenuItem onClick={settings}>Settings</MenuItem>
+              <MenuItem onClick={signOut}>Logout</MenuItem>
+            </MenuList>
+          </Menu>
+        </WrapItem>
+      </Wrap>
     </>
   );
 }

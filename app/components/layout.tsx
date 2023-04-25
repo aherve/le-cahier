@@ -1,6 +1,7 @@
 import type { AmplifyUser } from '@aws-amplify/ui';
 
 import { Authenticator } from '@aws-amplify/ui-react';
+import { Grid, GridItem } from '@chakra-ui/react';
 import { Outlet } from '@remix-run/react';
 import Cookies from 'universal-cookie';
 
@@ -26,8 +27,23 @@ export function LCLayout(props: { user: AmplifyUser | undefined }) {
   return (
     <Authenticator.Provider>
       <WithGame>
-        <LCMenu />
-        <Outlet />
+        <Grid
+          padding="10px"
+          templateAreas={'"header" "main" "footer"'}
+          gridTemplateRows="auto 1fr auto"
+          gridTemplateColumns="1fr"
+          h="100vh"
+        >
+          <GridItem gridArea="header">
+            <LCMenu />
+          </GridItem>
+          <GridItem gridArea="main">
+            <Outlet />
+          </GridItem>
+          <GridItem gridArea="footer" justifySelf="center">
+            &copy; {new Date().getFullYear()} Aurélien Hervé
+          </GridItem>
+        </Grid>
       </WithGame>
     </Authenticator.Provider>
   );
