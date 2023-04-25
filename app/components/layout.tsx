@@ -5,6 +5,7 @@ import { Grid, GridItem, Link } from '@chakra-ui/react';
 import { Outlet } from '@remix-run/react';
 import Cookies from 'universal-cookie';
 
+import { Footer } from './footer';
 import { LCMenu } from './menu';
 
 import { WithGame } from '~/with-game';
@@ -41,8 +42,7 @@ export function LCLayout(props: { user: AmplifyUser | undefined }) {
             <Outlet />
           </GridItem>
           <GridItem gridArea="footer" justifySelf="center">
-            &copy; {new Date().getFullYear()}{' '}
-            <Link href="mailto:mail@aurelien-herve.com">Aurélien Hervé</Link>
+            <Footer />
           </GridItem>
         </Grid>
       </WithGame>
