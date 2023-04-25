@@ -4,15 +4,7 @@ import type { Square } from 'react-chessboard/dist/chessboard/types';
 import type { GetChallengeOutput } from '~/routes/api/moves/challenge';
 
 import { EditIcon, RepeatIcon } from '@chakra-ui/icons';
-import {
-  Button,
-  Code,
-  Flex,
-  Grid,
-  GridItem,
-  Heading,
-  Wrap,
-} from '@chakra-ui/react';
+import { Button, Flex, GridItem, Heading, Wrap } from '@chakra-ui/react';
 import { useFetcher, useNavigate, useSearchParams } from '@remix-run/react';
 import { Chess } from 'chess.js';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';

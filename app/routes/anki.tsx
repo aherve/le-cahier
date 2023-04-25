@@ -5,15 +5,16 @@ import type { BookPosition } from '~/schemas/position';
 import {
   Button,
   Checkbox,
-  Code,
   Flex,
+  GridItem,
   Heading,
   Spinner,
   Text,
+  Wrap,
 } from '@chakra-ui/react';
 import { useFetcher, useNavigate } from '@remix-run/react';
 import { Chess } from 'chess.js';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { GiFalling } from 'react-icons/gi';
 import { VscBook } from 'react-icons/vsc';
@@ -21,6 +22,7 @@ import { VscBook } from 'react-icons/vsc';
 import LichessLink from '../components/lichess-link';
 import TrainMessage, { TrainMessageInput } from '../components/train-message';
 
+import { ChessGrid } from '~/components/chess-grid';
 import { GameContext } from '~/with-game';
 
 export default function Anki() {
@@ -32,6 +34,15 @@ export default function Anki() {
   const [hints, setHints] = useState<string[]>([]);
   const fetcher = useFetcher<BookPosition>();
   const [includeNovelties, setIncludeNovelties] = useState(false);
+
+  const boardRef = useRef<any>();
+  const [boardWidthContainer, setBoardWidthContainer] = useState(400);
+
+  useEffect(() => {
+    setBoardWidthContainer(
+      Math.min(boardRef?.current?.clientWidth, boardRef?.current?.clientHeight),
+    );
+  }, [boardRef?.current?.clientWidth, boardRef?.current?.clientHeight]);
 
   const ankiUpdate = useCallback(
     async (isSuccess: boolean) => {
@@ -142,35 +153,48 @@ export default function Anki() {
   }
 
   return (
-    <>
-      <Flex direction="column" align="center" gap="5">
-        <Flex direction="row" align="center" gap="5">
+    <ChessGrid>
+      <GridItem
+        gridArea="title"
+        alignSelf="center"
+        justifySelf="center"
+        paddingTop="5"
+      >
+        <Wrap>
           <GiFalling size="40" />
           <Heading size="lg">Reviewing failed moves</Heading>
-        </Flex>
-        <Checkbox isChecked={includeNovelties} onChange={toggleNovelties}>
-          Include novelties
-        </Checkbox>
+        </Wrap>
+      </GridItem>
+
+      <GridItem gridArea="message" alignSelf="center" justifySelf="center">
         <TrainMessage type={msg} hints={hints} />
-        <Context />
+        {fetcher.state !== 'loading' && <Context />}
         {fetcher.state === 'loading' && <Spinner />}
-        <Flex direction="row" gap="20">
+      </GridItem>
+
+      <GridItem gridArea="board" ref={boardRef} minW="200px">
+        <Flex>
           <Chessboard
             position={fen}
             onPieceDrop={onDrop}
-            boardWidth={400}
+            boardWidth={boardWidthContainer}
             boardOrientation={orientation}
           />
         </Flex>
-        <Flex direction="row" gap="5" align="center">
+      </GridItem>
+
+      <GridItem gridArea="actions">
+        <Wrap align="center" justify="center">
           <Button onClick={explore} variant="link">
             <VscBook />
           </Button>
           <LichessLink fen={fen}></LichessLink>
           <Button onClick={showHint}>get hint</Button>
-        </Flex>
-        <Code>{fen}</Code>
-      </Flex>
-    </>
+          <Checkbox isChecked={includeNovelties} onChange={toggleNovelties}>
+            Include novelties
+          </Checkbox>
+        </Wrap>
+      </GridItem>
+    </ChessGrid>
   );
 }

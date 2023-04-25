@@ -16,21 +16,23 @@ import {
   AlertIcon,
   Button,
   Flex,
+  GridItem,
   Heading,
   Spinner,
   Textarea,
   useDisclosure,
   useToast,
+  Wrap,
 } from '@chakra-ui/react';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { BiCloudUpload } from 'react-icons/bi';
 import { BsRecordCircle } from 'react-icons/bs';
-import { FiAlertTriangle } from 'react-icons/fi';
 import { MdYoutubeSearchedFor } from 'react-icons/md';
 
 import Moves from '../components/moves';
 
+import { ChessGrid } from '~/components/chess-grid';
 import { SaveMoveInputSchema } from '~/routes/api/moves/create';
 import { BookPositionSchema } from '~/schemas/position';
 import { toSAN } from '~/services/utils';
@@ -41,6 +43,14 @@ export default function Record() {
     useContext(GameContext);
   const [bookMoves, setBookMoves] = useState<string[]>([]);
   const toast = useToast();
+  const boardRef = useRef<any>();
+  const [boardWidthContainer, setBoardWidthContainer] = useState(400);
+
+  useEffect(() => {
+    setBoardWidthContainer(
+      Math.min(boardRef?.current?.clientWidth, boardRef?.current?.clientHeight),
+    );
+  }, [boardRef?.current?.clientWidth, boardRef?.current?.clientHeight]);
 
   useEffect(() => {
     fetch(`/api/moves/get?fen=${encodeURIComponent(fen)}`)
@@ -112,38 +122,56 @@ export default function Record() {
   }, [toast]);
 
   return (
-    <>
-      <Flex direction="column" align="center" gap="5">
-        <Flex direction="row" align="center" gap="5">
+    <ChessGrid>
+      <GridItem
+        gridArea="title"
+        alignSelf="center"
+        justifySelf="center"
+        paddingTop="5"
+      >
+        <Wrap>
           <BsRecordCircle color="red" size="40" />
           <Heading size="lg">Recording moves</Heading>
+        </Wrap>
+      </GridItem>
+
+      <GridItem
+        gridArea="message"
+        alignSelf="center"
+        justifySelf="center"
+      ></GridItem>
+
+      <GridItem gridArea="board" ref={boardRef} minW="200px">
+        <Flex>
+          <Chessboard
+            position={fen}
+            onPieceDrop={onDrop}
+            boardOrientation={orientation}
+            boardWidth={boardWidthContainer}
+          />
         </Flex>
-        <Flex direction="row" gap="20">
-          <Flex direction="column" align="center" gap="10">
-            <Chessboard
-              position={fen}
-              onPieceDrop={onDrop}
-              boardWidth={400}
-              boardOrientation={orientation}
-            />
-            <Flex direction="row" align="center" gap="5">
-              <Button leftIcon={<RepeatIcon />} onClick={flip}>
-                flip board
-              </Button>
-              {FindTranspositionsButton({ onScan })}
-              {LoadPGNButton({ orientation })}
-            </Flex>
-          </Flex>
-          <Moves
-            bookMoves={bookMoves}
-            showBookMoves={true}
-            moves={moves}
-            onNavigate={(m) => backTo(m.after)}
-            onPlay={LocalMakeMove}
-          ></Moves>
-        </Flex>
-      </Flex>
-    </>
+      </GridItem>
+
+      <GridItem gridArea="moves" maxW="300px">
+        <Moves
+          bookMoves={bookMoves}
+          showBookMoves={true}
+          moves={moves}
+          onNavigate={(m) => backTo(m.after)}
+          onPlay={LocalMakeMove}
+        ></Moves>
+      </GridItem>
+
+      <GridItem gridArea="actions">
+        <Wrap align="center" justify="center">
+          <Button leftIcon={<RepeatIcon />} onClick={flip}>
+            flip board
+          </Button>
+          {FindTranspositionsButton({ onScan })}
+          {LoadPGNButton({ orientation })}
+        </Wrap>
+      </GridItem>
+    </ChessGrid>
   );
 }
 
