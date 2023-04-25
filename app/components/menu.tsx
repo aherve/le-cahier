@@ -50,7 +50,6 @@ export function LCMenu() {
   return (
     <>
       <Wrap justify="center">
-        <Spacer />
         <WrapItem>
           <Button leftIcon={<VscBook />} onClick={explore}>
             Explore
@@ -78,8 +77,6 @@ export function LCMenu() {
             lichess report
           </Button>
         </WrapItem>
-
-        <Spacer />
 
         <WrapItem>
           <Menu>

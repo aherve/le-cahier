@@ -4,10 +4,18 @@ import type { Square } from 'react-chessboard/dist/chessboard/types';
 import type { GetChallengeOutput } from '~/routes/api/moves/challenge';
 
 import { EditIcon, RepeatIcon } from '@chakra-ui/icons';
-import { Button, Code, Flex, Heading } from '@chakra-ui/react';
+import {
+  Button,
+  Code,
+  Flex,
+  Grid,
+  GridItem,
+  Heading,
+  Wrap,
+} from '@chakra-ui/react';
 import { useFetcher, useNavigate, useSearchParams } from '@remix-run/react';
 import { Chess } from 'chess.js';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { MdOutlineSmartToy } from 'react-icons/md';
 
@@ -15,6 +23,7 @@ import LichessLink from '../components/lichess-link';
 import Moves from '../components/moves';
 import TrainMessage, { TrainMessageInput } from '../components/train-message';
 
+import { ChessGrid } from '~/components/chess-grid';
 import { GetChallengeOutputSchema } from '~/routes/api/moves/challenge';
 import { GameContext } from '~/with-game';
 
@@ -35,6 +44,15 @@ export default function Train() {
   const startingFEN = params.get('from');
   const [msg, setMsg] = useState<TrainMessageInputType>('empty');
   const [challenge, setChallenge] = useState<GetChallengeOutput | null>(null);
+
+  const boardRef = useRef<any>();
+  const [boardWidthContainer, setBoardWidthContainer] = useState(400);
+
+  useEffect(() => {
+    setBoardWidthContainer(
+      Math.min(boardRef?.current?.clientWidth, boardRef?.current?.clientHeight),
+    );
+  }, [boardRef?.current?.clientWidth, boardRef?.current?.clientHeight]);
 
   const isPlayerTurn =
     (orientation === 'white' && turn === 'w') ||
@@ -138,27 +156,44 @@ export default function Train() {
   }
 
   return (
-    <>
-      <Flex direction="column" align="center" gap="5">
-        <Flex direction="row" align="center" gap="5">
+    <ChessGrid>
+      <GridItem
+        gridArea="title"
+        alignSelf="center"
+        justifySelf="center"
+        paddingTop="5"
+      >
+        <Wrap>
           <MdOutlineSmartToy size="40" />
           <Heading size="lg">Training mode</Heading>
-        </Flex>
+        </Wrap>
+      </GridItem>
+
+      <GridItem gridArea="message" alignSelf="center" justifySelf="center">
         <TrainMessage type={msg} hints={hints} />
-        <Flex direction="row" gap="20">
+      </GridItem>
+
+      <GridItem gridArea="board" ref={boardRef} minW="200px">
+        <Flex>
           <Chessboard
             position={fen}
             onPieceDrop={onDrop}
-            boardWidth={400}
+            boardWidth={boardWidthContainer}
             boardOrientation={orientation}
           />
-          <Moves
-            showBookMoves={false}
-            moves={moves}
-            onNavigate={onNavigate}
-          ></Moves>
         </Flex>
-        <Flex direction="row" gap="5" align="center">
+      </GridItem>
+
+      <GridItem gridArea="moves" maxW="300px">
+        <Moves
+          showBookMoves={false}
+          moves={moves}
+          onNavigate={onNavigate}
+        ></Moves>
+      </GridItem>
+
+      <GridItem gridArea="actions">
+        <Wrap align="center" justify="center">
           <Button leftIcon={<RepeatIcon />} onClick={flip}>
             flip board
           </Button>
@@ -170,9 +205,8 @@ export default function Train() {
           </Button>
           <Button onClick={showHint}>get hint</Button>
           <LichessLink fen={fen}></LichessLink>
-        </Flex>
-        <Code>{fen}</Code>
-      </Flex>
-    </>
+        </Wrap>
+      </GridItem>
+    </ChessGrid>
   );
 }

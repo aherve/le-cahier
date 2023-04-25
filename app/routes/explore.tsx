@@ -1,17 +1,7 @@
 import type { Move, Square } from 'chess.js';
 
 import { RepeatIcon } from '@chakra-ui/icons';
-import {
-  Button,
-  Text,
-  Code,
-  Flex,
-  Grid,
-  GridItem,
-  Heading,
-  Spacer,
-  Wrap,
-} from '@chakra-ui/react';
+import { Button, Flex, Grid, GridItem, Heading, Wrap } from '@chakra-ui/react';
 import { useNavigate } from '@remix-run/react';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
@@ -20,6 +10,7 @@ import { VscBook } from 'react-icons/vsc';
 import LichessLink from '../components/lichess-link';
 import Moves from '../components/moves';
 
+import { ChessGrid } from '~/components/chess-grid';
 import { BookPositionSchema } from '~/schemas/position';
 import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
@@ -80,67 +71,10 @@ export default function Explore() {
     navigate('/train?' + new URLSearchParams({ from: fen }));
   }
 
-  const _ = (
-    <>
-      <Flex direction="column" align="center" gap="5">
-        <Flex direction="row" align="center" gap="5">
-          <VscBook size="40" />
-          <Heading size="lg">Browsing moves</Heading>
-        </Flex>
-        <Flex
-          direction="column"
-          align="center"
-          justify="space-between"
-          gap="10"
-          grow="1"
-        >
-          <Flex direction="row" gap="20">
-            <Chessboard
-              position={fen}
-              onPieceDrop={onDrop}
-              boardWidth={400}
-              boardOrientation={orientation}
-            />
-            <Moves
-              bookMoves={bookMoves}
-              moves={moves}
-              onNavigate={onNavigate}
-              showBookMoves={true}
-              onPlay={makeMove}
-            ></Moves>
-          </Flex>
-          <Text>
-            comment lolilol hahahacomment lolilol hahahacomment lolilol
-            hahahahhhcomment lolilol hahahah {comment}
-          </Text>
-          <Flex direction="row" gap="5" align="center">
-            <Button leftIcon={<RepeatIcon />} onClick={flip}>
-              flip board
-            </Button>
-            <Button onClick={startTraining}>Train from this position</Button>
-            <LichessLink fen={fen}></LichessLink>
-          </Flex>
-        </Flex>
-        <Spacer />
-        <Code>{fen}</Code>
-      </Flex>
-    </>
-  );
-
   return (
-    <Grid
-      templateAreas={`"header header"
-        "board moves"
-        "actions actions"
-        `}
-      gridTemplateRows="50px 1fr auto auto"
-      gridTemplateColumns="2fr 1fr"
-      columnGap="8"
-      rowGap="8"
-      h="100%"
-    >
+    <ChessGrid>
       <GridItem
-        gridArea="header"
+        gridArea="title"
         alignSelf="center"
         justifySelf="center"
         paddingTop="5"
@@ -150,6 +84,7 @@ export default function Explore() {
           <Heading size="lg">Browsing moves</Heading>
         </Wrap>
       </GridItem>
+
       <GridItem gridArea="board" ref={boardRef} minW="200px">
         <Flex>
           <Chessboard
@@ -160,6 +95,7 @@ export default function Explore() {
           />
         </Flex>
       </GridItem>
+
       <GridItem gridArea="moves" maxW="300px">
         <Moves
           bookMoves={bookMoves}
@@ -179,6 +115,6 @@ export default function Explore() {
           <LichessLink fen={fen}></LichessLink>
         </Wrap>
       </GridItem>
-    </Grid>
+    </ChessGrid>
   );
 }
