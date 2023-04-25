@@ -20,6 +20,7 @@ import {
   SkeletonText,
 } from '@chakra-ui/react';
 import { useFetcher, useNavigate } from '@remix-run/react';
+import { Chess } from 'chess.js';
 import moment from 'moment';
 import { useContext, useEffect, useState } from 'react';
 import { BsCircle, BsCircleFill } from 'react-icons/bs';
@@ -163,6 +164,10 @@ function GameItem(props: { game: LichessGame; startExplore: () => void }) {
 
   const report = GameReportSchema.nullable().optional().parse(fetcher.data);
   const lichessUsername = report?.lichessUsername;
+  const firstDeviationIndex =
+    (report?.movesReport.filter((m) => m.status === 'success').length ?? 0) *
+      2 +
+      1 ?? 0;
 
   return (
     <Tr>
@@ -194,7 +199,10 @@ function GameItem(props: { game: LichessGame; startExplore: () => void }) {
       <Td>
         <LichessLink
           gameId={game.id}
-          moveIndex={firstFailIndex(report)}
+          moveIndex={firstFailIndex(report) || firstDeviationIndex}
+          orientation={
+            game.players.white.user.name === lichessUsername ? 'white' : 'black'
+          }
         ></LichessLink>
       </Td>
       <Td>{ExploreButton({ report, startExplore: props.startExplore })}</Td>
