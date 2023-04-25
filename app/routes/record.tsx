@@ -6,12 +6,14 @@ import type {
 import { RepeatIcon } from '@chakra-ui/icons';
 import {
   Alert,
+  AlertDescription,
   AlertDialog,
   AlertDialogBody,
   AlertDialogContent,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogOverlay,
+  AlertIcon,
   Button,
   Flex,
   Heading,
@@ -24,6 +26,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { BiCloudUpload } from 'react-icons/bi';
 import { BsRecordCircle } from 'react-icons/bs';
+import { FiAlertTriangle } from 'react-icons/fi';
 import { MdYoutubeSearchedFor } from 'react-icons/md';
 
 import Moves from '../components/moves';
@@ -200,6 +203,13 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
               Load PGN file for {props.orientation}
             </AlertDialogHeader>
 
+            <Alert status="warning">
+              <AlertIcon />
+              <AlertDescription>
+                PGN variations are not yet supported. Only mainline will be
+                loaded
+              </AlertDescription>
+            </Alert>
             <AlertDialogBody>
               {isLoading && <Spinner />}
               {!isLoading && (
