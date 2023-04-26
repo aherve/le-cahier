@@ -162,7 +162,6 @@ function GameItem(props: { game: LichessGame; startExplore: () => void }) {
   }, [fetcher, game, reloader]);
 
   const report = GameReportSchema.nullable().optional().parse(fetcher.data);
-  const lichessUsername = report?.lichessUsername;
   const firstDeviationIndex =
     (report?.movesReport.filter((m) => m.status === 'success').length ?? 0) *
       2 +
@@ -176,8 +175,8 @@ function GameItem(props: { game: LichessGame; startExplore: () => void }) {
           {game.speed === 'blitz' && <SiStackblitz />}
           {game.speed === 'bullet' && <GiBulletBill />}
           {game.speed === 'rapid' && <GiRabbit />}
-          {game.players.white.user.name === lichessUsername && <BsCircle />}
-          {game.players.black.user.name === lichessUsername && <BsCircleFill />}
+          {getPlayerOrientation(game, report) === 'white' && <BsCircle />}
+          {getPlayerOrientation(game, report) === 'black' && <BsCircleFill />}
         </Flex>
       </Td>
       <Td>
@@ -199,12 +198,12 @@ function GameItem(props: { game: LichessGame; startExplore: () => void }) {
         <LichessLink
           gameId={game.id}
           moveIndex={firstFailIndex(report) || firstDeviationIndex}
-          orientation={
-            game.players.white.user.name === lichessUsername ? 'white' : 'black'
-          }
+          orientation={getPlayerOrientation(game, report) ?? 'white'}
         ></LichessLink>
       </Td>
-      <Td>{ExploreButton({ report, startExplore: props.startExplore })}</Td>
+      <Td>
+        {ExploreButton({ game, report, startExplore: props.startExplore })}
+      </Td>
       <Td>
         <Button size="xs" onClick={cleanGameReport}>
           <RepeatIcon />
@@ -265,16 +264,23 @@ function GameReportComponent(props: { game: LichessGame; report: GameReport }) {
 }
 
 function ExploreButton(props: {
+  game: LichessGame;
   report?: GameReport | null;
   startExplore: () => void;
 }) {
+  const { setOrientation } = useContext(GameContext);
   const { reset } = useContext(GameContext);
   const fen = props.report?.firstError?.before;
   if (!fen) {
     return <></>;
   }
 
+  const orientation = getPlayerOrientation(props.game, props.report);
+
   function explore() {
+    if (orientation) {
+      setOrientation(orientation);
+    }
     reset(fen);
     props.startExplore();
   }
@@ -286,4 +292,10 @@ function ExploreButton(props: {
       </Button>
     </>
   );
+}
+
+function getPlayerOrientation(game: LichessGame, report?: GameReport | null) {
+  if (game.players.white.user.name === report?.lichessUsername) return 'white';
+  if (game.players.black.user.name === report?.lichessUsername) return 'black';
+  return undefined;
 }

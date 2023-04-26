@@ -9,6 +9,7 @@ import { useFetcher, useNavigate, useSearchParams } from '@remix-run/react';
 import { Chess } from 'chess.js';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { MdOutlineSmartToy } from 'react-icons/md';
+import { VscBook } from 'react-icons/vsc';
 
 import LichessLink from '../components/lichess-link';
 import Moves from '../components/moves';
@@ -137,6 +138,10 @@ export default function Train() {
     navigate('/record');
   }
 
+  function explore() {
+    navigate('/explore');
+  }
+
   return (
     <ChessGrid fen={fen} onPieceDrop={onDrop} orientation={orientation}>
       <GridItem
@@ -175,6 +180,9 @@ export default function Train() {
             Again
           </Button>
           <Button onClick={showHint}>get hint</Button>
+          <Button onClick={explore} variant="link">
+            <VscBook />
+          </Button>
           <LichessLink fen={fen}></LichessLink>
         </Wrap>
       </GridItem>
