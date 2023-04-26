@@ -5,7 +5,6 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Spacer,
   Wrap,
   WrapItem,
 } from '@chakra-ui/react';

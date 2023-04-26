@@ -1,10 +1,9 @@
 import type { Move, Square } from 'chess.js';
 
 import { RepeatIcon } from '@chakra-ui/icons';
-import { Button, Flex, Grid, GridItem, Heading, Wrap } from '@chakra-ui/react';
+import { Button, GridItem, Heading, Wrap } from '@chakra-ui/react';
 import { useNavigate } from '@remix-run/react';
-import { useContext, useEffect, useRef, useState } from 'react';
-import { Chessboard } from 'react-chessboard';
+import { useContext, useEffect, useState } from 'react';
 import { VscBook } from 'react-icons/vsc';
 
 import LichessLink from '../components/lichess-link';
@@ -21,14 +20,6 @@ export default function Explore() {
     useContext(GameContext);
   const [comment, setComment] = useState<string>('');
   const [bookMoves, setBookMoves] = useState<string[]>([]);
-  const boardRef = useRef<any>();
-  const [boardWidthContainer, setBoardWidthContainer] = useState(400);
-
-  useEffect(() => {
-    setBoardWidthContainer(
-      Math.min(boardRef?.current?.clientWidth, boardRef?.current?.clientHeight),
-    );
-  }, [boardRef?.current?.clientWidth, boardRef?.current?.clientHeight]);
 
   useEffect(() => {
     fetch(`/api/moves/get?fen=${encodeURIComponent(fen)}`)
@@ -72,7 +63,7 @@ export default function Explore() {
   }
 
   return (
-    <ChessGrid>
+    <ChessGrid fen={fen} onPieceDrop={onDrop} orientation={orientation}>
       <GridItem
         gridArea="title"
         alignSelf="center"
@@ -83,17 +74,6 @@ export default function Explore() {
           <VscBook size="40" />
           <Heading size="lg">Browsing moves</Heading>
         </Wrap>
-      </GridItem>
-
-      <GridItem gridArea="board" ref={boardRef} minW="200px">
-        <Flex>
-          <Chessboard
-            position={fen}
-            onPieceDrop={onDrop}
-            boardWidth={boardWidthContainer}
-            boardOrientation={orientation}
-          />
-        </Flex>
       </GridItem>
 
       <GridItem gridArea="moves" maxW="300px">

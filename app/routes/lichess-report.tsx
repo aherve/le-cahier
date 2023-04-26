@@ -20,7 +20,6 @@ import {
   SkeletonText,
 } from '@chakra-ui/react';
 import { useFetcher, useNavigate } from '@remix-run/react';
-import { Chess } from 'chess.js';
 import moment from 'moment';
 import { useContext, useEffect, useState } from 'react';
 import { BsCircle, BsCircleFill } from 'react-icons/bs';

@@ -4,11 +4,10 @@ import type { Square } from 'react-chessboard/dist/chessboard/types';
 import type { GetChallengeOutput } from '~/routes/api/moves/challenge';
 
 import { EditIcon, RepeatIcon } from '@chakra-ui/icons';
-import { Button, Flex, GridItem, Heading, Wrap } from '@chakra-ui/react';
+import { Button, GridItem, Heading, Wrap } from '@chakra-ui/react';
 import { useFetcher, useNavigate, useSearchParams } from '@remix-run/react';
 import { Chess } from 'chess.js';
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { Chessboard } from 'react-chessboard';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { MdOutlineSmartToy } from 'react-icons/md';
 
 import LichessLink from '../components/lichess-link';
@@ -36,15 +35,6 @@ export default function Train() {
   const startingFEN = params.get('from');
   const [msg, setMsg] = useState<TrainMessageInputType>('empty');
   const [challenge, setChallenge] = useState<GetChallengeOutput | null>(null);
-
-  const boardRef = useRef<any>();
-  const [boardWidthContainer, setBoardWidthContainer] = useState(400);
-
-  useEffect(() => {
-    setBoardWidthContainer(
-      Math.min(boardRef?.current?.clientWidth, boardRef?.current?.clientHeight),
-    );
-  }, [boardRef?.current?.clientWidth, boardRef?.current?.clientHeight]);
 
   const isPlayerTurn =
     (orientation === 'white' && turn === 'w') ||
@@ -148,7 +138,7 @@ export default function Train() {
   }
 
   return (
-    <ChessGrid>
+    <ChessGrid fen={fen} onPieceDrop={onDrop} orientation={orientation}>
       <GridItem
         gridArea="title"
         alignSelf="center"
@@ -163,17 +153,6 @@ export default function Train() {
 
       <GridItem gridArea="message" alignSelf="center" justifySelf="center">
         <TrainMessage type={msg} hints={hints} />
-      </GridItem>
-
-      <GridItem gridArea="board" ref={boardRef} minW="200px">
-        <Flex>
-          <Chessboard
-            position={fen}
-            onPieceDrop={onDrop}
-            boardWidth={boardWidthContainer}
-            boardOrientation={orientation}
-          />
-        </Flex>
       </GridItem>
 
       <GridItem gridArea="moves" maxW="300px">

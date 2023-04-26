@@ -5,7 +5,6 @@ import type { BookPosition } from '~/schemas/position';
 import {
   Button,
   Checkbox,
-  Flex,
   GridItem,
   Heading,
   Spinner,
@@ -14,8 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { useFetcher, useNavigate } from '@remix-run/react';
 import { Chess } from 'chess.js';
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { Chessboard } from 'react-chessboard';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { GiFalling } from 'react-icons/gi';
 import { VscBook } from 'react-icons/vsc';
 
@@ -34,15 +32,6 @@ export default function Anki() {
   const [hints, setHints] = useState<string[]>([]);
   const fetcher = useFetcher<BookPosition>();
   const [includeNovelties, setIncludeNovelties] = useState(false);
-
-  const boardRef = useRef<any>();
-  const [boardWidthContainer, setBoardWidthContainer] = useState(400);
-
-  useEffect(() => {
-    setBoardWidthContainer(
-      Math.min(boardRef?.current?.clientWidth, boardRef?.current?.clientHeight),
-    );
-  }, [boardRef?.current?.clientWidth, boardRef?.current?.clientHeight]);
 
   const ankiUpdate = useCallback(
     async (isSuccess: boolean) => {
@@ -153,7 +142,7 @@ export default function Anki() {
   }
 
   return (
-    <ChessGrid>
+    <ChessGrid fen={fen} onPieceDrop={onDrop} orientation={orientation}>
       <GridItem
         gridArea="title"
         alignSelf="center"
@@ -170,17 +159,6 @@ export default function Anki() {
         <TrainMessage type={msg} hints={hints} />
         {fetcher.state !== 'loading' && <Context />}
         {fetcher.state === 'loading' && <Spinner />}
-      </GridItem>
-
-      <GridItem gridArea="board" ref={boardRef} minW="200px">
-        <Flex>
-          <Chessboard
-            position={fen}
-            onPieceDrop={onDrop}
-            boardWidth={boardWidthContainer}
-            boardOrientation={orientation}
-          />
-        </Flex>
       </GridItem>
 
       <GridItem gridArea="actions">

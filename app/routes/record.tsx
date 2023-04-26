@@ -15,7 +15,6 @@ import {
   AlertDialogOverlay,
   AlertIcon,
   Button,
-  Flex,
   GridItem,
   Heading,
   Spinner,
@@ -25,7 +24,6 @@ import {
   Wrap,
 } from '@chakra-ui/react';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { Chessboard } from 'react-chessboard';
 import { BiCloudUpload } from 'react-icons/bi';
 import { BsRecordCircle } from 'react-icons/bs';
 import { MdYoutubeSearchedFor } from 'react-icons/md';
@@ -43,14 +41,6 @@ export default function Record() {
     useContext(GameContext);
   const [bookMoves, setBookMoves] = useState<string[]>([]);
   const toast = useToast();
-  const boardRef = useRef<any>();
-  const [boardWidthContainer, setBoardWidthContainer] = useState(400);
-
-  useEffect(() => {
-    setBoardWidthContainer(
-      Math.min(boardRef?.current?.clientWidth, boardRef?.current?.clientHeight),
-    );
-  }, [boardRef?.current?.clientWidth, boardRef?.current?.clientHeight]);
 
   useEffect(() => {
     fetch(`/api/moves/get?fen=${encodeURIComponent(fen)}`)
@@ -122,7 +112,7 @@ export default function Record() {
   }, [toast]);
 
   return (
-    <ChessGrid>
+    <ChessGrid fen={fen} onPieceDrop={onDrop} orientation={orientation}>
       <GridItem
         gridArea="title"
         alignSelf="center"
@@ -140,17 +130,6 @@ export default function Record() {
         alignSelf="center"
         justifySelf="center"
       ></GridItem>
-
-      <GridItem gridArea="board" ref={boardRef} minW="200px">
-        <Flex>
-          <Chessboard
-            position={fen}
-            onPieceDrop={onDrop}
-            boardOrientation={orientation}
-            boardWidth={boardWidthContainer}
-          />
-        </Flex>
-      </GridItem>
 
       <GridItem gridArea="moves" maxW="300px">
         <Moves
