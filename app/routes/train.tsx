@@ -183,7 +183,7 @@ export default function Train() {
           <Button onClick={explore} variant="link">
             <VscBook />
           </Button>
-          <LichessLink fen={fen}></LichessLink>
+          <LichessLink fen={fen} orientation={orientation}></LichessLink>
         </Wrap>
       </GridItem>
     </ChessGrid>

@@ -13,14 +13,20 @@ export function ChessGrid(props: {
   onPieceDrop: (from: Square, to: Square) => boolean;
   orientation: BoardOrientation;
 }) {
-  const boardRef = useRef<any>();
+  const boardContainerRef = useRef<any>();
   const [boardWidthContainer, setBoardWidthContainer] = useState(400);
 
   useEffect(() => {
     setBoardWidthContainer(
-      Math.min(boardRef?.current?.clientWidth, boardRef?.current?.clientHeight),
+      Math.min(
+        boardContainerRef?.current?.clientWidth,
+        boardContainerRef?.current?.clientHeight,
+      ),
     );
-  }, [boardRef?.current?.clientWidth, boardRef?.current?.clientHeight]);
+  }, [
+    boardContainerRef?.current?.clientWidth,
+    boardContainerRef?.current?.clientHeight,
+  ]);
 
   return (
     <Grid
@@ -37,7 +43,7 @@ export function ChessGrid(props: {
     >
       {props.children}
 
-      <GridItem gridArea="board" ref={boardRef} minW="200px">
+      <GridItem gridArea="board" ref={boardContainerRef} minW="200px">
         <Flex>
           <Chessboard
             position={props.fen}
