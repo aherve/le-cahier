@@ -8,6 +8,7 @@ import { Button, GridItem, Heading, Wrap } from '@chakra-ui/react';
 import { useFetcher, useSearchParams } from '@remix-run/react';
 import { Chess } from 'chess.js';
 import { useCallback, useContext, useEffect, useState } from 'react';
+import { GoLightBulb } from 'react-icons/go';
 import { MdOutlineSmartToy } from 'react-icons/md';
 
 import LichessLink from '../components/lichess-link';
@@ -169,7 +170,9 @@ export default function Train() {
           <Button leftIcon={<RepeatIcon />} onClick={again}>
             Again
           </Button>
-          <Button onClick={showHint}>get hint</Button>
+          <Button leftIcon={<GoLightBulb />} onClick={showHint}>
+            get hint
+          </Button>
           <ExploreButton />
           <LichessLink fen={fen} orientation={orientation}></LichessLink>
         </Wrap>

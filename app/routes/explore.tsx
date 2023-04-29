@@ -86,7 +86,7 @@ export default function Explore() {
           <Button leftIcon={<RepeatIcon />} onClick={flip}>
             flip board
           </Button>
-          <TrainButton variant="icon" />
+          <TrainButton />
           <LichessLink fen={fen}></LichessLink>
         </Wrap>
       </GridItem>

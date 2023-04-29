@@ -15,6 +15,7 @@ import { useFetcher } from '@remix-run/react';
 import { Chess } from 'chess.js';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { GiFalling } from 'react-icons/gi';
+import { GoLightBulb } from 'react-icons/go';
 
 import LichessLink from '../components/lichess-link';
 import TrainMessage, { TrainMessageInput } from '../components/train-message';
@@ -162,7 +163,9 @@ export default function Anki() {
           <ExploreButton />
           <LichessLink fen={fen}></LichessLink>
           <TrainButton />
-          <Button onClick={showHint}>get hint</Button>
+          <Button leftIcon={<GoLightBulb />} onClick={showHint}>
+            get hint
+          </Button>
           <Checkbox isChecked={includeNovelties} onChange={toggleNovelties}>
             Include novelties
           </Checkbox>
