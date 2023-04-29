@@ -21,6 +21,7 @@ import LichessLink from '../components/lichess-link';
 import TrainMessage, { TrainMessageInput } from '../components/train-message';
 
 import { ChessGrid } from '~/components/chess-grid';
+import { TrainButton } from '~/components/train-button';
 import { GameContext } from '~/with-game';
 
 export default function Anki() {
@@ -167,6 +168,7 @@ export default function Anki() {
             <VscBook />
           </Button>
           <LichessLink fen={fen}></LichessLink>
+          <TrainButton />
           <Button onClick={showHint}>get hint</Button>
           <Checkbox isChecked={includeNovelties} onChange={toggleNovelties}>
             Include novelties

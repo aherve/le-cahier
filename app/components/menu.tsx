@@ -12,9 +12,11 @@ import { useNavigate } from '@remix-run/react';
 import { useContext } from 'react';
 import { BsRecordCircle } from 'react-icons/bs';
 import { GiFalling, GiHamburgerMenu } from 'react-icons/gi';
-import { MdLogout, MdOutlineSmartToy, MdSettings } from 'react-icons/md';
+import { MdLogout, MdSettings } from 'react-icons/md';
 import { SiLichess } from 'react-icons/si';
 import { VscBook } from 'react-icons/vsc';
+
+import { TrainButton } from './train-button';
 
 import { GameContext } from '~/with-game';
 
@@ -26,10 +28,6 @@ export function LCMenu() {
   function explore() {
     reset();
     navigate('/explore');
-  }
-  function train() {
-    reset();
-    navigate('/train');
   }
   function anki() {
     reset();
@@ -55,9 +53,7 @@ export function LCMenu() {
           </Button>
         </WrapItem>
         <WrapItem>
-          <Button leftIcon={<MdOutlineSmartToy />} onClick={train}>
-            Train
-          </Button>
+          <TrainButton reset={true} />
         </WrapItem>
         <WrapItem>
           <Button onClick={anki} leftIcon={<GiFalling />}>

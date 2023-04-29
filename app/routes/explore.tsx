@@ -10,6 +10,7 @@ import LichessLink from '../components/lichess-link';
 import Moves from '../components/moves';
 
 import { ChessGrid } from '~/components/chess-grid';
+import { TrainButton } from '~/components/train-button';
 import { BookPositionSchema } from '~/schemas/position';
 import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
@@ -58,10 +59,6 @@ export default function Explore() {
     }
   }
 
-  function startTraining() {
-    navigate('/train?' + new URLSearchParams({ from: fen }));
-  }
-
   return (
     <ChessGrid fen={fen} onPieceDrop={onDrop} orientation={orientation}>
       <GridItem
@@ -91,7 +88,7 @@ export default function Explore() {
           <Button leftIcon={<RepeatIcon />} onClick={flip}>
             flip board
           </Button>
-          <Button onClick={startTraining}>Train from this position</Button>
+          <TrainButton />
           <LichessLink fen={fen}></LichessLink>
         </Wrap>
       </GridItem>
