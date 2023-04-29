@@ -19,22 +19,20 @@ import {
   VStack,
   SkeletonText,
 } from '@chakra-ui/react';
-import { useFetcher, useNavigate } from '@remix-run/react';
+import { useFetcher } from '@remix-run/react';
 import moment from 'moment';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BsCircle, BsCircleFill } from 'react-icons/bs';
 import { GiBulletBill, GiRabbit } from 'react-icons/gi';
 import { SiStackblitz } from 'react-icons/si';
-import { VscBook } from 'react-icons/vsc';
 
 import LichessLink from '../components/lichess-link';
 
+import { ExploreButton } from '~/components/explore-button';
 import { GameReportSchema, MissedMoveSchema } from '~/schemas/game-report';
 import { LichessGameSchema } from '~/schemas/lichess';
-import { GameContext } from '~/with-game';
 
 export default function LichessReport() {
-  const navigate = useNavigate();
   const gameListFetcher = useFetcher();
   const [games, setGames] = useState<LichessGame[]>([]);
 
@@ -100,10 +98,6 @@ export default function LichessReport() {
     gameListFetcher.load(`/api/lichess/games?until=${oldTimestamp}`);
   }
 
-  function explore() {
-    navigate('/explore');
-  }
-
   return (
     <>
       <VStack spacing={5} paddingTop="10">
@@ -121,11 +115,7 @@ export default function LichessReport() {
             </Thead>
             <Tbody>
               {games.map((game) => (
-                <GameItem
-                  game={game}
-                  key={game.id}
-                  startExplore={explore}
-                ></GameItem>
+                <GameItem game={game} key={game.id}></GameItem>
               ))}
             </Tbody>
           </Table>
@@ -141,7 +131,7 @@ export default function LichessReport() {
   );
 }
 
-function GameItem(props: { game: LichessGame; startExplore: () => void }) {
+function GameItem(props: { game: LichessGame }) {
   const { game } = props;
   const fetcher = useFetcher();
   const [reloader, setReloader] = useState(Date.now());
@@ -201,9 +191,7 @@ function GameItem(props: { game: LichessGame; startExplore: () => void }) {
           orientation={getPlayerOrientation(game, report) ?? 'white'}
         ></LichessLink>
       </Td>
-      <Td>
-        {ExploreButton({ game, report, startExplore: props.startExplore })}
-      </Td>
+      <Td>{GameExploreButton({ game, report })}</Td>
       <Td>
         <Button size="xs" onClick={cleanGameReport}>
           <RepeatIcon />
@@ -263,13 +251,10 @@ function GameReportComponent(props: { game: LichessGame; report: GameReport }) {
   );
 }
 
-function ExploreButton(props: {
+function GameExploreButton(props: {
   game: LichessGame;
   report?: GameReport | null;
-  startExplore: () => void;
 }) {
-  const { setOrientation } = useContext(GameContext);
-  const { reset } = useContext(GameContext);
   const fen = props.report?.firstError?.before;
   if (!fen) {
     return <></>;
@@ -277,21 +262,7 @@ function ExploreButton(props: {
 
   const orientation = getPlayerOrientation(props.game, props.report);
 
-  function explore() {
-    if (orientation) {
-      setOrientation(orientation);
-    }
-    reset(fen);
-    props.startExplore();
-  }
-
-  return (
-    <>
-      <Button onClick={explore} variant="link">
-        <VscBook />
-      </Button>
-    </>
-  );
+  return <ExploreButton fen={fen} orientation={orientation} />;
 }
 
 function getPlayerOrientation(game: LichessGame, report?: GameReport | null) {

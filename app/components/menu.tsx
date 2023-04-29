@@ -14,8 +14,8 @@ import { BsRecordCircle } from 'react-icons/bs';
 import { GiFalling, GiHamburgerMenu } from 'react-icons/gi';
 import { MdLogout, MdSettings } from 'react-icons/md';
 import { SiLichess } from 'react-icons/si';
-import { VscBook } from 'react-icons/vsc';
 
+import { ExploreButton } from './explore-button';
 import { TrainButton } from './train-button';
 
 import { GameContext } from '~/with-game';
@@ -25,10 +25,6 @@ export function LCMenu() {
   const { signOut } = useAuthenticator();
   const navigate = useNavigate();
 
-  function explore() {
-    reset();
-    navigate('/explore');
-  }
   function anki() {
     reset();
     navigate('/anki');
@@ -48,9 +44,7 @@ export function LCMenu() {
     <>
       <Wrap justify="center">
         <WrapItem>
-          <Button leftIcon={<VscBook />} onClick={explore}>
-            Explore
-          </Button>
+          <ExploreButton reset={true} />
         </WrapItem>
         <WrapItem>
           <TrainButton reset={true} />

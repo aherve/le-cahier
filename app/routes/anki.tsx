@@ -11,21 +11,20 @@ import {
   Text,
   Wrap,
 } from '@chakra-ui/react';
-import { useFetcher, useNavigate } from '@remix-run/react';
+import { useFetcher } from '@remix-run/react';
 import { Chess } from 'chess.js';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { GiFalling } from 'react-icons/gi';
-import { VscBook } from 'react-icons/vsc';
 
 import LichessLink from '../components/lichess-link';
 import TrainMessage, { TrainMessageInput } from '../components/train-message';
 
 import { ChessGrid } from '~/components/chess-grid';
+import { ExploreButton } from '~/components/explore-button';
 import { TrainButton } from '~/components/train-button';
 import { GameContext } from '~/with-game';
 
 export default function Anki() {
-  const navigate = useNavigate();
   const { fen, turn, makeMove, reset, orientation, setOrientation } =
     useContext(GameContext);
   const [position, setPosition] = useState<BookPosition | null>(null);
@@ -138,10 +137,6 @@ export default function Anki() {
     fetcher.load(`/api/moves/get-anki?skipNovelties=${!newValue}`);
   }
 
-  function explore() {
-    navigate('/explore');
-  }
-
   return (
     <ChessGrid fen={fen} onPieceDrop={onDrop} orientation={orientation}>
       <GridItem
@@ -164,9 +159,7 @@ export default function Anki() {
 
       <GridItem gridArea="actions">
         <Wrap align="center" justify="center">
-          <Button onClick={explore} variant="link">
-            <VscBook />
-          </Button>
+          <ExploreButton />
           <LichessLink fen={fen}></LichessLink>
           <TrainButton />
           <Button onClick={showHint}>get hint</Button>
