@@ -2,7 +2,6 @@ import type { Move, Square } from 'chess.js';
 
 import { RepeatIcon } from '@chakra-ui/icons';
 import { Button, GridItem, Heading, Wrap } from '@chakra-ui/react';
-import { useNavigate } from '@remix-run/react';
 import { useContext, useEffect, useState } from 'react';
 import { VscBook } from 'react-icons/vsc';
 
@@ -16,7 +15,6 @@ import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
 
 export default function Explore() {
-  const navigate = useNavigate();
   const { fen, moves, turn, backTo, makeMove, orientation, setOrientation } =
     useContext(GameContext);
   const [comment, setComment] = useState<string>('');
@@ -88,7 +86,7 @@ export default function Explore() {
           <Button leftIcon={<RepeatIcon />} onClick={flip}>
             flip board
           </Button>
-          <TrainButton />
+          <TrainButton variant="icon" />
           <LichessLink fen={fen}></LichessLink>
         </Wrap>
       </GridItem>

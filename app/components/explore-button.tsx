@@ -11,9 +11,11 @@ export function ExploreButton(props: {
   reset?: boolean;
   fen?: string;
   orientation?: BoardOrientation;
+  variant?: 'button' | 'icon';
 }) {
   const { reset, setOrientation } = useContext(GameContext);
   const navigate = useNavigate();
+  const variant = props.variant ?? 'button';
 
   function explore() {
     if (props.reset) {
@@ -28,9 +30,17 @@ export function ExploreButton(props: {
     navigate('/explore');
   }
 
-  return (
-    <Button leftIcon={<VscBook />} onClick={explore}>
-      Explore
-    </Button>
-  );
+  if (variant === 'button') {
+    return (
+      <Button leftIcon={<VscBook />} onClick={explore}>
+        Explore
+      </Button>
+    );
+  } else {
+    return (
+      <Button onClick={explore} variant="link">
+        <VscBook />
+      </Button>
+    );
+  }
 }

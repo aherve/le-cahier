@@ -262,7 +262,7 @@ function GameExploreButton(props: {
 
   const orientation = getPlayerOrientation(props.game, props.report);
 
-  return <ExploreButton fen={fen} orientation={orientation} />;
+  return <ExploreButton fen={fen} orientation={orientation} variant="link" />;
 }
 
 function getPlayerOrientation(game: LichessGame, report?: GameReport | null) {
