@@ -10,12 +10,12 @@ import {
 } from '@chakra-ui/react';
 import { useNavigate } from '@remix-run/react';
 import { useContext } from 'react';
-import { BsRecordCircle } from 'react-icons/bs';
 import { GiFalling, GiHamburgerMenu } from 'react-icons/gi';
 import { MdLogout, MdSettings } from 'react-icons/md';
 import { SiLichess } from 'react-icons/si';
 
 import { ExploreButton } from './explore-button';
+import { RecordButton } from './record-button';
 import { TrainButton } from './train-button';
 
 import { GameContext } from '~/with-game';
@@ -28,10 +28,6 @@ export function LCMenu() {
   function anki() {
     reset();
     navigate('/anki');
-  }
-  function record() {
-    reset();
-    navigate('/record');
   }
   function lichessReport() {
     navigate('/lichess-report');
@@ -56,9 +52,7 @@ export function LCMenu() {
         </WrapItem>
 
         <WrapItem>
-          <Button leftIcon={<BsRecordCircle />} onClick={record}>
-            Record moves
-          </Button>
+          <RecordButton reset={true} />
         </WrapItem>
 
         <WrapItem>

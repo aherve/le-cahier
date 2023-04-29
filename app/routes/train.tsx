@@ -3,9 +3,9 @@ import type { Move } from 'chess.js';
 import type { Square } from 'react-chessboard/dist/chessboard/types';
 import type { GetChallengeOutput } from '~/routes/api/moves/challenge';
 
-import { EditIcon, RepeatIcon } from '@chakra-ui/icons';
+import { RepeatIcon } from '@chakra-ui/icons';
 import { Button, GridItem, Heading, Wrap } from '@chakra-ui/react';
-import { useFetcher, useNavigate, useSearchParams } from '@remix-run/react';
+import { useFetcher, useSearchParams } from '@remix-run/react';
 import { Chess } from 'chess.js';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { MdOutlineSmartToy } from 'react-icons/md';
@@ -16,6 +16,7 @@ import TrainMessage, { TrainMessageInput } from '../components/train-message';
 
 import { ChessGrid } from '~/components/chess-grid';
 import { ExploreButton } from '~/components/explore-button';
+import { RecordButton } from '~/components/record-button';
 import { GetChallengeOutputSchema } from '~/routes/api/moves/challenge';
 import { GameContext } from '~/with-game';
 
@@ -31,7 +32,6 @@ export default function Train() {
     setOrientation,
     reset,
   } = useContext(GameContext);
-  const navigate = useNavigate();
   const [params] = useSearchParams();
   const startingFEN = params.get('from');
   const [msg, setMsg] = useState<TrainMessageInputType>('empty');
@@ -134,10 +134,6 @@ export default function Train() {
     setOrientation(orientation === 'white' ? 'black' : 'white');
   }
 
-  function recordFromHere() {
-    navigate('/record');
-  }
-
   return (
     <ChessGrid fen={fen} onPieceDrop={onDrop} orientation={orientation}>
       <GridItem
@@ -169,9 +165,7 @@ export default function Train() {
           <Button leftIcon={<RepeatIcon />} onClick={flip}>
             flip board
           </Button>
-          <Button leftIcon={<EditIcon />} onClick={recordFromHere}>
-            Record more moves
-          </Button>
+          <RecordButton />
           <Button leftIcon={<RepeatIcon />} onClick={again}>
             Again
           </Button>
