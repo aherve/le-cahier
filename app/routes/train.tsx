@@ -154,11 +154,7 @@ export default function Train() {
       </GridItem>
 
       <GridItem gridArea="moves" maxW="300px">
-        <Moves
-          showBookMoves={false}
-          moves={moves}
-          onNavigate={onNavigate}
-        ></Moves>
+        <Moves showBookMoves={false} showComments={false}></Moves>
       </GridItem>
 
       <GridItem gridArea="actions">

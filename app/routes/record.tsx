@@ -37,9 +37,10 @@ import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
 
 export default function Record() {
-  const { fen, moves, turn, makeMove, backTo, orientation, setOrientation } =
+  const { fen, turn, makeMove, orientation, setOrientation } =
     useContext(GameContext);
   const [bookMoves, setBookMoves] = useState<string[]>([]);
+  const [comment, setComment] = useState<string>('');
   const toast = useToast();
 
   useEffect(() => {
@@ -53,6 +54,11 @@ export default function Record() {
             ? Object.keys(position?.bookMoves ?? {})
             : Object.keys(position?.opponentMoves ?? {})
           ).map((m) => toSAN(fen, m)),
+        );
+        setComment(
+          orientation === 'white'
+            ? position?.commentForWhite ?? ''
+            : position?.commentForBlack ?? '',
         );
       });
   }, [fen, orientation, turn]);
@@ -133,11 +139,10 @@ export default function Record() {
 
       <GridItem gridArea="moves" maxW="300px">
         <Moves
+          comments={comment}
           bookMoves={bookMoves}
           showBookMoves={true}
-          moves={moves}
-          onNavigate={(m) => backTo(m.after)}
-          onPlay={LocalMakeMove}
+          showComments={true}
         ></Moves>
       </GridItem>
 

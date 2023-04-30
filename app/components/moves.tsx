@@ -15,15 +15,18 @@ import {
 import { chunk } from 'lodash';
 import { useContext } from 'react';
 
+import { PositionComments } from './position-comments';
+
 import { GameContext } from '~/with-game';
 
 export default function Moves(props: {
   bookMoves?: Array<string>;
   showBookMoves: boolean;
   comments?: string;
+  showComments: boolean;
 }) {
   const bookMoves = props.bookMoves ?? [];
-  const { moves, backTo, makeMove } = useContext(GameContext);
+  const { orientation, moves, backTo, makeMove, fen } = useContext(GameContext);
   const chunks = chunk(moves, 2);
 
   function onNavigate(m: Move) {
@@ -74,16 +77,14 @@ export default function Moves(props: {
                 })}
               </List>
             </StackItem>
-            {props.comments && (
+            {props.showComments && (
               <StackItem>
-                <Flex
-                  gap="1"
-                  direction="row"
-                  justifyContent="space-between"
-                  wrap="wrap"
-                >
-                  {props.comments}
-                </Flex>
+                <PositionComments
+                  orientation={orientation}
+                  comments={props.comments}
+                  key={props.comments}
+                  fen={fen}
+                />
               </StackItem>
             )}
           </Stack>
