@@ -15,6 +15,8 @@ import {
 import { chunk } from 'lodash';
 import { useContext } from 'react';
 
+import { PositionComments } from './position-comments';
+
 import { GameContext } from '~/with-game';
 
 export default function Moves(props: {
@@ -74,18 +76,12 @@ export default function Moves(props: {
                 })}
               </List>
             </StackItem>
-            {props.comments && (
-              <StackItem>
-                <Flex
-                  gap="1"
-                  direction="row"
-                  justifyContent="space-between"
-                  wrap="wrap"
-                >
-                  {props.comments}
-                </Flex>
-              </StackItem>
-            )}
+            <StackItem>
+              <PositionComments
+                comments={props.comments}
+                key={props.comments}
+              />
+            </StackItem>
           </Stack>
         </CardBody>
       </Card>
