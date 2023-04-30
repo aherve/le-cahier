@@ -1,4 +1,5 @@
 import type { AttributeValue } from '@aws-sdk/client-dynamodb';
+import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 import type { SaveMoveInput } from '~/routes/api/moves/create';
 import type { GameReport } from '~/schemas/game-report';
 import type { LichessGame } from '~/schemas/lichess';
@@ -28,6 +29,28 @@ export class ChessBook {
     this.ankiIndexName = 'ankiScoreIndex';
   }
 
+  public async addComment(input: {
+    fen: string;
+    userId: string;
+    comment: string;
+    orientation: BoardOrientation;
+  }) {
+    await this.dynCli.updateItem({
+      TableName: this.positionTableName,
+      Key: marshall({
+        fen: stripFEN(input.fen),
+        userId: input.userId,
+      }),
+      UpdateExpression: 'set #comment = :comment',
+      ExpressionAttributeNames: {
+        '#comment':
+          input.orientation === 'white' ? 'commentForWhite' : 'commentForBlack',
+      },
+      ExpressionAttributeValues: {
+        ':comment': { S: input.comment },
+      },
+    });
+  }
   public async addMove(input: SaveMoveInput & { userId: string }) {
     let { isOpponentMove, fen, move, comment } = input;
     comment = stripComment(fen, comment);
@@ -35,6 +58,13 @@ export class ChessBook {
     console.log('adding move', input);
 
     const game = new Chess(fen);
+    const turnBeforeMove = game.turn();
+
+    // that's ugly
+    const isForWhite =
+      (turnBeforeMove === 'w' && !isOpponentMove) ||
+      (turnBeforeMove === 'b' && isOpponentMove);
+
     game.move(move);
     const bookMove = BookMoveSchema.parse({
       targetFEN: stripFEN(game.fen()),
@@ -59,9 +89,9 @@ export class ChessBook {
       };
       if (comment && comment.length > 0) {
         updateExpr += ', #comment = :comment';
-        attrNames['#comment'] = isOpponentMove
-          ? 'commentForOpponent'
-          : 'commentForPlayer';
+        attrNames['#comment'] = isForWhite
+          ? 'commentForWhite'
+          : 'commentForBlack';
         attrValues[':comment'] = { S: comment };
       }
       await this.dynCli.updateItem({
@@ -87,9 +117,9 @@ export class ChessBook {
 
       if (comment && comment.length > 0) {
         updateExpr += ', #comment = :comment';
-        attrNames['#comment'] = isOpponentMove
-          ? 'commentForOpponent'
-          : 'commentForPlayer';
+        attrNames['#comment'] = isForWhite
+          ? 'commentForWhite'
+          : 'commentForBlack';
         attrValues[':comment'] = { S: comment };
       }
       const update = {

@@ -32,11 +32,11 @@ export default function Explore() {
             : Object.keys(position?.opponentMoves ?? {})
           ).map((m) => toSAN(fen, m)),
         );
-        if (isPlayerTurn) {
-          setComment(position?.commentForPlayer ?? '');
-        } else {
-          setComment(position?.commentForOpponent ?? '');
-        }
+        setComment(
+          orientation === 'white'
+            ? position?.commentForWhite ?? ''
+            : position?.commentForBlack ?? '',
+        );
       });
   }, [fen, orientation, turn]);
 
@@ -72,6 +72,7 @@ export default function Explore() {
           bookMoves={bookMoves}
           showBookMoves={true}
           comments={comment}
+          showComments={true}
         ></Moves>
       </GridItem>
       <GridItem gridArea="actions">

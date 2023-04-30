@@ -23,9 +23,10 @@ export default function Moves(props: {
   bookMoves?: Array<string>;
   showBookMoves: boolean;
   comments?: string;
+  showComments: boolean;
 }) {
   const bookMoves = props.bookMoves ?? [];
-  const { moves, backTo, makeMove } = useContext(GameContext);
+  const { orientation, moves, backTo, makeMove, fen } = useContext(GameContext);
   const chunks = chunk(moves, 2);
 
   function onNavigate(m: Move) {
@@ -76,12 +77,16 @@ export default function Moves(props: {
                 })}
               </List>
             </StackItem>
-            <StackItem>
-              <PositionComments
-                comments={props.comments}
-                key={props.comments}
-              />
-            </StackItem>
+            {props.showComments && (
+              <StackItem>
+                <PositionComments
+                  orientation={orientation}
+                  comments={props.comments}
+                  key={props.comments}
+                  fen={fen}
+                />
+              </StackItem>
+            )}
           </Stack>
         </CardBody>
       </Card>
