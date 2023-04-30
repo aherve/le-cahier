@@ -8,8 +8,10 @@ import {
   GridItem,
   Heading,
   Spinner,
+  Switch,
   Text,
   Wrap,
+  WrapItem,
 } from '@chakra-ui/react';
 import { useFetcher } from '@remix-run/react';
 import { Chess } from 'chess.js';
@@ -166,9 +168,9 @@ export default function Anki() {
           <Button leftIcon={<GoLightBulb />} onClick={showHint}>
             get hint
           </Button>
-          <Checkbox isChecked={includeNovelties} onChange={toggleNovelties}>
+          <Switch isChecked={includeNovelties} onChange={toggleNovelties}>
             Include novelties
-          </Checkbox>
+          </Switch>
         </Wrap>
       </GridItem>
     </ChessGrid>
