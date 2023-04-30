@@ -13,17 +13,26 @@ import {
   StackItem,
 } from '@chakra-ui/react';
 import { chunk } from 'lodash';
+import { useContext } from 'react';
+
+import { GameContext } from '~/with-game';
 
 export default function Moves(props: {
-  moves: Array<Move>;
-  onNavigate: (move: Move) => void;
-  onPlay?: (move: string) => void;
   bookMoves?: Array<string>;
   showBookMoves: boolean;
   comments?: string;
 }) {
-  const chunks = chunk(props.moves, 2);
   const bookMoves = props.bookMoves ?? [];
+  const { moves, backTo, makeMove } = useContext(GameContext);
+  const chunks = chunk(moves, 2);
+
+  function onNavigate(m: Move) {
+    backTo(m.after);
+  }
+
+  function onPlay(m: string) {
+    makeMove(m);
+  }
 
   return (
     <>
@@ -42,7 +51,7 @@ export default function Moves(props: {
                 >
                   {bookMoves.map((m) => {
                     return (
-                      <Link onClick={() => props.onPlay?.(m)} key={m}>
+                      <Link onClick={() => onPlay(m)} key={m}>
                         {m}
                       </Link>
                     );
@@ -56,7 +65,7 @@ export default function Moves(props: {
                 {chunks.map((c, i) => {
                   return (
                     <MoveItem
-                      onNavigate={props.onNavigate}
+                      onNavigate={onNavigate}
                       movePair={c}
                       moveIndex={i}
                       key={i}

@@ -1,4 +1,4 @@
-import type { Move, Square } from 'chess.js';
+import type { Square } from 'chess.js';
 
 import { RepeatIcon } from '@chakra-ui/icons';
 import { Button, GridItem, Heading, Wrap } from '@chakra-ui/react';
@@ -15,7 +15,7 @@ import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
 
 export default function Explore() {
-  const { fen, moves, turn, backTo, makeMove, orientation, setOrientation } =
+  const { fen, turn, makeMove, orientation, setOrientation } =
     useContext(GameContext);
   const [comment, setComment] = useState<string>('');
   const [bookMoves, setBookMoves] = useState<string[]>([]);
@@ -44,10 +44,6 @@ export default function Explore() {
     setOrientation(orientation === 'white' ? 'black' : 'white');
   }
 
-  function onNavigate(move: Move) {
-    backTo(move.after);
-  }
-
   function onDrop(from: Square, to: Square) {
     try {
       makeMove({ from, to });
@@ -74,10 +70,7 @@ export default function Explore() {
       <GridItem gridArea="moves" maxW="300px">
         <Moves
           bookMoves={bookMoves}
-          moves={moves}
-          onNavigate={onNavigate}
           showBookMoves={true}
-          onPlay={makeMove}
           comments={comment}
         ></Moves>
       </GridItem>
