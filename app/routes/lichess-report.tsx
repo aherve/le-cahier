@@ -185,13 +185,17 @@ function GameItem(props: { game: LichessGame }) {
         )}
       </Td>
       <Td>
-        <LichessLink
-          gameId={game.id}
-          moveIndex={firstFailIndex(report) || firstDeviationIndex}
-          orientation={getPlayerOrientation(game, report) ?? 'white'}
-        ></LichessLink>
+        <Wrap>
+          <WrapItem>
+            <LichessLink
+              gameId={game.id}
+              moveIndex={firstFailIndex(report) || firstDeviationIndex}
+              orientation={getPlayerOrientation(game, report) ?? 'white'}
+            ></LichessLink>
+          </WrapItem>
+          <WrapItem>{GameExploreButton({ game, report })}</WrapItem>
+        </Wrap>
       </Td>
-      <Td>{GameExploreButton({ game, report })}</Td>
       <Td>
         <Button size="xs" onClick={cleanGameReport}>
           <RepeatIcon />
@@ -262,7 +266,7 @@ function GameExploreButton(props: {
 
   const orientation = getPlayerOrientation(props.game, props.report);
 
-  return <ExploreButton fen={fen} orientation={orientation} />;
+  return <ExploreButton fen={fen} orientation={orientation} variant="icon" />;
 }
 
 function getPlayerOrientation(game: LichessGame, report?: GameReport | null) {

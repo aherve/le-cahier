@@ -1,6 +1,6 @@
 import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 
-import { Button } from '@chakra-ui/react';
+import { Button, Tooltip } from '@chakra-ui/react';
 import { useNavigate } from '@remix-run/react';
 import { useContext } from 'react';
 import { VscBook } from 'react-icons/vsc';
@@ -38,9 +38,11 @@ export function ExploreButton(props: {
     );
   } else {
     return (
-      <Button onClick={explore} variant="link">
-        <VscBook />
-      </Button>
+      <Tooltip label="browse in repertoire">
+        <Button onClick={explore} variant="link">
+          <VscBook />
+        </Button>
+      </Tooltip>
     );
   }
 }
