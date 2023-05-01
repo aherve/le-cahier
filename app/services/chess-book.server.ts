@@ -1,4 +1,5 @@
 import type { AttributeValue } from '@aws-sdk/client-dynamodb';
+import type { Move } from 'chess.js';
 import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 import type { SaveMoveInput } from '~/routes/api/moves/create';
 import type { GameReport } from '~/schemas/game-report';
@@ -48,6 +49,25 @@ export class ChessBook {
       },
       ExpressionAttributeValues: {
         ':comment': { S: input.comment },
+      },
+    });
+  }
+  public async deleteMove(input: {
+    fen: string;
+    move: Move;
+    userId: string;
+    isOpponentMove: boolean;
+  }) {
+    await this.dynCli.updateItem({
+      TableName: this.positionTableName,
+      Key: marshall({
+        fen: stripFEN(input.fen),
+        userId: input.userId,
+      }),
+      UpdateExpression: 'REMOVE #key.#move',
+      ExpressionAttributeNames: {
+        '#key': input.isOpponentMove ? 'opponentMoves' : 'bookMoves',
+        '#move': input.move.lan,
       },
     });
   }

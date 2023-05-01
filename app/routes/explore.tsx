@@ -9,6 +9,7 @@ import Moves from '../components/moves';
 
 import { ChessGrid } from '~/components/chess-grid';
 import { FlipBoardButton } from '~/components/flip-board-button';
+import { RecordButton } from '~/components/record-button';
 import { TrainButton } from '~/components/train-button';
 import { BookPositionSchema } from '~/schemas/position';
 import { toSAN } from '~/services/utils';
@@ -74,6 +75,7 @@ export default function Explore() {
         <Wrap align="center" justify="center">
           <FlipBoardButton />
           <TrainButton />
+          <RecordButton />
           <LichessLink fen={fen}></LichessLink>
         </Wrap>
       </GridItem>

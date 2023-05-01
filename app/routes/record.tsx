@@ -1,3 +1,4 @@
+import type { Move } from 'chess.js';
 import type {
   BoardOrientation,
   Square,
@@ -22,6 +23,7 @@ import {
   useToast,
   Wrap,
 } from '@chakra-ui/react';
+import { Chess } from 'chess.js';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { BiCloudUpload } from 'react-icons/bi';
 import { BsRecordCircle } from 'react-icons/bs';
@@ -30,6 +32,7 @@ import { MdYoutubeSearchedFor } from 'react-icons/md';
 import Moves from '../components/moves';
 
 import { ChessGrid } from '~/components/chess-grid';
+import { ExploreButton } from '~/components/explore-button';
 import { FlipBoardButton } from '~/components/flip-board-button';
 import { SaveMoveInputSchema } from '~/routes/api/moves/create';
 import { BookPositionSchema } from '~/schemas/position';
@@ -41,6 +44,7 @@ export default function Record() {
   const [bookMoves, setBookMoves] = useState<string[]>([]);
   const [comment, setComment] = useState<string>('');
   const toast = useToast();
+  const [lastDelete, setLastDelete] = useState(Date.now());
 
   useEffect(() => {
     fetch(`/api/moves/get?fen=${encodeURIComponent(fen)}`)
@@ -60,7 +64,7 @@ export default function Record() {
             : position?.commentForBlack ?? '',
         );
       });
-  }, [fen, orientation, turn]);
+  }, [fen, orientation, turn, lastDelete]);
 
   async function LocalMakeMove(move: string | { from: Square; to: Square }) {
     try {
@@ -90,6 +94,40 @@ export default function Record() {
 
   function onDrop(sourceSquare: Square, targetSquare: Square) {
     return LocalMakeMove({ from: sourceSquare, to: targetSquare }) !== null;
+  }
+
+  function deleteMove(move: Move) {
+    const turnBefore = new Chess(move.before).turn();
+    const isOpponentMove =
+      (orientation === 'white' && turnBefore === 'b') ||
+      (orientation === 'black' && turnBefore === 'w');
+    fetch('api/moves/delete', {
+      method: 'POST',
+      body: JSON.stringify({
+        fen,
+        move,
+        isOpponentMove,
+      }),
+    }).then((r) => {
+      setLastDelete(Date.now());
+      if (r.ok) {
+        toast({
+          title: 'Move deleted',
+          description: 'Successfully deleted move',
+          status: 'success',
+          duration: 1000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: 'Error deleting move',
+          description: 'Failed to delete move',
+          status: 'error',
+          duration: 1000,
+          isClosable: true,
+        });
+      }
+    });
   }
 
   const onScan = useCallback(async () => {
@@ -138,6 +176,8 @@ export default function Record() {
           bookMoves={bookMoves}
           showBookMoves={true}
           showComments={true}
+          allowDelete={true}
+          onDelete={deleteMove}
         ></Moves>
       </GridItem>
 
@@ -234,6 +274,7 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
+      <ExploreButton />
     </>
   );
 }

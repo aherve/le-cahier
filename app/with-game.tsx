@@ -6,7 +6,7 @@ import { useForceUpdate } from '@chakra-ui/react';
 import { Chess } from 'chess.js';
 import { useEffect, useCallback, createContext, useState } from 'react';
 
-import { useKeyPress } from './key-press';
+import { useKeyPress } from './hooks/key-press';
 
 export const GameContext = createContext({
   backTo: (_: string) => {},

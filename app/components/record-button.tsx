@@ -17,7 +17,7 @@ export function RecordButton(props: { reset?: boolean }) {
   }
   return (
     <Button leftIcon={<BsRecordCircle />} onClick={record}>
-      Record moves
+      {props.reset ? 'Record moves' : 'update repertoire'}
     </Button>
   );
 }
