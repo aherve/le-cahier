@@ -18,6 +18,8 @@ import {
   Spinner,
   VStack,
   SkeletonText,
+  Wrap,
+  WrapItem,
 } from '@chakra-ui/react';
 import { useFetcher } from '@remix-run/react';
 import moment from 'moment';
@@ -107,8 +109,7 @@ export default function LichessReport() {
               <Tr>
                 <Th> Date</Th>
                 <Th> Type</Th>
-                <Th> white</Th>
-                <Th> black</Th>
+                <Th> Opening</Th>
                 <Th> report</Th>
                 <Th> </Th>
               </Tr>
@@ -165,15 +166,14 @@ function GameItem(props: { game: LichessGame }) {
           {game.speed === 'blitz' && <SiStackblitz />}
           {game.speed === 'bullet' && <GiBulletBill />}
           {game.speed === 'rapid' && <GiRabbit />}
-          {getPlayerOrientation(game, report) === 'white' && <BsCircle />}
-          {getPlayerOrientation(game, report) === 'black' && <BsCircleFill />}
         </Flex>
       </Td>
       <Td>
-        {game.players.white.user.name} ({game.players.white.rating})
-      </Td>
-      <Td>
-        {game.players.black.user.name} ({game.players.black.rating})
+        <Wrap>
+          {getPlayerOrientation(game, report) === 'white' && <BsCircle />}
+          {getPlayerOrientation(game, report) === 'black' && <BsCircleFill />}
+          <WrapItem>{game.opening.name}</WrapItem>
+        </Wrap>
       </Td>
       <Td>
         {fetcher.state === 'loading' && <Spinner size="sm" />}
