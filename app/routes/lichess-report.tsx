@@ -20,6 +20,7 @@ import {
   SkeletonText,
   Wrap,
   WrapItem,
+  Tooltip,
 } from '@chakra-ui/react';
 import { useFetcher } from '@remix-run/react';
 import moment from 'moment';
@@ -197,9 +198,11 @@ function GameItem(props: { game: LichessGame }) {
         </Wrap>
       </Td>
       <Td>
-        <Button size="xs" onClick={cleanGameReport}>
-          <RepeatIcon />
-        </Button>
+        <Tooltip label="reset game analysis">
+          <Button size="xs" onClick={cleanGameReport} variant="ghost">
+            <RepeatIcon />
+          </Button>
+        </Tooltip>
       </Td>
     </Tr>
   );

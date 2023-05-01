@@ -4,7 +4,9 @@ import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 
 import { useForceUpdate } from '@chakra-ui/react';
 import { Chess } from 'chess.js';
-import { useCallback, createContext, useState } from 'react';
+import { useEffect, useCallback, createContext, useState } from 'react';
+
+import { useKeyPress } from './key-press';
 
 export const GameContext = createContext({
   backTo: (_: string) => {},
@@ -24,10 +26,23 @@ export function WithGame(props: { children: ReactNode }) {
   const forceUpdate = useForceUpdate();
   const [game, setGame] = useState<Chess>(new Chess());
   const [orientation, setOrientation] = useState<BoardOrientation>('white');
+  const [backWasPressed, setBackWasPressed] = useState(false);
 
   const fen = game.fen();
   const moves: Move[] = game.history({ verbose: true });
   const turn = game.turn();
+
+  const arrowLeftPressed = useKeyPress('ArrowLeft');
+
+  useEffect(() => {
+    if (arrowLeftPressed) {
+      setBackWasPressed(true);
+    }
+    if (!arrowLeftPressed && backWasPressed) {
+      setBackWasPressed(false);
+      game.undo();
+    }
+  }, [arrowLeftPressed, game, backWasPressed]);
 
   const makeMove = useCallback(
     (move: string | { from: string; to: string; promotion?: string }) => {

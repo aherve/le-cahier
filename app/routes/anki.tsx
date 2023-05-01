@@ -4,14 +4,12 @@ import type { BookPosition } from '~/schemas/position';
 
 import {
   Button,
-  Checkbox,
   GridItem,
   Heading,
   Spinner,
   Switch,
   Text,
   Wrap,
-  WrapItem,
 } from '@chakra-ui/react';
 import { useFetcher } from '@remix-run/react';
 import { Chess } from 'chess.js';
@@ -163,11 +161,11 @@ export default function Anki() {
       <GridItem gridArea="actions">
         <Wrap align="center" justify="center">
           <ExploreButton />
-          <LichessLink fen={fen}></LichessLink>
           <TrainButton />
           <Button leftIcon={<GoLightBulb />} onClick={showHint}>
             get hint
           </Button>
+          <LichessLink fen={fen}></LichessLink>
           <Switch isChecked={includeNovelties} onChange={toggleNovelties}>
             Include novelties
           </Switch>

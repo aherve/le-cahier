@@ -1,7 +1,6 @@
 import type { Square } from 'chess.js';
 
-import { RepeatIcon } from '@chakra-ui/icons';
-import { Button, GridItem, Heading, Wrap } from '@chakra-ui/react';
+import { GridItem, Heading, Wrap } from '@chakra-ui/react';
 import { useContext, useEffect, useState } from 'react';
 import { VscBook } from 'react-icons/vsc';
 
@@ -16,8 +15,7 @@ import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
 
 export default function Explore() {
-  const { fen, turn, makeMove, orientation, setOrientation } =
-    useContext(GameContext);
+  const { fen, turn, makeMove, orientation } = useContext(GameContext);
   const [comment, setComment] = useState<string>('');
   const [bookMoves, setBookMoves] = useState<string[]>([]);
 
