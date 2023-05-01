@@ -3,7 +3,6 @@ import type {
   Square,
 } from 'react-chessboard/dist/chessboard/types';
 
-import { RepeatIcon } from '@chakra-ui/icons';
 import {
   Alert,
   AlertDescription,
@@ -38,8 +37,7 @@ import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
 
 export default function Record() {
-  const { fen, turn, makeMove, orientation, setOrientation } =
-    useContext(GameContext);
+  const { fen, turn, makeMove, orientation } = useContext(GameContext);
   const [bookMoves, setBookMoves] = useState<string[]>([]);
   const [comment, setComment] = useState<string>('');
   const toast = useToast();
@@ -92,10 +90,6 @@ export default function Record() {
 
   function onDrop(sourceSquare: Square, targetSquare: Square) {
     return LocalMakeMove({ from: sourceSquare, to: targetSquare }) !== null;
-  }
-
-  function flip() {
-    setOrientation(orientation === 'white' ? 'black' : 'white');
   }
 
   const onScan = useCallback(async () => {

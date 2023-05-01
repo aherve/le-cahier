@@ -1,9 +1,7 @@
 import type { TrainMessageInputType } from '../components/train-message';
-import type { Move } from 'chess.js';
 import type { Square } from 'react-chessboard/dist/chessboard/types';
 import type { GetChallengeOutput } from '~/routes/api/moves/challenge';
 
-import { RepeatIcon } from '@chakra-ui/icons';
 import { Button, GridItem, Heading, Wrap } from '@chakra-ui/react';
 import { useFetcher, useSearchParams } from '@remix-run/react';
 import { Chess } from 'chess.js';
@@ -24,17 +22,8 @@ import { GetChallengeOutputSchema } from '~/routes/api/moves/challenge';
 import { GameContext } from '~/with-game';
 
 export default function Train() {
-  const {
-    fen,
-    moves,
-    turn,
-    backTo,
-    makeMove,
-    isValidMove,
-    orientation,
-    setOrientation,
-    reset,
-  } = useContext(GameContext);
+  const { fen, turn, backTo, makeMove, isValidMove, orientation, reset } =
+    useContext(GameContext);
   const [params] = useSearchParams();
   const startingFEN = params.get('from');
   const [msg, setMsg] = useState<TrainMessageInputType>('empty');
@@ -75,12 +64,6 @@ export default function Train() {
       }
     }
   }, [fen, fetcher, orientation, turn, isPlayerTurn, makeMove]);
-
-  function onNavigate(move: Move) {
-    backTo(move.after);
-    fetcher.data = null;
-    setChallenge(null);
-  }
 
   const ankiUpdate = useCallback(
     (isSuccess: boolean) => {
@@ -131,10 +114,6 @@ export default function Train() {
       return;
     }
     setMsg(TrainMessageInput.enum.hint);
-  }
-
-  function flip() {
-    setOrientation(orientation === 'white' ? 'black' : 'white');
   }
 
   return (

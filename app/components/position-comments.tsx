@@ -1,5 +1,3 @@
-import type { ActionFunction } from '@remix-run/node';
-import type { ChangeEventHandler, FormEvent } from 'react';
 import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 
 import {
