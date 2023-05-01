@@ -10,6 +10,7 @@ import { Chess } from 'chess.js';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { GoLightBulb } from 'react-icons/go';
 import { MdOutlineSmartToy } from 'react-icons/md';
+import { VscDebugRestart } from 'react-icons/vsc';
 
 import LichessLink from '../components/lichess-link';
 import Moves from '../components/moves';
@@ -17,6 +18,7 @@ import TrainMessage, { TrainMessageInput } from '../components/train-message';
 
 import { ChessGrid } from '~/components/chess-grid';
 import { ExploreButton } from '~/components/explore-button';
+import { FlipBoardButton } from '~/components/flip-board-button';
 import { RecordButton } from '~/components/record-button';
 import { GetChallengeOutputSchema } from '~/routes/api/moves/challenge';
 import { GameContext } from '~/with-game';
@@ -159,11 +161,9 @@ export default function Train() {
 
       <GridItem gridArea="actions">
         <Wrap align="center" justify="center">
-          <Button leftIcon={<RepeatIcon />} onClick={flip}>
-            flip board
-          </Button>
+          <FlipBoardButton />
           <RecordButton />
-          <Button leftIcon={<RepeatIcon />} onClick={again}>
+          <Button leftIcon={<VscDebugRestart />} onClick={again}>
             Again
           </Button>
           <Button leftIcon={<GoLightBulb />} onClick={showHint}>

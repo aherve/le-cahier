@@ -9,6 +9,7 @@ import LichessLink from '../components/lichess-link';
 import Moves from '../components/moves';
 
 import { ChessGrid } from '~/components/chess-grid';
+import { FlipBoardButton } from '~/components/flip-board-button';
 import { TrainButton } from '~/components/train-button';
 import { BookPositionSchema } from '~/schemas/position';
 import { toSAN } from '~/services/utils';
@@ -39,10 +40,6 @@ export default function Explore() {
         );
       });
   }, [fen, orientation, turn]);
-
-  function flip() {
-    setOrientation(orientation === 'white' ? 'black' : 'white');
-  }
 
   function onDrop(from: Square, to: Square) {
     try {
@@ -77,9 +74,7 @@ export default function Explore() {
       </GridItem>
       <GridItem gridArea="actions">
         <Wrap align="center" justify="center">
-          <Button leftIcon={<RepeatIcon />} onClick={flip}>
-            flip board
-          </Button>
+          <FlipBoardButton />
           <TrainButton />
           <LichessLink fen={fen}></LichessLink>
         </Wrap>

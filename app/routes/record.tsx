@@ -31,6 +31,7 @@ import { MdYoutubeSearchedFor } from 'react-icons/md';
 import Moves from '../components/moves';
 
 import { ChessGrid } from '~/components/chess-grid';
+import { FlipBoardButton } from '~/components/flip-board-button';
 import { SaveMoveInputSchema } from '~/routes/api/moves/create';
 import { BookPositionSchema } from '~/schemas/position';
 import { toSAN } from '~/services/utils';
@@ -148,9 +149,7 @@ export default function Record() {
 
       <GridItem gridArea="actions">
         <Wrap align="center" justify="center">
-          <Button leftIcon={<RepeatIcon />} onClick={flip}>
-            flip board
-          </Button>
+          <FlipBoardButton />
           {FindTranspositionsButton({ onScan })}
           {LoadPGNButton({ orientation })}
         </Wrap>
