@@ -11,6 +11,7 @@ import {
   Stack,
   StackDivider,
   StackItem,
+  Wrap,
 } from '@chakra-ui/react';
 import { chunk } from 'lodash';
 import { useContext } from 'react';
@@ -46,12 +47,7 @@ export default function Moves(props: {
               <StackItem>
                 <Heading size="xs">Book moves</Heading>
 
-                <Flex
-                  gap="1"
-                  direction="row"
-                  justifyContent="space-between"
-                  wrap="wrap"
-                >
+                <Wrap>
                   {bookMoves.map((m) => {
                     return (
                       <Link onClick={() => onPlay(m)} key={m}>
@@ -59,7 +55,7 @@ export default function Moves(props: {
                       </Link>
                     );
                   })}
-                </Flex>
+                </Wrap>
               </StackItem>
             )}
             <StackItem>
