@@ -211,6 +211,7 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
     }).then((resp) => {
       if (resp.ok) {
         setPgn('');
+        setError(null);
         onClose();
         toast({
           title: 'PGN loaded',
@@ -231,6 +232,12 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
     setPgn(e.target.value);
   }
 
+  function cancel() {
+    setError(null);
+    setPgn('');
+    onClose();
+  }
+
   return (
     <>
       <Button leftIcon={<BiCloudUpload />} onClick={onOpen}>
@@ -240,7 +247,7 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
       <AlertDialog
         isOpen={isOpen}
         leastDestructiveRef={cancelRef as any}
-        onClose={onClose}
+        onClose={cancel}
       >
         <AlertDialogOverlay>
           <AlertDialogContent>
@@ -264,7 +271,7 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button ref={cancelRef as any} onClick={onClose}>
+              <Button ref={cancelRef as any} onClick={cancel}>
                 Cancel
               </Button>
               <Button colorScheme="blue" onClick={onConfirm} ml={3}>

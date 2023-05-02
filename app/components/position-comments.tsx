@@ -13,7 +13,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { Form } from '@remix-run/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaRegEdit, FaRegSave } from 'react-icons/fa';
 
 export function PositionComments(props: {
@@ -25,6 +25,12 @@ export function PositionComments(props: {
   const [editMode, setEditMode] = useState(false);
   const [comments, setComments] = useState(props.comments ?? '');
   const [isSaving, setIsSaving] = useState(false);
+
+  // prevents a comment to stay after we added it
+  useEffect(
+    () => setComments(props.comments ?? ''),
+    [props.comments, props.fen],
+  );
 
   function saveComment(newComment: string) {
     setEditMode(false);
@@ -55,7 +61,11 @@ export function PositionComments(props: {
     <Stack>
       <StackItem alignSelf="center">
         {editMode && !isSaving && (
-          <DisplayEdit comments={comments} submit={saveComment} />
+          <DisplayEdit
+            comments={comments}
+            submit={saveComment}
+            cancel={() => setEditMode(false)}
+          />
         )}
 
         {!editMode && !isSaving && (
@@ -74,11 +84,17 @@ export function PositionComments(props: {
 function DisplayEdit(props: {
   comments: string;
   submit: (comment: string) => void;
+  cancel: () => void;
 }) {
   const [comments, setComments] = useState(props.comments ?? '');
 
   function updateComments(evt: any) {
     setComments(evt.target.value);
+  }
+
+  function cancel() {
+    setComments(props.comments ?? '');
+    props.cancel();
   }
 
   return (
@@ -91,9 +107,12 @@ function DisplayEdit(props: {
             value={comments}
           />
         </FormControl>
-        <Button alignSelf="end" leftIcon={<FaRegSave />} type="submit">
-          Save
-        </Button>
+        <Wrap alignSelf="end">
+          <Button onClick={cancel}>Cancel</Button>
+          <Button leftIcon={<FaRegSave />} type="submit">
+            Save
+          </Button>
+        </Wrap>
       </Stack>
     </Form>
   );
