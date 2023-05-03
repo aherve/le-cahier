@@ -2,7 +2,6 @@ import type { Move } from 'chess.js';
 import type { ReactNode } from 'react';
 import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 
-import { useForceUpdate } from '@chakra-ui/react';
 import { Chess } from 'chess.js';
 import { useEffect, useCallback, createContext, useState } from 'react';
 
@@ -23,16 +22,50 @@ export const GameContext = createContext({
 });
 
 export function WithGame(props: { children: ReactNode }) {
-  const forceUpdate = useForceUpdate();
   const [game, setGame] = useState<Chess>(new Chess());
   const [orientation, setOrientation] = useState<BoardOrientation>('white');
   const [backWasPressed, setBackWasPressed] = useState(false);
+  const [forwardWasPressed, setForwardWasPressed] = useState(false);
+  const [forwardMoveStack, setForwardMoveStack] = useState<Move[]>([]);
 
   const fen = game.fen();
   const moves: Move[] = game.history({ verbose: true });
   const turn = game.turn();
 
   const arrowLeftPressed = useKeyPress('ArrowLeft');
+  const arrowRightPressed = useKeyPress('ArrowRight');
+  const makeMove = useCallback(
+    (move: string | { from: string; to: string; promotion?: string }) => {
+      const m = game.move(move);
+      if (m.lan === forwardMoveStack[0]?.lan) {
+        setForwardMoveStack((prev) => prev.slice(1));
+      } else {
+        setForwardMoveStack([]);
+      }
+      return m;
+    },
+    [game, forwardMoveStack, setForwardMoveStack],
+  );
+
+  const undo = useCallback(() => {
+    const undone = game.undo();
+    if (undone) {
+      setForwardMoveStack((moves) => [undone, ...moves]);
+    }
+  }, [game, setForwardMoveStack]);
+
+  useEffect(() => {
+    if (arrowRightPressed) {
+      setForwardWasPressed(true);
+    }
+    if (!arrowRightPressed && forwardWasPressed) {
+      setForwardWasPressed(false);
+      const move = forwardMoveStack[0];
+      if (move) {
+        makeMove(move);
+      }
+    }
+  }, [arrowRightPressed, game, forwardWasPressed, forwardMoveStack, makeMove]);
 
   useEffect(() => {
     if (arrowLeftPressed) {
@@ -40,18 +73,9 @@ export function WithGame(props: { children: ReactNode }) {
     }
     if (!arrowLeftPressed && backWasPressed) {
       setBackWasPressed(false);
-      game.undo();
+      undo();
     }
-  }, [arrowLeftPressed, game, backWasPressed]);
-
-  const makeMove = useCallback(
-    (move: string | { from: string; to: string; promotion?: string }) => {
-      const m = game.move(move);
-      forceUpdate();
-      return m;
-    },
-    [game, forceUpdate],
-  );
+  }, [arrowLeftPressed, backWasPressed, undo]);
 
   const isValidMove = useCallback(
     (move: string | { from: string; to: string }) => {
@@ -73,11 +97,10 @@ export function WithGame(props: { children: ReactNode }) {
   const backTo = useCallback(
     (fen: string) => {
       while (game.fen() !== fen) {
-        game.undo();
+        undo();
       }
-      forceUpdate();
     },
-    [game, forceUpdate],
+    [game, undo],
   );
 
   return (
