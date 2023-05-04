@@ -48,7 +48,7 @@ export class ChessBook {
           input.orientation === 'white' ? 'commentForWhite' : 'commentForBlack',
       },
       ExpressionAttributeValues: {
-        ':comment': { S: input.comment },
+        ':comment': { S: trimComment(input.comment) },
       },
     });
   }
@@ -383,3 +383,8 @@ export class ChessBook {
 }
 
 export const ChessBookService = new ChessBook();
+
+function trimComment(comment: string) {
+  const res = comment.replaceAll('[diagram]', '').trim();
+  return res;
+}
