@@ -10,7 +10,6 @@ export const SaveMoveInputSchema = z.object({
   fen: z.string(),
   isOpponentMove: z.boolean(),
   move: z.string(),
-  comment: z.string().optional(),
 });
 export type SaveMoveInput = z.infer<typeof SaveMoveInputSchema>;
 
