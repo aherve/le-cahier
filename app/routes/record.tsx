@@ -255,13 +255,6 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
               Load PGN file for {props.orientation}
             </AlertDialogHeader>
 
-            <Alert status="warning">
-              <AlertIcon />
-              <AlertDescription>
-                PGN variations are not yet supported. Only mainline will be
-                loaded
-              </AlertDescription>
-            </Alert>
             <AlertDialogBody>
               {isLoading && <Spinner />}
               {!isLoading && (
