@@ -55,37 +55,44 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 function PGNWalk(pgn: string) {
-  const parsed = parse(pgn, { startRule: 'game' }) as ParseTree;
-  const tree = parsed.moves;
-
-  const queue: Array<{
-    startingFEN: string;
-    tree: ParseTree['moves'];
-  }> = [
-    {
-      startingFEN: new Chess().fen(),
-      tree,
-    },
-  ];
-
-  const results: Array<Move> = [];
+  const moves: Array<Move> = [];
   const comments: Map<string, string> = new Map();
-  while (queue.length) {
-    const data = queue.pop();
-    if (!data) continue;
-    const { startingFEN, tree } = data;
-    const g = new Chess(startingFEN);
-    for (const node of tree) {
-      queue.push(
-        ...node.variations.flatMap((v) => ({ startingFEN: g.fen(), tree: v })),
-      );
-      const m = g.move(node.notation.notation);
-      if (node.commentAfter) {
-        comments.set(stripFEN(m.after), node.commentAfter);
+
+  const games = parse(pgn, { startRule: 'games' }) as ParseTree[];
+
+  for (const game of games) {
+    const tree = game.moves;
+
+    const queue: Array<{
+      startingFEN: string;
+      tree: ParseTree['moves'];
+    }> = [
+      {
+        startingFEN: new Chess().fen(),
+        tree,
+      },
+    ];
+
+    while (queue.length) {
+      const data = queue.pop();
+      if (!data) continue;
+      const { startingFEN, tree } = data;
+      const g = new Chess(startingFEN);
+      for (const node of tree) {
+        queue.push(
+          ...node.variations.flatMap((v) => ({
+            startingFEN: g.fen(),
+            tree: v,
+          })),
+        );
+        const m = g.move(node.notation.notation);
+        if (node.commentAfter) {
+          comments.set(stripFEN(m.after), node.commentAfter);
+        }
+        moves.push(m);
       }
-      results.push(m);
     }
   }
 
-  return { moves: results, comments };
+  return { moves, comments };
 }
