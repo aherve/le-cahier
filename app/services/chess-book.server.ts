@@ -48,7 +48,7 @@ export class ChessBook {
           input.orientation === 'white' ? 'commentForWhite' : 'commentForBlack',
       },
       ExpressionAttributeValues: {
-        ':comment': { S: input.comment },
+        ':comment': { S: trimComment(input.comment) },
       },
     });
   }
@@ -72,18 +72,11 @@ export class ChessBook {
     });
   }
   public async addMove(input: SaveMoveInput & { userId: string }) {
-    let { isOpponentMove, fen, move, comment } = input;
-    comment = stripComment(fen, comment);
+    let { isOpponentMove, fen, move } = input;
 
     console.log('adding move', input);
 
     const game = new Chess(fen);
-    const turnBeforeMove = game.turn();
-
-    // that's ugly
-    const isForWhite =
-      (turnBeforeMove === 'w' && !isOpponentMove) ||
-      (turnBeforeMove === 'b' && isOpponentMove);
 
     game.move(move);
     const bookMove = BookMoveSchema.parse({
@@ -107,13 +100,6 @@ export class ChessBook {
           },
         },
       };
-      if (comment && comment.length > 0) {
-        updateExpr += ', #comment = :comment';
-        attrNames['#comment'] = isForWhite
-          ? 'commentForWhite'
-          : 'commentForBlack';
-        attrValues[':comment'] = { S: comment };
-      }
       await this.dynCli.updateItem({
         TableName: this.positionTableName,
         Key: marshall({
@@ -135,13 +121,6 @@ export class ChessBook {
         ':move': { M: marshall(bookMove, { removeUndefinedValues: true }) },
       };
 
-      if (comment && comment.length > 0) {
-        updateExpr += ', #comment = :comment';
-        attrNames['#comment'] = isForWhite
-          ? 'commentForWhite'
-          : 'commentForBlack';
-        attrValues[':comment'] = { S: comment };
-      }
       const update = {
         TableName: this.positionTableName,
         Key: marshall({
@@ -405,20 +384,7 @@ export class ChessBook {
 
 export const ChessBookService = new ChessBook();
 
-function stripComment(fen: string, comment: string | undefined) {
-  // No comment on starting position
-  if (fen === new Chess().fen()) {
-    return undefined;
-  }
-  if (!comment) {
-    return undefined;
-  }
-
-  // Remove diagram references
-  let stripped = comment.replaceAll('[diagram]', '');
-  if (!stripped.length) {
-    return undefined;
-  }
-
-  return stripped;
+function trimComment(comment: string) {
+  const res = comment.replaceAll('[diagram]', '').trim();
+  return res;
 }

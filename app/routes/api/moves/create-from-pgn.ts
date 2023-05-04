@@ -1,10 +1,14 @@
+import type { ParseTree } from '@mliebelt/pgn-parser';
 import type { ActionFunction } from '@remix-run/node';
+import type { Move } from 'chess.js';
 
+import { parse } from '@mliebelt/pgn-parser';
 import { json } from '@remix-run/node';
 import { Chess } from 'chess.js';
 
 import { authenticate } from '~/services/auth.server';
 import { ChessBookService } from '~/services/chess-book.server';
+import { stripFEN } from '~/services/utils';
 
 export const action: ActionFunction = async ({ request }) => {
   const { userId } = await authenticate(request);
@@ -20,36 +24,68 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   try {
-    const game = new Chess();
-    game.loadPgn(pgn);
-    const allComments = game.getComments().reduce((acc, moveComment) => {
-      const { fen, comment } = moveComment;
-      if (comment && comment.length > 0) {
-        acc.set(fen, comment);
-      }
-      return acc;
-    }, new Map<string, string>());
-
-    const toRecord = game.history({ verbose: true });
-
+    const { moves, comments } = PGNWalk(pgn);
     const promises: Array<Promise<void>> = [];
-    for (const move of toRecord) {
+    for (const move of moves) {
       promises.push(
         ChessBookService.addMove({
           userId,
           fen: move.before,
           isOpponentMove: move.color !== myColor,
           move: move.lan,
-          comment: allComments.get(move.before),
         }),
       );
     }
-
+    for (const [fen, comment] of comments) {
+      promises.push(
+        ChessBookService.addComment({
+          fen,
+          userId,
+          comment,
+          orientation,
+        }),
+      );
+    }
     await Promise.all(promises);
-
     return json({ success: true });
   } catch (e) {
     console.error('Error while loading pgn', e);
     return json({ error: 'Invalid pgn' }, { status: 400 });
   }
 };
+
+function PGNWalk(pgn: string) {
+  const parsed = parse(pgn, { startRule: 'game' }) as ParseTree;
+  const tree = parsed.moves;
+
+  const queue: Array<{
+    startingFEN: string;
+    tree: ParseTree['moves'];
+  }> = [
+    {
+      startingFEN: new Chess().fen(),
+      tree,
+    },
+  ];
+
+  const results: Array<Move> = [];
+  const comments: Map<string, string> = new Map();
+  while (queue.length) {
+    const data = queue.pop();
+    if (!data) continue;
+    const { startingFEN, tree } = data;
+    const g = new Chess(startingFEN);
+    for (const node of tree) {
+      queue.push(
+        ...node.variations.flatMap((v) => ({ startingFEN: g.fen(), tree: v })),
+      );
+      const m = g.move(node.notation.notation);
+      if (node.commentAfter) {
+        comments.set(stripFEN(m.after), node.commentAfter);
+      }
+      results.push(m);
+    }
+  }
+
+  return { moves: results, comments };
+}
