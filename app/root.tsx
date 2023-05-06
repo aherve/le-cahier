@@ -51,7 +51,7 @@ export default function App() {
     if (gaTrackingId?.length) {
       gaPageView(location.pathname, gaTrackingId);
     }
-  }, [location.pathname, gaTrackingId]);
+  }, [location, gaTrackingId]);
 
   return (
     <html lang="en">
