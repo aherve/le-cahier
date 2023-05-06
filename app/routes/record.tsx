@@ -6,14 +6,12 @@ import type {
 
 import {
   Alert,
-  AlertDescription,
   AlertDialog,
   AlertDialogBody,
   AlertDialogContent,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogOverlay,
-  AlertIcon,
   Button,
   GridItem,
   Heading,
