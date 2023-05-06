@@ -96,7 +96,9 @@ export function WithGame(props: { children: ReactNode }) {
 
   const backTo = useCallback(
     (fen: string) => {
-      while (game.fen() !== fen) {
+      let safety = 150;
+      while (game.fen() !== fen && safety > 0) {
+        safety--;
         undo();
       }
     },

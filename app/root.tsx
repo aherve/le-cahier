@@ -34,6 +34,7 @@ export const links: LinksFunction = () => {
 };
 
 export default function App() {
+  const nodeEnv = getNodeEnv();
   return (
     <html lang="en">
       <head>
@@ -47,10 +48,14 @@ export default function App() {
           </Authenticator>
         </ChakraProvider>
         <ScrollRestoration />
-        <Analytics />
+        {nodeEnv === 'production' && <Analytics />}
         <Scripts />
         <LiveReload />
       </body>
     </html>
   );
+}
+
+function getNodeEnv() {
+  return process.env.NODE_ENV ?? 'development';
 }

@@ -73,7 +73,9 @@ export default function Anki() {
       return;
     }
     reset(fetcher.data.fen);
-    setPosition(fetcher.data);
+    if (!('error' in fetcher.data)) {
+      setPosition(fetcher.data);
+    }
   }, [fetcher.data, reset]);
 
   function showHint() {
