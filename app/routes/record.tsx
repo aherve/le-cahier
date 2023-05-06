@@ -139,6 +139,7 @@ export default function Record() {
   }
 
   const onScan = useCallback(async () => {
+    gaEvent({ action: 'findTranspositions' });
     toast({
       title: 'Scanning',
       description: 'Searching for transpositions. This might take some time...',
