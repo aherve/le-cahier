@@ -36,9 +36,7 @@ export const gaEvent = ({
   value,
 }: Record<string, string>) => {
   if (!window.gtag) {
-    console.warn(
-      'window.gtag is not defined. This could mean your google analytics script has not loaded on the page yet.',
-    );
+    console.warn('window.gtag is not defined.');
     return;
   }
   window.gtag('event', action, {

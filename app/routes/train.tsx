@@ -20,6 +20,7 @@ import { ExploreButton } from '~/components/explore-button';
 import { FlipBoardButton } from '~/components/flip-board-button';
 import { RecordButton } from '~/components/record-button';
 import { GetChallengeOutputSchema } from '~/routes/api/moves/challenge';
+import { gaEvent } from '~/services/analytics';
 import { GameContext } from '~/with-game';
 
 export const meta: MetaFunction = () => {
@@ -57,6 +58,10 @@ export default function Train() {
 
   useEffect(() => {
     if (!isPlayerTurn && fetcher.state === 'idle' && fetcher.data == null) {
+      gaEvent({
+        action: 'getChallenge',
+      });
+
       fetcher.load(`/api/moves/challenge?fen=${encodeURIComponent(fen)}`);
     }
 
