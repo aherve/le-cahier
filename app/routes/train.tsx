@@ -1,4 +1,5 @@
 import type { TrainMessageInputType } from '../components/train-message';
+import type { MetaFunction } from '@remix-run/node';
 import type { Square } from 'react-chessboard/dist/chessboard/types';
 import type { GetChallengeOutput } from '~/routes/api/moves/challenge';
 
@@ -20,6 +21,13 @@ import { FlipBoardButton } from '~/components/flip-board-button';
 import { RecordButton } from '~/components/record-button';
 import { GetChallengeOutputSchema } from '~/routes/api/moves/challenge';
 import { GameContext } from '~/with-game';
+
+export const meta: MetaFunction = () => {
+  return {
+    title: 'Train | Le Cahier',
+    description: 'How well do you know your openings?',
+  };
+};
 
 export default function Train() {
   const { fen, turn, backTo, makeMove, isValidMove, orientation, reset } =

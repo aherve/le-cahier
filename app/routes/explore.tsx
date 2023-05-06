@@ -1,3 +1,4 @@
+import type { MetaFunction } from '@remix-run/node';
 import type { Square } from 'chess.js';
 
 import { GridItem, Heading, Wrap } from '@chakra-ui/react';
@@ -14,6 +15,13 @@ import { TrainButton } from '~/components/train-button';
 import { BookPositionSchema } from '~/schemas/position';
 import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
+
+export const meta: MetaFunction = () => {
+  return {
+    title: 'Explore | Le Cahier',
+    description: 'Browse your repertoire',
+  };
+};
 
 export default function Explore() {
   const { fen, turn, makeMove, orientation } = useContext(GameContext);

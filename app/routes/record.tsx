@@ -1,3 +1,4 @@
+import type { MetaFunction } from '@remix-run/node';
 import type { Move } from 'chess.js';
 import type {
   BoardOrientation,
@@ -36,6 +37,13 @@ import { SaveMoveInputSchema } from '~/routes/api/moves/create';
 import { BookPositionSchema } from '~/schemas/position';
 import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
+
+export const meta: MetaFunction = () => {
+  return {
+    title: 'Update Repertoire | Le Cahier',
+    description: 'Update your repertoire',
+  };
+};
 
 export default function Record() {
   const { fen, turn, makeMove, orientation } = useContext(GameContext);

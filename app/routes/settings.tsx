@@ -1,4 +1,4 @@
-import type { ActionFunction } from '@remix-run/node';
+import type { ActionFunction, MetaFunction } from '@remix-run/node';
 
 import {
   Button,
@@ -29,6 +29,13 @@ export const action: ActionFunction = async ({ request }) => {
 
   await UserService.setLichessUsername(userId, lichessUsername as string);
   return redirect('/');
+};
+
+export const meta: MetaFunction = () => {
+  return {
+    title: 'Settings | Le Cahier',
+    description: 'settings',
+  };
 };
 
 export default function Settings() {

@@ -1,4 +1,5 @@
 import type { TrainMessageInputType } from '../components/train-message';
+import type { MetaFunction } from '@remix-run/node';
 import type { Square } from 'chess.js';
 import type { BookPosition } from '~/schemas/position';
 
@@ -24,6 +25,13 @@ import { ChessGrid } from '~/components/chess-grid';
 import { ExploreButton } from '~/components/explore-button';
 import { TrainButton } from '~/components/train-button';
 import { GameContext } from '~/with-game';
+
+export const meta: MetaFunction = () => {
+  return {
+    title: 'Review mistakes | Le Cahier',
+    description: 'Reviewing positions you might have missed',
+  };
+};
 
 export default function Anki() {
   const { fen, turn, makeMove, reset, orientation, setOrientation } =

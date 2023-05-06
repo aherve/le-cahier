@@ -1,3 +1,4 @@
+import type { MetaFunction } from '@remix-run/node';
 import type { GameReport } from '~/schemas/game-report';
 import type { LichessGame } from '~/schemas/lichess';
 
@@ -34,6 +35,13 @@ import LichessLink from '../components/lichess-link';
 import { ExploreButton } from '~/components/explore-button';
 import { GameReportSchema, MissedMoveSchema } from '~/schemas/game-report';
 import { LichessGameSchema } from '~/schemas/lichess';
+
+export const meta: MetaFunction = () => {
+  return {
+    title: 'Lichess Report | Le Cahier',
+    description: 'Analyzing your lichess games',
+  };
+};
 
 export default function LichessReport() {
   const gameListFetcher = useFetcher();
