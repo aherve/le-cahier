@@ -3,10 +3,11 @@ import type { MetaFunction } from '@remix-run/node';
 import type { Square } from 'react-chessboard/dist/chessboard/types';
 import type { GetChallengeOutput } from '~/routes/api/moves/challenge';
 
-import { Button, GridItem, Heading, Wrap } from '@chakra-ui/react';
+import { Button, GridItem, Heading, Tooltip, Wrap } from '@chakra-ui/react';
 import { useFetcher, useSearchParams } from '@remix-run/react';
 import { Chess } from 'chess.js';
 import { useCallback, useContext, useEffect, useState } from 'react';
+import { FaAnchor } from 'react-icons/fa';
 import { GoLightBulb } from 'react-icons/go';
 import { MdOutlineSmartToy } from 'react-icons/md';
 import { VscDebugRestart } from 'react-icons/vsc';
@@ -18,7 +19,6 @@ import TrainMessage, { TrainMessageInput } from '../components/train-message';
 import { ChessGrid } from '~/components/chess-grid';
 import { ExploreButton } from '~/components/explore-button';
 import { FlipBoardButton } from '~/components/flip-board-button';
-import { RecordButton } from '~/components/record-button';
 import { GetChallengeOutputSchema } from '~/routes/api/moves/challenge';
 import { gaEvent } from '~/services/analytics';
 import { GameContext } from '~/with-game';
@@ -34,7 +34,7 @@ export default function Train() {
   const { fen, turn, backTo, makeMove, isValidMove, orientation, reset } =
     useContext(GameContext);
   const [params] = useSearchParams();
-  const startingFEN = params.get('from');
+  const [startingFEN, setStartingFEN] = useState(params.get('from'));
   const [msg, setMsg] = useState<TrainMessageInputType>('empty');
   const [challenge, setChallenge] = useState<GetChallengeOutput | null>(null);
 
@@ -129,6 +129,10 @@ export default function Train() {
     setMsg(TrainMessageInput.enum.hint);
   }
 
+  function anchor() {
+    setStartingFEN(fen);
+  }
+
   return (
     <ChessGrid fen={fen} onPieceDrop={onDrop} orientation={orientation}>
       <GridItem
@@ -154,10 +158,16 @@ export default function Train() {
       <GridItem gridArea="actions">
         <Wrap align="center" justify="center">
           <FlipBoardButton />
-          <RecordButton />
-          <Button leftIcon={<VscDebugRestart />} onClick={again}>
-            Again
-          </Button>
+          <Tooltip label="Set current position as the new starting point for training">
+            <Button onClick={anchor}>
+              <FaAnchor />
+            </Button>
+          </Tooltip>
+          <Tooltip label="(re)start from anchored or starting position">
+            <Button leftIcon={<VscDebugRestart />} onClick={again}>
+              Again
+            </Button>
+          </Tooltip>
           <Button leftIcon={<GoLightBulb />} onClick={showHint}>
             get hint
           </Button>

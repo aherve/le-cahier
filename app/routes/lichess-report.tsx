@@ -63,45 +63,7 @@ export default function LichessReport() {
   }, [gameListFetcher.data]);
 
   if (gameListFetcher.state === 'loading' && games.length === 0) {
-    return (
-      <VStack spacing={5} paddingTop="10">
-        <TableContainer>
-          <Table size="sm" variant="simple">
-            <Thead>
-              <Tr>
-                <Th> Date</Th>
-                <Th> Type</Th>
-                <Th> white</Th>
-                <Th> black</Th>
-                <Th> report</Th>
-                <Th> </Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Tr key={i}>
-                  <Td>
-                    <SkeletonText width="5em" />
-                  </Td>
-                  <Td>
-                    <SkeletonText width="3em" />
-                  </Td>
-                  <Td>
-                    <SkeletonText width="18em" />
-                  </Td>
-                  <Td>
-                    <SkeletonText width="18em" />
-                  </Td>
-                  <Td>
-                    <SkeletonText width="4em" />
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
-      </VStack>
-    );
+    return <TableSkeleton />;
   }
 
   function LoadMore() {
@@ -284,4 +246,46 @@ function getPlayerOrientation(game: LichessGame, report?: GameReport | null) {
   if (game.players.white.user.name === report?.lichessUsername) return 'white';
   if (game.players.black.user.name === report?.lichessUsername) return 'black';
   return undefined;
+}
+
+function TableSkeleton() {
+  return (
+    <VStack spacing={5} paddingTop="10">
+      <TableContainer>
+        <Table size="sm" variant="simple">
+          <Thead>
+            <Tr>
+              <Th> Date</Th>
+              <Th> Type</Th>
+              <Th> white</Th>
+              <Th> black</Th>
+              <Th> report</Th>
+              <Th> </Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Tr key={i}>
+                <Td>
+                  <SkeletonText width="5em" />
+                </Td>
+                <Td>
+                  <SkeletonText width="3em" />
+                </Td>
+                <Td>
+                  <SkeletonText width="18em" />
+                </Td>
+                <Td>
+                  <SkeletonText width="18em" />
+                </Td>
+                <Td>
+                  <SkeletonText width="4em" />
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
+    </VStack>
+  );
 }
