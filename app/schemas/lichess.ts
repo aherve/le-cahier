@@ -85,7 +85,7 @@ export const MoveSchema = z.object({
 });
 const LichessGameUserSchema = z.object({
   rating: z.number(),
-  ratingDiff: z.number(),
+  ratingDiff: z.number().optional(),
   user: z.object({
     name: z.string(),
     patron: z.boolean().optional(),
