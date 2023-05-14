@@ -11,7 +11,7 @@ import {
 import { useNavigate } from '@remix-run/react';
 import { useContext } from 'react';
 import { GiFalling, GiHamburgerMenu } from 'react-icons/gi';
-import { MdLogout, MdSettings } from 'react-icons/md';
+import { MdLogout } from 'react-icons/md';
 import { SiLichess } from 'react-icons/si';
 
 import { ExploreButton } from './explore-button';
@@ -32,8 +32,9 @@ export function LCMenu() {
   function lichessReport() {
     navigate('/lichess-report');
   }
-  function settings() {
-    navigate('/settings');
+
+  function lichessLogin() {
+    navigate('/lichess/login');
   }
 
   return (
@@ -67,9 +68,9 @@ export function LCMenu() {
               <GiHamburgerMenu />
             </MenuButton>
             <MenuList>
-              <MenuItem onClick={settings}>
+              <MenuItem onClick={lichessLogin}>
                 <Wrap align="center">
-                  <MdSettings /> <WrapItem>Settings</WrapItem>
+                  <SiLichess /> <WrapItem>Lichess login</WrapItem>
                 </Wrap>
               </MenuItem>
               <MenuItem onClick={signOut}>
