@@ -5,9 +5,8 @@ import { redirect, json } from '@remix-run/node';
 import { LichessGameParserSchema } from '~/schemas/lichess';
 import { authenticate } from '~/services/auth.server';
 import { ChessBookService } from '~/services/chess-book.server';
-import { UserService } from '~/services/users.server';
+import { getSession } from '~/session';
 
-const LICHESS_TOKEN = process.env.LICHESS_TOKEN;
 const GAMES_COUNT = 5;
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -16,15 +15,15 @@ export const loader: LoaderFunction = async ({ request }) => {
   const until =
     new URL(request.url).searchParams.get('until') ?? Date.now().toString();
 
-  const user = await UserService.getUser(userId);
-  const lichessUsername = user?.lichessUsername;
-
-  if (!lichessUsername) {
-    return redirect('/settings');
+  const session = await getSession(request.headers.get('Cookie'));
+  const lichessToken = session.get('lichessAccessToken');
+  const lichessUsername = session.get('lichessUsername');
+  if (!lichessToken || !lichessUsername) {
+    return redirect('/lichess/login');
   }
 
   const headers = {
-    Authorization: `Bearer ${LICHESS_TOKEN}`,
+    Authorization: `Bearer ${lichessToken}`,
     Accept: 'application/x-ndjson',
   };
 

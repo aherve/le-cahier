@@ -9,14 +9,16 @@ import { Chess } from 'chess.js';
 import { ReportStatusSchema } from '~/schemas/game-report';
 import { authenticate } from '~/services/auth.server';
 import { ChessBookService } from '~/services/chess-book.server';
-import { UserService } from '~/services/users.server';
+import { getSession } from '~/session';
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const { userId } = await authenticate(request);
-  const user = await UserService.getUser(userId);
-  const lichessUsername = user?.lichessUsername;
+  const [{ userId }, session] = await Promise.all([
+    authenticate(request),
+    getSession(request.headers.get('Cookie')),
+  ]);
+  const lichessUsername = session.get('lichessUsername');
   if (!lichessUsername) {
-    return redirect('/settings');
+    return redirect('/lichess/login');
   }
 
   const id = new URL(request.url).searchParams.get('id');
