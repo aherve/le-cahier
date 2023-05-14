@@ -40,10 +40,5 @@ function getSecret() {
     return fromEnv;
   }
 
-  if (process.env.NODE_ENV === 'development') {
-    console.warn('generating a session secret for development');
-    return 's3cret';
-  }
-
-  throw new Error('No SESSION_SECRET found in production environment');
+  throw new Error('No SESSION_SECRET found environment');
 }
