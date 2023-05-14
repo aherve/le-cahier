@@ -28,7 +28,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         response_type: 'code',
         client_id: 'le-cahier',
         redirect_uri: `${baseURL}/lichess/callback`,
-        scope: 'preference:read',
+        //scope: 'preference:read',
         code_challenge_method: 'S256',
         code_challenge: challenge,
       }),
