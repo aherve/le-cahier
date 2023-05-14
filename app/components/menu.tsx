@@ -11,7 +11,7 @@ import {
 import { useNavigate } from '@remix-run/react';
 import { useContext } from 'react';
 import { GiFalling, GiHamburgerMenu } from 'react-icons/gi';
-import { MdLogout, MdSettings } from 'react-icons/md';
+import { MdLogout } from 'react-icons/md';
 import { SiLichess } from 'react-icons/si';
 
 import { ExploreButton } from './explore-button';
