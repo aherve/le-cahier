@@ -20,7 +20,7 @@ resource "aws_apprunner_service" "le_cahier" {
     code_repository {
       code_configuration {
         code_configuration_values {
-          build_command = "npm install --omit=dev && npm run build"
+          build_command = "npm ci --omit=dev && npm run build"
           port          = "3000"
           runtime       = "NODEJS_16"
           start_command = "npm run start"
