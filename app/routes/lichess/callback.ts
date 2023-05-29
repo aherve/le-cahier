@@ -16,7 +16,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   if (!parsed) {
     throw new Error('No parsed url');
   }
-  const baseURL = parsed.protocol + '//' + parsed.host;
+  let protocol = parsed.hostname === 'localhost' ? 'http' : 'https';
+
+  const baseURL = protocol + '://' + parsed.host;
   const session = await getSession(request.headers.get('Cookie'));
   const verifier = session.get('codeVerifier');
   if (!verifier) {
