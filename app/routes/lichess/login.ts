@@ -13,9 +13,9 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Error('No parsed url');
   }
 
-  let protocol = parsed.host === 'localhost' ? 'http' : 'https';
+  let protocol = parsed.hostname === 'localhost' ? 'http' : 'https';
 
-  const baseURL = protocol + '//' + parsed.host;
+  const baseURL = protocol + '://' + parsed.host;
   const verifier = createVerifier();
   const challenge = createChallenge(verifier);
 
