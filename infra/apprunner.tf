@@ -24,7 +24,8 @@ resource "aws_apprunner_service" "le_cahier" {
           runtime       = "NODEJS_16"
           start_command = "npm run start"
           runtime_environment_variables = {
-            NODE_ENV = "production"
+            NODE_ENV       = "production"
+            GA_TRACKING_ID = "G-9SHBNWDDWB"
           }
           runtime_environment_secrets = {
             SESSION_SECRET = aws_secretsmanager_secret.session_secret.arn
