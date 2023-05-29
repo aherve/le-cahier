@@ -9,7 +9,6 @@ resource "aws_apprunner_auto_scaling_configuration_version" "le_cahier" {
   max_size        = 2
   min_size        = 1
 }
-
 resource "aws_apprunner_service" "le_cahier" {
   service_name = "le-cahier"
   source_configuration {
@@ -64,3 +63,4 @@ resource "aws_apprunner_service" "le_cahier" {
 
   auto_scaling_configuration_arn = aws_apprunner_auto_scaling_configuration_version.le_cahier.arn
 }
+
