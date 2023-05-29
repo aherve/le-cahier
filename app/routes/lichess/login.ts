@@ -13,6 +13,12 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Error('No parsed url');
   }
 
+  console.log('DEBUG URL PARSING', {
+    parsed,
+    request,
+    url: request.url,
+  });
+
   const baseURL = parsed.protocol + '//' + parsed.host;
   const verifier = createVerifier();
   const challenge = createChallenge(verifier);
