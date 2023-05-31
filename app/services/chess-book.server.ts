@@ -297,7 +297,6 @@ export class ChessBook {
     // Build map of all moves. Warning, this is expensive $$$
     let newTransposition = 0;
     let deadEnds = 0;
-    let alreadyRegistered = 0;
     let positionScanned = 0;
     const scanner = this.positionScanner(userId);
     const allPositions: Record<string, BookPosition> = {};
@@ -308,12 +307,11 @@ export class ChessBook {
 
     // Find transpositions
     for (const position of Object.values(allPositions)) {
+      await Promise.resolve(); // This loop is cpu-intensive. Don't block the event loop for too long
       positionScanned++;
-      const allOpponentMoves = new Chess(position.fen).moves({ verbose: true });
-      const newOpponentMoves = allOpponentMoves.filter(
-        (m) => !(m.lan in position.opponentMoves),
-      );
-      alreadyRegistered += allOpponentMoves.length - newOpponentMoves.length;
+      const newOpponentMoves = new Chess(position.fen)
+        .moves({ verbose: true })
+        .filter((m) => !(m.lan in position.opponentMoves));
 
       for (const newMove of newOpponentMoves) {
         const newFen = stripFEN(newMove.after);
@@ -339,8 +337,7 @@ export class ChessBook {
     await Promise.all(savePromises);
     const res = {
       newTransposition,
-      leadsToUnknownPosition: deadEnds,
-      alreadyRegistered,
+      deadEnds,
       positionScanned,
     };
     console.log(res);
