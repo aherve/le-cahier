@@ -7,6 +7,8 @@ import { useEffect, useCallback, createContext, useState } from 'react';
 
 import { useKeyPress } from './hooks/key-press';
 
+const NO_SOUND = 'noSound';
+
 export const GameContext = createContext({
   backTo: (_: string) => {},
   fen: new Chess().fen(),
@@ -19,6 +21,8 @@ export const GameContext = createContext({
   turn: 'w',
   orientation: 'white' as BoardOrientation,
   setOrientation: (_: BoardOrientation) => {},
+  soundEnabled: true,
+  toggleSound: () => {},
 });
 
 export function WithGame(props: { children: ReactNode }) {
@@ -27,10 +31,21 @@ export function WithGame(props: { children: ReactNode }) {
   const [backWasPressed, setBackWasPressed] = useState(false);
   const [forwardWasPressed, setForwardWasPressed] = useState(false);
   const [forwardMoveStack, setForwardMoveStack] = useState<Move[]>([]);
+  const [noSound, setNoSound] = useState(
+    localStorage.getItem(NO_SOUND) === 'true',
+  );
+
+  useEffect(() => {
+    localStorage.setItem(NO_SOUND, noSound.toString());
+  }, [noSound]);
 
   const fen = game.fen();
   const moves: Move[] = game.history({ verbose: true });
   const turn = game.turn();
+
+  const toggleSound = useCallback(() => {
+    setNoSound((v) => !v);
+  }, [setNoSound]);
 
   const arrowLeftPressed = useKeyPress('ArrowLeft');
   const arrowRightPressed = useKeyPress('ArrowRight');
@@ -39,7 +54,9 @@ export function WithGame(props: { children: ReactNode }) {
       const moveSound = new Audio('sounds/Move.ogg');
       const captureSound = new Audio('sounds/Capture.ogg');
       const m = game.move(move);
-      m.captured ? captureSound.play() : moveSound.play();
+      if (!noSound) {
+        m.captured ? captureSound.play() : moveSound.play();
+      }
       if (m.lan === forwardMoveStack[0]?.lan) {
         setForwardMoveStack((prev) => prev.slice(1));
       } else {
@@ -47,7 +64,7 @@ export function WithGame(props: { children: ReactNode }) {
       }
       return m;
     },
-    [game, forwardMoveStack, setForwardMoveStack],
+    [game, forwardMoveStack, setForwardMoveStack, noSound],
   );
 
   const undo = useCallback(() => {
@@ -121,6 +138,8 @@ export function WithGame(props: { children: ReactNode }) {
           reset,
           setOrientation,
           turn,
+          toggleSound,
+          soundEnabled: !noSound,
         }}
       >
         {props.children}

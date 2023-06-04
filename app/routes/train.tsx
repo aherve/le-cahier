@@ -31,8 +31,16 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Train() {
-  const { fen, turn, backTo, makeMove, isValidMove, orientation, reset } =
-    useContext(GameContext);
+  const {
+    fen,
+    turn,
+    backTo,
+    makeMove,
+    isValidMove,
+    orientation,
+    reset,
+    soundEnabled,
+  } = useContext(GameContext);
   const [params] = useSearchParams();
   const [startingFEN, setStartingFEN] = useState(params.get('from'));
   const [msg, setMsg] = useState<TrainMessageInputType>('empty');
@@ -72,7 +80,7 @@ export default function Train() {
       const data = GetChallengeOutputSchema.parse(fetcher.data);
       if (!data.challengeMove) {
         setMsg(TrainMessageInput.enum.noMoreData);
-        practiceCompleteSound.play();
+        soundEnabled && practiceCompleteSound.play();
       } else {
         makeMove(data.challengeMove);
         fetcher.data = null;
@@ -80,7 +88,7 @@ export default function Train() {
         setMsg(TrainMessageInput.enum.yourTurn);
       }
     }
-  }, [fen, fetcher, orientation, turn, isPlayerTurn, makeMove]);
+  }, [fen, fetcher, orientation, turn, isPlayerTurn, makeMove, soundEnabled]);
 
   const ankiUpdate = useCallback(
     (isSuccess: boolean) => {
@@ -110,7 +118,7 @@ export default function Train() {
       makeMove({ from: sourceSquare, to: targetSquare });
       return true;
     } else {
-      errorSound.play();
+      soundEnabled && errorSound.play();
       ankiUpdate(false);
       setMsg(TrainMessageInput.enum.nope);
       return false;

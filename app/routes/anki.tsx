@@ -35,8 +35,15 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Anki() {
-  const { fen, turn, makeMove, reset, orientation, setOrientation } =
-    useContext(GameContext);
+  const {
+    fen,
+    turn,
+    makeMove,
+    reset,
+    orientation,
+    setOrientation,
+    soundEnabled,
+  } = useContext(GameContext);
   const [position, setPosition] = useState<BookPosition | null>(null);
   const [msg, setMsg] = useState<TrainMessageInputType>('empty');
   const [hints, setHints] = useState<string[]>([]);
@@ -112,7 +119,7 @@ export default function Anki() {
     const move = `${sourceSquare}${targetSquare}`;
 
     if (expectedMoves.includes(move)) {
-      successSound.play();
+      soundEnabled && successSound.play();
       makeMove(move);
       setMsg(TrainMessageInput.enum.yourTurn);
       ankiUpdate(true).then(() => {
@@ -120,7 +127,7 @@ export default function Anki() {
       });
       return true;
     } else {
-      errorSound.play();
+      soundEnabled && errorSound.play();
       setMsg(TrainMessageInput.enum.nope);
       ankiUpdate(false);
       return false;
