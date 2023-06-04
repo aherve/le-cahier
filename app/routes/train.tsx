@@ -38,6 +38,8 @@ export default function Train() {
   const [msg, setMsg] = useState<TrainMessageInputType>('empty');
   const [challenge, setChallenge] = useState<GetChallengeOutput | null>(null);
 
+  const errorSound = new Audio('/sounds/Error.ogg');
+
   const isPlayerTurn =
     (orientation === 'white' && turn === 'w') ||
     (orientation === 'black' && turn === 'b');
@@ -57,6 +59,7 @@ export default function Train() {
     .filter(Boolean) as string[];
 
   useEffect(() => {
+    const practiceCompleteSound = new Audio('/sounds/PracticeComplete.ogg');
     if (!isPlayerTurn && fetcher.state === 'idle' && fetcher.data == null) {
       gaEvent({
         action: 'getChallenge',
@@ -69,6 +72,7 @@ export default function Train() {
       const data = GetChallengeOutputSchema.parse(fetcher.data);
       if (!data.challengeMove) {
         setMsg(TrainMessageInput.enum.noMoreData);
+        practiceCompleteSound.play();
       } else {
         makeMove(data.challengeMove);
         fetcher.data = null;
@@ -106,6 +110,7 @@ export default function Train() {
       makeMove({ from: sourceSquare, to: targetSquare });
       return true;
     } else {
+      errorSound.play();
       ankiUpdate(false);
       setMsg(TrainMessageInput.enum.nope);
       return false;

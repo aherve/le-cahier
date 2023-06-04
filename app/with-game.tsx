@@ -36,7 +36,10 @@ export function WithGame(props: { children: ReactNode }) {
   const arrowRightPressed = useKeyPress('ArrowRight');
   const makeMove = useCallback(
     (move: string | { from: string; to: string; promotion?: string }) => {
+      const moveSound = new Audio('sounds/Move.ogg');
+      const captureSound = new Audio('sounds/Capture.ogg');
       const m = game.move(move);
+      m.captured ? captureSound.play() : moveSound.play();
       if (m.lan === forwardMoveStack[0]?.lan) {
         setForwardMoveStack((prev) => prev.slice(1));
       } else {

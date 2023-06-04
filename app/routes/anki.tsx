@@ -42,6 +42,8 @@ export default function Anki() {
   const [hints, setHints] = useState<string[]>([]);
   const fetcher = useFetcher<BookPosition>();
   const [includeNovelties, setIncludeNovelties] = useState(false);
+  const errorSound = new Audio('/sounds/Error.ogg');
+  const successSound = new Audio('/sounds/PracticeGood.ogg');
 
   const ankiUpdate = useCallback(
     async (isSuccess: boolean) => {
@@ -82,8 +84,8 @@ export default function Anki() {
     if (!fetcher.data) {
       return;
     }
-    reset(fetcher.data.fen);
     if (!('error' in fetcher.data)) {
+      reset(fetcher.data.fen);
       setPosition(fetcher.data);
     }
   }, [fetcher.data, reset]);
@@ -110,6 +112,7 @@ export default function Anki() {
     const move = `${sourceSquare}${targetSquare}`;
 
     if (expectedMoves.includes(move)) {
+      successSound.play();
       makeMove(move);
       setMsg(TrainMessageInput.enum.yourTurn);
       ankiUpdate(true).then(() => {
@@ -117,6 +120,7 @@ export default function Anki() {
       });
       return true;
     } else {
+      errorSound.play();
       setMsg(TrainMessageInput.enum.nope);
       ankiUpdate(false);
       return false;
