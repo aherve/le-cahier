@@ -212,7 +212,7 @@ function GameReportComponent(props: { game: LichessGame; report: GameReport }) {
     .map((m) => `expected ${m.expected.join(', ')}, but ${m.played} was played`)
     .join('. ');
 
-  if (failedCount === 1) {
+  if (failedCount >= 1) {
     return (
       <Text color="red.500">
         {' '}

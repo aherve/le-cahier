@@ -7,7 +7,7 @@ import { authenticate } from '~/services/auth.server';
 import { ChessBookService } from '~/services/chess-book.server';
 import { getSession } from '~/session';
 
-const GAMES_COUNT = 15;
+const GAMES_COUNT = 10;
 
 export const loader: LoaderFunction = async ({ request }) => {
   const { userId } = await authenticate(request);
