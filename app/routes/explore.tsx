@@ -1,7 +1,15 @@
 import type { MetaFunction } from '@remix-run/node';
 import type { Square } from 'chess.js';
 
-import { GridItem, Heading, Wrap } from '@chakra-ui/react';
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  GridItem,
+  Heading,
+  Link,
+  Wrap,
+} from '@chakra-ui/react';
 import { useContext, useEffect, useState } from 'react';
 import { VscBook } from 'react-icons/vsc';
 
@@ -27,6 +35,7 @@ export default function Explore() {
   const { fen, turn, makeMove, orientation } = useContext(GameContext);
   const [comment, setComment] = useState<string>('');
   const [bookMoves, setBookMoves] = useState<string[]>([]);
+  const [noMoreMoves, setNoMoreMoves] = useState<boolean>(false);
 
   useEffect(() => {
     fetch(`/api/moves/get?fen=${encodeURIComponent(fen)}`)
@@ -34,17 +43,18 @@ export default function Explore() {
       .then((data) => {
         const isPlayerTurn = turn === orientation[0];
         const position = BookPositionSchema.nullable().parse(data);
-        setBookMoves(
-          (isPlayerTurn
+        const moves = (
+          isPlayerTurn
             ? Object.keys(position?.bookMoves ?? {})
             : Object.keys(position?.opponentMoves ?? {})
-          ).map((m) => toSAN(fen, m)),
-        );
+        ).map((m) => toSAN(fen, m));
+        setBookMoves(moves);
         setComment(
           orientation === 'white'
             ? position?.commentForWhite ?? ''
             : position?.commentForBlack ?? '',
         );
+        setNoMoreMoves(moves.length === 0);
       });
   }, [fen, orientation, turn]);
 
@@ -59,6 +69,20 @@ export default function Explore() {
 
   return (
     <ChessGrid fen={fen} onPieceDrop={onDrop} orientation={orientation}>
+      <GridItem justifySelf="center" alignSelf="center" gridArea="message">
+        {noMoreMoves ? (
+          <Alert status="info">
+            <AlertIcon />
+            <AlertDescription>
+              You don't have any saved move for this position. Go to{' '}
+              <Link href="/record">Record Moves</Link> to add some!
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <></>
+        )}
+      </GridItem>
+
       <GridItem
         gridArea="title"
         alignSelf="center"

@@ -43,7 +43,7 @@ export default function Train() {
   } = useContext(GameContext);
   const [params] = useSearchParams();
   const [startingFEN, setStartingFEN] = useState(params.get('from'));
-  const [msg, setMsg] = useState<TrainMessageInputType>('empty');
+  const [msg, setMsg] = useState<TrainMessageInputType>('yourTurn');
   const [challenge, setChallenge] = useState<GetChallengeOutput | null>(null);
 
   const errorSound = new Audio('/sounds/Error.ogg');

@@ -190,7 +190,7 @@ export default function Anki() {
           </Button>
           <LichessLink fen={fen}></LichessLink>
           <Switch isChecked={includeNovelties} onChange={toggleNovelties}>
-            Include novelties
+            Include positions you haven't yet played
           </Switch>
         </Wrap>
       </GridItem>

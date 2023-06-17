@@ -13,6 +13,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogOverlay,
+  Box,
   Button,
   GridItem,
   Heading,
@@ -38,6 +39,8 @@ import { BookPositionSchema } from '~/schemas/position';
 import { gaEvent } from '~/services/analytics';
 import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
+
+const enableFindTranspositions = false; // todo: scale function
 
 export const meta: MetaFunction = () => {
   return {
@@ -173,11 +176,9 @@ export default function Record() {
         </Wrap>
       </GridItem>
 
-      <GridItem
-        gridArea="message"
-        alignSelf="center"
-        justifySelf="center"
-      ></GridItem>
+      <GridItem gridArea="message" alignSelf="center" justifySelf="center">
+        <Box>Move any piece or upload a PGN file to update your repertoire</Box>
+      </GridItem>
 
       <GridItem gridArea="moves" maxW="300px">
         <Moves
@@ -296,6 +297,9 @@ function FindTranspositionsButton(props: { onScan: () => void }) {
     onClose();
   };
 
+  if (!enableFindTranspositions) {
+    return <></>;
+  }
   return (
     <>
       <Button leftIcon={<MdYoutubeSearchedFor />} onClick={onOpen}>
