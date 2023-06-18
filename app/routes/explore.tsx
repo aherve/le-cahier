@@ -10,6 +10,7 @@ import {
   Link,
   Wrap,
 } from '@chakra-ui/react';
+import mixpanel from 'mixpanel-browser';
 import { useContext, useEffect, useState } from 'react';
 import { VscBook } from 'react-icons/vsc';
 
@@ -38,6 +39,7 @@ export default function Explore() {
   const [noMoreMoves, setNoMoreMoves] = useState<boolean>(false);
 
   useEffect(() => {
+    mixpanel.track('Explore');
     fetch(`/api/moves/get?fen=${encodeURIComponent(fen)}`)
       .then((res) => res.json())
       .then((data) => {

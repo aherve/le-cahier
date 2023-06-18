@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { useFetcher } from '@remix-run/react';
 import { Chess } from 'chess.js';
+import mixpanel from 'mixpanel-browser';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { GiFalling } from 'react-icons/gi';
 import { GoLightBulb } from 'react-icons/go';
@@ -24,7 +25,6 @@ import TrainMessage, { TrainMessageInput } from '../components/train-message';
 import { ChessGrid } from '~/components/chess-grid';
 import { ExploreButton } from '~/components/explore-button';
 import { TrainButton } from '~/components/train-button';
-import { gaEvent } from '~/services/analytics';
 import { GameContext } from '~/with-game';
 
 export const meta: MetaFunction = () => {
@@ -82,7 +82,7 @@ export default function Anki() {
 
   useEffect(() => {
     if (fetcher.state === 'idle' && fetcher.data == null) {
-      gaEvent({ action: 'getAnki' });
+      mixpanel.track('getAnki');
       fetcher.load(`/api/moves/get-anki?skipNovelties=${!includeNovelties}`);
     }
   }, [fetcher, includeNovelties]);

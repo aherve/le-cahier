@@ -24,6 +24,7 @@ import {
   Tooltip,
 } from '@chakra-ui/react';
 import { useFetcher } from '@remix-run/react';
+import mixpanel from 'mixpanel-browser';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { BsCircle, BsCircleFill } from 'react-icons/bs';
@@ -49,6 +50,7 @@ export default function LichessReport() {
 
   useEffect(() => {
     if (gameListFetcher.state === 'idle' && gameListFetcher.data == null) {
+      mixpanel.track('get lichess report');
       gameListFetcher.load('/api/lichess/games');
     }
   }, [gameListFetcher]);
@@ -67,6 +69,7 @@ export default function LichessReport() {
   }
 
   function LoadMore() {
+    mixpanel.track('load more lichess games');
     const oldTimestamp = Math.min(...games.map((g) => g.createdAt));
     gameListFetcher.load(`/api/lichess/games?until=${oldTimestamp}`);
   }

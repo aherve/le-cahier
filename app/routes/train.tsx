@@ -6,6 +6,7 @@ import type { GetChallengeOutput } from '~/routes/api/moves/challenge';
 import { Button, GridItem, Heading, Tooltip, Wrap } from '@chakra-ui/react';
 import { useFetcher, useSearchParams } from '@remix-run/react';
 import { Chess } from 'chess.js';
+import mixpanel from 'mixpanel-browser';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { FaAnchor } from 'react-icons/fa';
 import { GoLightBulb } from 'react-icons/go';
@@ -20,7 +21,6 @@ import { ChessGrid } from '~/components/chess-grid';
 import { ExploreButton } from '~/components/explore-button';
 import { FlipBoardButton } from '~/components/flip-board-button';
 import { GetChallengeOutputSchema } from '~/routes/api/moves/challenge';
-import { gaEvent } from '~/services/analytics';
 import { GameContext } from '~/with-game';
 
 export const meta: MetaFunction = () => {
@@ -69,9 +69,7 @@ export default function Train() {
   useEffect(() => {
     const practiceCompleteSound = new Audio('/sounds/PracticeComplete.ogg');
     if (!isPlayerTurn && fetcher.state === 'idle' && fetcher.data == null) {
-      gaEvent({
-        action: 'getChallenge',
-      });
+      mixpanel.track('get-challenge');
 
       fetcher.load(`/api/moves/challenge?fen=${encodeURIComponent(fen)}`);
     }
@@ -126,6 +124,7 @@ export default function Train() {
   }
 
   function again() {
+    mixpanel.track('again');
     if (startingFEN) {
       backTo(startingFEN);
     } else {
@@ -136,6 +135,7 @@ export default function Train() {
   }
 
   function showHint() {
+    mixpanel.track('show-hint');
     if (hints.length === 0) {
       return;
     }
@@ -143,6 +143,7 @@ export default function Train() {
   }
 
   function anchor() {
+    mixpanel.track('anchor');
     setStartingFEN(fen);
   }
 

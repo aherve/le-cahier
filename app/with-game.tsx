@@ -2,6 +2,7 @@ import type { Move } from 'chess.js';
 import type { ReactNode } from 'react';
 import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 
+import { useAuthenticator } from '@aws-amplify/ui-react';
 import { Chess } from 'chess.js';
 import { useEffect, useCallback, createContext, useState } from 'react';
 

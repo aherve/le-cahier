@@ -24,6 +24,7 @@ import {
   Wrap,
 } from '@chakra-ui/react';
 import { Chess } from 'chess.js';
+import mixpanel from 'mixpanel-browser';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { BiCloudUpload } from 'react-icons/bi';
 import { BsRecordCircle } from 'react-icons/bs';
@@ -36,7 +37,6 @@ import { ExploreButton } from '~/components/explore-button';
 import { FlipBoardButton } from '~/components/flip-board-button';
 import { SaveMoveInputSchema } from '~/routes/api/moves/create';
 import { BookPositionSchema } from '~/schemas/position';
-import { gaEvent } from '~/services/analytics';
 import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
 
@@ -90,7 +90,7 @@ export default function Record() {
         move: `${validMove.from}${validMove.to}`,
       });
       console.log('recording move', payload);
-      gaEvent({ action: 'recordMove' });
+      mixpanel.track('record-move');
       await fetch('api/moves/create', {
         method: 'POST',
         body: JSON.stringify(payload),
@@ -142,7 +142,7 @@ export default function Record() {
   }
 
   const onScan = useCallback(async () => {
-    gaEvent({ action: 'findTranspositions' });
+    mixpanel.track('find transpositions');
     toast({
       title: 'Scanning',
       description: 'Searching for transpositions. This might take some time...',
@@ -212,7 +212,7 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
   const onConfirm = () => {
     console.log('submitting', pgn);
     setIsLoading(true);
-    gaEvent({ action: 'loadPGN' });
+    mixpanel.track('load pgn');
     fetch('api/moves/create-from-pgn', {
       method: 'POST',
       body: JSON.stringify({

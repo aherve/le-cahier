@@ -25,7 +25,7 @@ resource "aws_apprunner_service" "le_cahier" {
           start_command = "npm run start"
           runtime_environment_variables = {
             NODE_ENV       = "production"
-            GA_TRACKING_ID = "G-9SHBNWDDWB"
+            MIXPANEL_TOKEN = "b65762eeaddacf3eb0888ad4e6da2c0b"
           }
           runtime_environment_secrets = {
             SESSION_SECRET = aws_secretsmanager_secret.session_secret.arn

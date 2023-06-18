@@ -14,10 +14,11 @@ import {
   useLocation,
 } from '@remix-run/react';
 import { Amplify } from 'aws-amplify';
+import mixpanel from 'mixpanel-browser';
 import { useEffect } from 'react';
 
 import { LCLayout } from './components/layout';
-import { gaPageView } from './services/analytics';
+import { WithAnalytics } from './components/with-analytics';
 import amplifyConfig from '../infra/aws-export.json';
 
 Amplify.configure(amplifyConfig);
@@ -39,18 +40,22 @@ export const links: LinksFunction = () => {
 
 // Load the GA tracking id from the .env
 export const loader = async () => {
-  return json({ gaTrackingId: process.env.GA_TRACKING_ID });
+  return json({ mixpanelToken: process.env.MIXPANEL_TOKEN });
 };
 
 export default function App() {
   const location = useLocation();
-  const { gaTrackingId } = useLoaderData<typeof loader>();
+  const { mixpanelToken } = useLoaderData<typeof loader>();
+
+  if (mixpanelToken && mixpanelToken.length) {
+    mixpanel.init(mixpanelToken, { ignore_dnt: true });
+  }
 
   useEffect(() => {
-    if (gaTrackingId?.length) {
-      gaPageView(location.pathname, gaTrackingId);
+    if (mixpanelToken && mixpanelToken.length) {
+      mixpanel.track(`View ${location.pathname}`);
     }
-  }, [location, gaTrackingId]);
+  }, [location.pathname, mixpanelToken]);
 
   return (
     <html lang="en">
@@ -59,32 +64,15 @@ export default function App() {
         <Links />
       </head>
       <body>
-        {!gaTrackingId ? null : (
-          <>
-            <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${gaTrackingId}`}
-            />
-            <script
-              async
-              id="gtag-init"
-              dangerouslySetInnerHTML={{
-                __html: `
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${gaTrackingId}', {
-                  page_path: window.location.pathname,
-                });
-              `,
-              }}
-            />
-          </>
-        )}
-
         <ChakraProvider>
           <Authenticator signUpAttributes={['email']}>
-            {({ user }) => LCLayout({ user })}
+            {({ user }) => {
+              return (
+                <WithAnalytics>
+                  <LCLayout user={user} />
+                </WithAnalytics>
+              );
+            }}
           </Authenticator>
         </ChakraProvider>
         <ScrollRestoration />
