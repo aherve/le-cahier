@@ -1,7 +1,11 @@
-import type { AttributeValue } from '@aws-sdk/client-dynamodb';
+import type {
+  AttributeValue,
+  ScanCommandInput,
+} from '@aws-sdk/client-dynamodb';
 import type { Move } from 'chess.js';
 import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 import type { SaveMoveInput } from '~/routes/api/moves/create';
+import type { AdminReport } from '~/schemas/admin-report';
 import type { GameReport } from '~/schemas/game-report';
 import type { LichessGame } from '~/schemas/lichess';
 import type { BookPosition } from '~/schemas/position';
@@ -11,6 +15,7 @@ import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { Chess } from 'chess.js';
 import cache from 'memory-cache';
 
+import { listUsers } from './auth.server';
 import { inOneMonthUnix, stripFEN } from './utils';
 
 import { GameReportSchema } from '~/schemas/game-report';
@@ -355,21 +360,49 @@ export class ChessBook {
     });
   }
 
-  private async *positionScanner(userId: string) {
+  public async adminReport(): Promise<AdminReport> {
+    const users = await listUsers();
+    const res: AdminReport['usage'] = {};
+    for await (const pos of this.positionScanner()) {
+      const opponentMoves = Object.keys(pos.opponentMoves).length;
+      const bookMoves = Object.keys(pos.bookMoves).length;
+      const username = users[pos.userId] ?? pos.userId;
+      res[username] ??= {
+        positions: 0,
+        opponentMoves: 0,
+        bookMoves: 0,
+      };
+      res[username].positions += 1;
+      res[username].opponentMoves += opponentMoves;
+      res[username].bookMoves += bookMoves;
+    }
+
+    return {
+      usage: res,
+      totalUsers: Object.keys(users).length,
+    };
+  }
+
+  private async *positionScanner(userId?: string) {
     let lastEvaluatedKey: Record<string, AttributeValue> | undefined;
     do {
+      const params: ScanCommandInput = {
+        TableName: this.positionTableName,
+        ExclusiveStartKey: lastEvaluatedKey,
+      };
+
+      if (userId) {
+        params.FilterExpression = '#userId = :userId';
+        params.ExpressionAttributeNames = {
+          '#userId': 'userId',
+        };
+        params.ExpressionAttributeValues = {
+          ':userId': { S: userId },
+        };
+      }
+
       const { Items, LastEvaluatedKey } = await this.dynCli.send(
-        new ScanCommand({
-          TableName: this.positionTableName,
-          ExclusiveStartKey: lastEvaluatedKey,
-          FilterExpression: '#userId = :userId',
-          ExpressionAttributeNames: {
-            '#userId': 'userId',
-          },
-          ExpressionAttributeValues: {
-            ':userId': { S: userId },
-          },
-        }),
+        new ScanCommand(params),
       );
       lastEvaluatedKey = LastEvaluatedKey;
       for (const item of Items ?? []) {

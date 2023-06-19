@@ -3,6 +3,7 @@ import type { CognitoUser } from '~/schemas/user';
 import {
   AdminGetUserCommand,
   CognitoIdentityProviderClient,
+  ListUsersCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import Cookies from 'universal-cookie';
@@ -57,4 +58,28 @@ export async function isAdmin(username: string): Promise<Boolean> {
   }
 
   return false;
+}
+
+export async function listUsers() {
+  const users = await cognitoCli.send(
+    new ListUsersCommand({
+      UserPoolId: amplifyConfig.userPoolId,
+      AttributesToGet: ['sub'],
+    }),
+  );
+  const userList = (users.Users ?? []).map((user) => ({
+    username: user.Username,
+    ...user.Attributes?.reduce(
+      (acc, attr) => ({
+        ...acc,
+        [attr.Name as string]: attr.Value,
+      }),
+      {},
+    ),
+  })) as Array<{ username: string; sub: string }>;
+
+  return userList.reduce((acc, user) => {
+    acc[user.sub] = user.username;
+    return acc;
+  }, {} as Record<string, string>);
 }
