@@ -13,6 +13,14 @@ resource "aws_cognito_user_pool" "pool" {
       priority = 1
     }
   }
+
+  schema {
+    name                     = "isAdmin"
+    attribute_data_type      = "Boolean"
+    developer_only_attribute = true
+    mutable                  = true
+    required                 = false
+  }
 }
 
 resource "aws_cognito_user_pool_client" "client" {
