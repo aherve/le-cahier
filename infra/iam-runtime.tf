@@ -24,16 +24,18 @@ data "aws_iam_policy_document" "remix_policy" {
       "secretsmanager:DescribeSecret",
       "secretsmanager:ListSecretVersionIds"
     ]
-    resources = [
-      aws_secretsmanager_secret.session_secret.arn,
-    ]
+    resources = [aws_secretsmanager_secret.session_secret.arn]
   }
   statement {
-    effect = "Allow"
-    actions = [
-      "secretsmanager:ListSecrets",
-    ]
+    effect    = "Allow"
+    actions   = ["secretsmanager:ListSecrets"]
     resources = ["*"]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["cognito-idp:AdminGetUser", "cognito-idp:ListUsers"]
+    resources = [aws_cognito_user_pool.pool.arn]
   }
 }
 
