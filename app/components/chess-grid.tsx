@@ -15,8 +15,13 @@ export function ChessGrid(props: {
 }) {
   const boardContainerRef = useRef<any>();
   const [boardWidthContainer, setBoardWidthContainer] = useState(400);
+  const [fixBoardSize, setFixBoardSize] = useState(false);
 
   useEffect(() => {
+    if (fixBoardSize) {
+      return;
+    }
+    setFixBoardSize(true);
     setBoardWidthContainer(
       Math.min(
         boardContainerRef?.current?.clientWidth,
@@ -26,6 +31,7 @@ export function ChessGrid(props: {
   }, [
     boardContainerRef?.current?.clientWidth,
     boardContainerRef?.current?.clientHeight,
+    fixBoardSize,
   ]);
 
   return (

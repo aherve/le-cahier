@@ -10,6 +10,7 @@ import {
   Link,
   Wrap,
 } from '@chakra-ui/react';
+import { DEFAULT_POSITION } from 'chess.js';
 import mixpanel from 'mixpanel-browser';
 import { useContext, useEffect, useState } from 'react';
 import { VscBook } from 'react-icons/vsc';
@@ -76,8 +77,15 @@ export default function Explore() {
           <Alert status="info">
             <AlertIcon />
             <AlertDescription>
-              You don't have any saved move for this position. Go to{' '}
-              <Link href="/record">Record Moves</Link> to add some!
+              {fen === DEFAULT_POSITION ? (
+                <div>
+                  You don't have any saved move yet. Go to
+                  <Link href="/record">Record Moves</Link> to start building
+                  your repertoire!
+                </div>
+              ) : (
+                'no more moves'
+              )}
             </AlertDescription>
           </Alert>
         ) : (
