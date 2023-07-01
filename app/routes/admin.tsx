@@ -44,6 +44,7 @@ export default function Admin() {
       <VStack paddingTop="10">
         <StackItem>
           <Box>Total users: {report.totalUsers}</Box>
+          <Box>Total users: {report.totalUsers}</Box>
         </StackItem>
         <TableContainer>
           <Table variant="striped">
