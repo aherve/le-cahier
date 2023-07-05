@@ -6,9 +6,14 @@ import { useEffect } from 'react';
 
 export function WithAnalytics(props: { children: ReactNode }) {
   const { user } = useAuthenticator((context) => [context.user]);
+
   useEffect(() => {
-    mixpanel.identify(user.attributes?.sub);
-  }, [user.attributes?.sub]);
+    if (!user.username) {
+      return;
+    }
+    mixpanel.identify(user.username);
+    mixpanel.people.set('$name', user.username);
+  }, [user.username]);
 
   return <>{props.children}</>;
 }
