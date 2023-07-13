@@ -3,9 +3,11 @@ import type {
   Square,
 } from 'react-chessboard/dist/chessboard/types';
 
-import { Flex, Grid, GridItem } from '@chakra-ui/react';
+import { Flex, Grid, GridItem, Show } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
+
+import { FenEditor } from './fen-editor';
 
 export function ChessGrid(props: {
   children: React.ReactNode;
@@ -39,15 +41,27 @@ export function ChessGrid(props: {
       templateAreas={`"title title"
         "message message"
         "board moves"
+        "fen moves"
         "actions actions"
         `}
-      gridTemplateRows="50px 10px 1fr auto auto"
+      gridTemplateRows="50px 10px 1fr auto auto auto auto"
       gridTemplateColumns="2fr 1fr"
       columnGap="8"
       rowGap="8"
       h="100%"
     >
       {props.children}
+
+      <Show above="sm">
+        <GridItem
+          marginTop="-20px"
+          gridArea="fen"
+          alignSelf="start"
+          justifySelf="end"
+        >
+          <FenEditor width={boardWidthContainer} />
+        </GridItem>
+      </Show>
 
       <GridItem gridArea="board" ref={boardContainerRef} minW="200px">
         <Flex>
