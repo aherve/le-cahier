@@ -54,16 +54,21 @@ export default function Admin() {
                 <Th>Positions</Th>
                 <Th>BookMoves</Th>
                 <Th>OpponentMoves</Th>
+                <Th>Comments</Th>
               </Tr>
             </Thead>
             <Tbody>
               {entries.map(
-                ([userId, { positions, opponentMoves, bookMoves }]) => (
+                ([
+                  userId,
+                  { positions, opponentMoves, bookMoves, comments },
+                ]) => (
                   <Tr key={userId}>
                     <Td>{userId}</Td>
                     <Td>{positions}</Td>
                     <Td>{bookMoves}</Td>
                     <Td>{opponentMoves}</Td>
+                    <Td>{comments}</Td>
                   </Tr>
                 ),
               )}

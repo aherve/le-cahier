@@ -367,14 +367,25 @@ export class ChessBook {
       const opponentMoves = Object.keys(pos.opponentMoves).length;
       const bookMoves = Object.keys(pos.bookMoves).length;
       const username = users[pos.userId] ?? pos.userId;
+
+      let comments = 0;
+      if (pos.commentForBlack && pos.commentForBlack.length > 0) {
+        comments++;
+      }
+      if (pos.commentForWhite && pos.commentForWhite.length > 0) {
+        comments++;
+      }
+
       res[username] ??= {
         positions: 0,
         opponentMoves: 0,
         bookMoves: 0,
+        comments: 0,
       };
       res[username].positions += 1;
       res[username].opponentMoves += opponentMoves;
       res[username].bookMoves += bookMoves;
+      res[username].comments += comments;
     }
 
     return {

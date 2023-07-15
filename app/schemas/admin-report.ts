@@ -7,6 +7,7 @@ export const AdminReportSchema = z.object({
       bookMoves: z.number(),
       opponentMoves: z.number(),
       positions: z.number(),
+      comments: z.number(),
     }),
   ),
   totalUsers: z.number(),
