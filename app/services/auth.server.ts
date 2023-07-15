@@ -1,3 +1,7 @@
+import type {
+  ListUsersCommandInput,
+  ListUsersCommandOutput,
+} from '@aws-sdk/client-cognito-identity-provider';
 import type { CognitoUser } from '~/schemas/user';
 
 import {
@@ -61,22 +65,34 @@ export async function isAdmin(username: string): Promise<Boolean> {
 }
 
 export async function listUsers() {
-  const users = await cognitoCli.send(
-    new ListUsersCommand({
+  let hasMore = true;
+  let PaginationToken: string | undefined = undefined;
+
+  const userList: Array<{ username: string; sub: string }> = [];
+
+  while (hasMore) {
+    let command = new ListUsersCommand({
       UserPoolId: amplifyConfig.userPoolId,
       AttributesToGet: ['sub'],
-    }),
-  );
-  const userList = (users.Users ?? []).map((user) => ({
-    username: user.Username,
-    ...user.Attributes?.reduce(
-      (acc, attr) => ({
-        ...acc,
-        [attr.Name as string]: attr.Value,
-      }),
-      {},
-    ),
-  })) as Array<{ username: string; sub: string }>;
+      PaginationToken,
+    });
+    const res: ListUsersCommandOutput = await cognitoCli.send(command);
+    PaginationToken = res.PaginationToken;
+    if (!PaginationToken) {
+      hasMore = false;
+    }
+    const newUsers = (res.Users || []).map((user) => ({
+      username: user.Username,
+      ...user.Attributes?.reduce(
+        (acc, attr) => ({
+          ...acc,
+          [attr.Name as string]: attr.Value,
+        }),
+        {},
+      ),
+    })) as Array<{ username: string; sub: string }>;
+    userList.push(...newUsers);
+  }
 
   return userList.reduce((acc, user) => {
     acc[user.sub] = user.username;
