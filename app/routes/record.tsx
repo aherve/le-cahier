@@ -177,7 +177,10 @@ export default function Record() {
       </GridItem>
 
       <GridItem gridArea="message" alignSelf="center" justifySelf="center">
-        <Box>Move any piece or upload a PGN file to update your repertoire</Box>
+        <Box>
+          Move pieces or upload a PGN to update your repertoire for{' '}
+          {orientation} (flip board to switch color)
+        </Box>
       </GridItem>
 
       <GridItem gridArea="moves" maxW="300px">

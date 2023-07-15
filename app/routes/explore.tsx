@@ -79,9 +79,11 @@ export default function Explore() {
             <AlertDescription>
               {fen === DEFAULT_POSITION ? (
                 <div>
-                  You don't have any saved move yet. Go to
-                  <Link href="/record">Record Moves</Link> to start building
-                  your repertoire!
+                  You don't have any saved move yet.{' '}
+                  <Link textDecoration="underline" href="/record">
+                    Record moves
+                  </Link>{' '}
+                  to start building your repertoire!
                 </div>
               ) : (
                 'no more moves'
