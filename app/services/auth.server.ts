@@ -1,7 +1,4 @@
-import type {
-  ListUsersCommandInput,
-  ListUsersCommandOutput,
-} from '@aws-sdk/client-cognito-identity-provider';
+import type { ListUsersCommandOutput } from '@aws-sdk/client-cognito-identity-provider';
 import type { CognitoUser } from '~/schemas/user';
 
 import {
