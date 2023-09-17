@@ -1,7 +1,10 @@
 import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 
 import { Link, Tooltip } from '@chakra-ui/react';
+import { useContext } from 'react';
 import { SiLichess } from 'react-icons/si';
+
+import { GameContext } from '~/with-game';
 
 export default function LichessLink(
   props: { orientation?: BoardOrientation } & (
@@ -10,7 +13,8 @@ export default function LichessLink(
   ),
 ) {
   let link: string;
-  const orientation = props.orientation ?? 'white';
+  const ctx = useContext(GameContext);
+  const orientation = props.orientation ?? ctx.orientation;
 
   if ('fen' in props) {
     link = `https://lichess.org/analysis/${encodeURI(

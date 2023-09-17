@@ -186,7 +186,7 @@ export default function Train() {
             get hint
           </Button>
           <ExploreButton />
-          <LichessLink fen={fen} orientation={orientation}></LichessLink>
+          <LichessLink fen={fen}></LichessLink>
         </Wrap>
       </GridItem>
     </ChessGrid>
