@@ -40,6 +40,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const data = (await apiRes.text()).split('\n').filter(Boolean);
   const rawJSON = data.map((d) => JSON.parse(d));
   try {
+    console.log('PARSING', JSON.stringify(rawJSON, null, 2));
     const parsed = LichessGameParserSchema.array().parse(rawJSON);
 
     await Promise.all(

@@ -42,7 +42,10 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const newReport = await analyzeGame(
     game,
-    game.players.white.user.name === lichessUsername ? 'w' : 'b',
+    'user' in game.players.white &&
+      game.players.white.user.name === lichessUsername
+      ? 'w'
+      : 'b',
     userId,
     lichessUsername,
   );

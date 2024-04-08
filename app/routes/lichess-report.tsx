@@ -246,8 +246,16 @@ function GameExploreButton(props: {
 }
 
 function getPlayerOrientation(game: LichessGame, report?: GameReport | null) {
-  if (game.players.white.user.name === report?.lichessUsername) return 'white';
-  if (game.players.black.user.name === report?.lichessUsername) return 'black';
+  if (
+    'user' in game.players.white &&
+    game.players.white.user.name === report?.lichessUsername
+  )
+    return 'white';
+  if (
+    'user' in game.players.black &&
+    game.players.black.user.name === report?.lichessUsername
+  )
+    return 'black';
   return undefined;
 }
 

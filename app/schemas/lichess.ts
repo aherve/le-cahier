@@ -103,8 +103,8 @@ const LichessGameCommonSchema = z.object({
   lastMoveAt: z.number(),
   status: z.string(),
   players: z.object({
-    white: LichessGameUserSchema,
-    black: LichessGameUserSchema,
+    white: z.union([LichessGameUserSchema, z.object({ aiLevel: z.number() })]),
+    black: z.union([LichessGameUserSchema, z.object({ aiLevel: z.number() })]),
   }),
   winner: z.string().optional(),
   opening: z.object({
@@ -112,11 +112,13 @@ const LichessGameCommonSchema = z.object({
     name: z.string(),
     ply: z.number(),
   }),
-  clock: z.object({
-    initial: z.number(),
-    increment: z.number(),
-    totalTime: z.number(),
-  }),
+  clock: z
+    .object({
+      initial: z.number(),
+      increment: z.number(),
+      totalTime: z.number(),
+    })
+    .optional(),
 });
 
 export const LichessGameParserSchema = LichessGameCommonSchema.extend({
