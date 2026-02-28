@@ -78,7 +78,7 @@ export default function Moves(props: {
                       <Switch.Root
                         colorPalette="red"
                         checked={showDelete}
-                        onCheckedChange={(e) => toggleShowDelete()}
+                        onCheckedChange={() => toggleShowDelete()}
                       >
                         <Switch.Control>
                           <Switch.Thumb />
@@ -166,7 +166,7 @@ function MoveItem(props: {
 
 function DeleteWithConfirm(props: { text: string; onConfirm: () => void }) {
   const { open, onOpen, onClose } = useDisclosure();
-  const cancelRef = useRef<any>();
+  const cancelRef = useRef<HTMLButtonElement>(null);
 
   function onConfirm() {
     props.onConfirm();
@@ -198,7 +198,12 @@ function DeleteWithConfirm(props: { text: string; onConfirm: () => void }) {
               <Button variant="outline" ref={cancelRef} onClick={onClose}>
                 Abort !
               </Button>
-              <Button variant="outline" colorPalette="red" onClick={onConfirm} ml={3}>
+              <Button
+                variant="outline"
+                colorPalette="red"
+                onClick={onConfirm}
+                ml={3}
+              >
                 Yes, delete move
               </Button>
             </Dialog.Footer>

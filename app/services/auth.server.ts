@@ -43,7 +43,7 @@ export async function authenticate(request: Request): Promise<CognitoUser> {
   return user;
 }
 
-export async function isAdmin(username: string): Promise<Boolean> {
+export async function isAdmin(username: string): Promise<boolean> {
   const user = await cognitoCli.send(
     new AdminGetUserCommand({
       UserPoolId: amplifyConfig.userPoolId,
@@ -68,7 +68,7 @@ export async function listUsers() {
   const userList: Array<{ username: string; sub: string }> = [];
 
   while (hasMore) {
-    let command = new ListUsersCommand({
+    const command = new ListUsersCommand({
       UserPoolId: amplifyConfig.userPoolId,
       AttributesToGet: ['sub'],
       PaginationToken,
@@ -91,8 +91,11 @@ export async function listUsers() {
     userList.push(...newUsers);
   }
 
-  return userList.reduce((acc, user) => {
-    acc[user.sub] = user.username;
-    return acc;
-  }, {} as Record<string, string>);
+  return userList.reduce(
+    (acc, user) => {
+      acc[user.sub] = user.username;
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
 }

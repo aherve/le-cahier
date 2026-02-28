@@ -9,8 +9,8 @@
     "typecheck": "tsc",
     "test:watch": "vitest watch",
     "test": "vitest run",
-    "lint": "eslint . && prettier --check app",
-    "lint:fix": "eslint --fix . && prettier --write app"
+    "lint": "eslint 'app/**/*.{ts,tsx,js,jsx}' && prettier --check app",
+    "lint:fix": "eslint --fix 'app/**/*.{ts,tsx,js,jsx}' && prettier --write app"
   },
   "dependencies": {
     "@aws-amplify/ui": "^6.15.1",
@@ -51,6 +51,8 @@
     "@types/parseurl": "^1.3.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
     "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jsx-a11y": "^6.8.0",

@@ -80,7 +80,7 @@ export default function Train() {
       const data = GetChallengeOutputSchema.parse(fetcher.data);
       if (!data.challengeMove) {
         setMsg(TrainMessageInput.enum.noMoreData);
-        soundEnabled && practiceCompleteSound.play();
+        void (soundEnabled && practiceCompleteSound.play());
       } else {
         makeMove(data.challengeMove);
         fetcher.data = null;
@@ -118,7 +118,7 @@ export default function Train() {
       makeMove({ from: sourceSquare, to: targetSquare });
       return true;
     } else {
-      soundEnabled && errorSound.play();
+      void (soundEnabled && errorSound.play());
       ankiUpdate(false);
       setMsg(TrainMessageInput.enum.nope);
       return false;
@@ -187,20 +187,32 @@ export default function Train() {
               </Button>
             </Tooltip.Trigger>
             <Tooltip.Positioner>
-              <Tooltip.Content>Set current position as the new starting point for training</Tooltip.Content>
+              <Tooltip.Content>
+                Set current position as the new starting point for training
+              </Tooltip.Content>
             </Tooltip.Positioner>
           </Tooltip.Root>
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button variant="outline" leftIcon={<VscDebugRestart />} onClick={again}>
+              <Button
+                variant="outline"
+                leftIcon={<VscDebugRestart />}
+                onClick={again}
+              >
                 Again
               </Button>
             </Tooltip.Trigger>
             <Tooltip.Positioner>
-              <Tooltip.Content>(re)start from anchored or starting position</Tooltip.Content>
+              <Tooltip.Content>
+                (re)start from anchored or starting position
+              </Tooltip.Content>
             </Tooltip.Positioner>
           </Tooltip.Root>
-          <Button variant="outline" leftIcon={<GoLightBulb />} onClick={showHint}>
+          <Button
+            variant="outline"
+            leftIcon={<GoLightBulb />}
+            onClick={showHint}
+          >
             get hint
           </Button>
           <ExploreButton />

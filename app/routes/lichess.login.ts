@@ -7,13 +7,17 @@ import parseurl from 'parseurl';
 
 import { commitSession, getSession } from '~/session';
 
+interface RequestWithUrl extends Request {
+  url?: string;
+}
+
 export const loader: LoaderFunction = async ({ request }) => {
-  const parsed = parseurl.original(request as any);
+  const parsed = parseurl.original(request as RequestWithUrl);
   if (!parsed) {
     throw new Error('No parsed url');
   }
 
-  let protocol = parsed.hostname === 'localhost' ? 'http' : 'https';
+  const protocol = parsed.hostname === 'localhost' ? 'http' : 'https';
 
   const baseURL = protocol + '://' + parsed.host;
   const verifier = createVerifier();

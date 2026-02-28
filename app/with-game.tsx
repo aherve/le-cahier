@@ -10,17 +10,17 @@ import { useKeyPress } from './hooks/key-press';
 const NO_SOUND = 'noSound';
 
 export const GameContext = createContext({
-  backTo: (_: string) => {},
+  backTo: () => {},
   fen: new Chess().fen(),
-  isValidMove: (_: string | { from: string; to: string }) => false as boolean,
-  makeMove: (_: string | { from: string; to: string; promotion?: string }) => {
+  isValidMove: () => false as boolean,
+  makeMove: () => {
     return new Chess().move('e4');
   },
   moves: [] as Move[],
-  reset: (_?: string) => {},
+  reset: () => {},
   turn: 'w',
   orientation: 'white' as BoardOrientation,
-  setOrientation: (_: BoardOrientation) => {},
+  setOrientation: () => {},
   soundEnabled: true,
   toggleSound: () => {},
 });
@@ -63,7 +63,7 @@ export function WithGame(props: { children: ReactNode }) {
 
       const m = newGame.move(move);
       if (!noSound) {
-        m.captured ? captureSound.play() : moveSound.play();
+        void (m.captured ? captureSound.play() : moveSound.play());
       }
       if (m.lan === forwardMoveStack[0]?.lan) {
         setForwardMoveStack((prev) => prev.slice(1));
@@ -83,7 +83,11 @@ export function WithGame(props: { children: ReactNode }) {
     const newGame = new Chess();
     // Replay all moves except the last one
     for (let i = 0; i < history.length - 1; i++) {
-      newGame.move({ from: history[i].from, to: history[i].to, promotion: history[i].promotion });
+      newGame.move({
+        from: history[i].from,
+        to: history[i].to,
+        promotion: history[i].promotion,
+      });
     }
 
     const undone = history[history.length - 1];

@@ -86,7 +86,7 @@ function DisplayEdit(props: {
 }) {
   const [comments, setComments] = useState(props.comments ?? '');
 
-  function updateComments(evt: any) {
+  function updateComments(evt: React.ChangeEvent<HTMLTextAreaElement>) {
     setComments(evt.target.value);
   }
 
@@ -98,13 +98,11 @@ function DisplayEdit(props: {
   return (
     <Form onSubmit={() => props.submit(comments)}>
       <Stack>
-        <Textarea
-          autoFocus={true}
-          onChange={updateComments}
-          value={comments}
-        />
+        <Textarea onChange={updateComments} value={comments} />
         <Wrap alignSelf="end">
-          <Button variant="outline" onClick={cancel}>Cancel</Button>
+          <Button variant="outline" onClick={cancel}>
+            Cancel
+          </Button>
           <Button variant="outline" leftIcon={<FaRegSave />} type="submit">
             Save
           </Button>
@@ -122,7 +120,12 @@ function DisplayComment(props: { comments: string; setEditMode: () => void }) {
           <Text>{props.comments}</Text>
         </WrapItem>
       </Wrap>
-      <Button variant="outline" onClick={props.setEditMode} leftIcon={<FaRegEdit />} size="xs">
+      <Button
+        variant="outline"
+        onClick={props.setEditMode}
+        leftIcon={<FaRegEdit />}
+        size="xs"
+      >
         {props.comments ? 'Edit' : 'Add comments'}
       </Button>
     </Stack>

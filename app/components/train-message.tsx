@@ -20,7 +20,7 @@ export default function TrainMessage(props: {
       return (
         <Alert.Root status="success">
           <Alert.Indicator />
-          <Alert.Description>It's your turn</Alert.Description>
+          <Alert.Description>It&apos;s your turn</Alert.Description>
         </Alert.Root>
       );
     case TrainMessageInput.enum.nope:

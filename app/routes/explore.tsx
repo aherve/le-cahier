@@ -1,13 +1,7 @@
 import type { MetaFunction } from '@remix-run/node';
 import type { Square } from 'chess.js';
 
-import {
-  Alert,
-  GridItem,
-  Heading,
-  Link,
-  Wrap,
-} from '@chakra-ui/react';
+import { Alert, GridItem, Heading, Link, Wrap } from '@chakra-ui/react';
 import { DEFAULT_POSITION } from 'chess.js';
 import mixpanel from 'mixpanel-browser';
 import { useContext, useEffect, useState } from 'react';
@@ -54,8 +48,8 @@ export default function Explore() {
         setBookMoves(moves);
         setComment(
           orientation === 'white'
-            ? position?.commentForWhite ?? ''
-            : position?.commentForBlack ?? '',
+            ? (position?.commentForWhite ?? '')
+            : (position?.commentForBlack ?? ''),
         );
         setNoMoreMoves(moves.length === 0);
       });
@@ -79,7 +73,7 @@ export default function Explore() {
             <Alert.Description>
               {fen === DEFAULT_POSITION ? (
                 <div>
-                  You don't have any saved move yet.{' '}
+                  You don&apos;t have any saved move yet.{' '}
                   <Link textDecoration="underline" href="/record">
                     Record moves
                   </Link>{' '}

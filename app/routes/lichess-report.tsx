@@ -12,17 +12,15 @@ import {
   Spinner,
   VStack,
   SkeletonText,
-  Wrap,
-  WrapItem,
   Tooltip,
 } from '@chakra-ui/react';
-import { MdRefresh } from 'react-icons/md';
 import { useFetcher } from '@remix-run/react';
 import mixpanel from 'mixpanel-browser';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { BsCircle, BsCircleFill } from 'react-icons/bs';
 import { GiBulletBill, GiRabbit, GiTortoise } from 'react-icons/gi';
+import { MdRefresh } from 'react-icons/md';
 import { SiStackblitz } from 'react-icons/si';
 
 import LichessLink from '../components/lichess-link';
@@ -94,7 +92,9 @@ export default function LichessReport() {
         <Box>
           {gameListFetcher.state !== 'idle' && <Spinner />}
           {gameListFetcher.state === 'idle' && (
-            <Button variant="outline" onClick={LoadMore}>Load More</Button>
+            <Button variant="outline" onClick={LoadMore}>
+              Load More
+            </Button>
           )}
         </Box>
       </VStack>

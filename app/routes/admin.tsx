@@ -1,11 +1,7 @@
 import type { LoaderFunction } from '@remix-run/node';
 import type { AdminReport } from '~/schemas/admin-report';
 
-import {
-  Box,
-  Table,
-  VStack,
-} from '@chakra-ui/react';
+import { Box, Table, VStack } from '@chakra-ui/react';
 import { redirect, json } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 
@@ -51,10 +47,7 @@ export default function Admin() {
           </Table.Header>
           <Table.Body>
             {entries.map(
-              ([
-                userId,
-                { positions, opponentMoves, bookMoves, comments },
-              ]) => (
+              ([userId, { positions, opponentMoves, bookMoves, comments }]) => (
                 <Table.Row key={userId}>
                   <Table.Cell>{userId}</Table.Cell>
                   <Table.Cell>{positions}</Table.Cell>

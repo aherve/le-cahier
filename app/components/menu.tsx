@@ -1,10 +1,5 @@
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import {
-  Button,
-  Menu,
-  Wrap,
-  WrapItem,
-} from '@chakra-ui/react';
+import { Button, Menu, Wrap, WrapItem } from '@chakra-ui/react';
 import { useNavigate } from '@remix-run/react';
 import { useContext } from 'react';
 import { GiFalling, GiHamburgerMenu } from 'react-icons/gi';
@@ -70,7 +65,11 @@ export function LCMenu() {
         </WrapItem>
 
         <WrapItem>
-          <Button variant="outline" leftIcon={<SiLichess />} onClick={lichessReport}>
+          <Button
+            variant="outline"
+            leftIcon={<SiLichess />}
+            onClick={lichessReport}
+          >
             lichess report
           </Button>
         </WrapItem>

@@ -69,8 +69,8 @@ export default function Record() {
         );
         setComment(
           orientation === 'white'
-            ? position?.commentForWhite ?? ''
-            : position?.commentForBlack ?? '',
+            ? (position?.commentForWhite ?? '')
+            : (position?.commentForBlack ?? ''),
         );
       });
   }, [fen, orientation, turn, lastDelete]);
@@ -205,7 +205,7 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [pgn, setPgn] = useState('');
-  const cancelRef = useRef();
+  const cancelRef = useRef<HTMLButtonElement>(null);
   const onConfirm = () => {
     console.log('submitting', pgn);
     setIsLoading(true);
@@ -270,14 +270,23 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
               {!isLoading && (
                 <Textarea value={pgn} onChange={onChange}></Textarea>
               )}
-              {error && <Alert.Root status="error"><Alert.Description>{error}</Alert.Description></Alert.Root>}
+              {error && (
+                <Alert.Root status="error">
+                  <Alert.Description>{error}</Alert.Description>
+                </Alert.Root>
+              )}
             </Dialog.Body>
 
             <Dialog.Footer>
-              <Button variant="outline" ref={cancelRef as any} onClick={cancel}>
+              <Button variant="outline" ref={cancelRef} onClick={cancel}>
                 Cancel
               </Button>
-              <Button variant="outline" colorPalette="blue" onClick={onConfirm} ml={3}>
+              <Button
+                variant="outline"
+                colorPalette="blue"
+                onClick={onConfirm}
+                ml={3}
+              >
                 Upload & save
               </Button>
             </Dialog.Footer>
@@ -290,7 +299,7 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
 }
 function FindTranspositionsButton(props: { onScan: () => void }) {
   const { open, onOpen, onClose } = useDisclosure();
-  const cancelRef = useRef();
+  const cancelRef = useRef<HTMLButtonElement>(null);
   const onConfirm = () => {
     props.onScan();
     onClose();
@@ -301,7 +310,11 @@ function FindTranspositionsButton(props: { onScan: () => void }) {
   }
   return (
     <>
-      <Button variant="outline" leftIcon={<MdYoutubeSearchedFor />} onClick={onOpen}>
+      <Button
+        variant="outline"
+        leftIcon={<MdYoutubeSearchedFor />}
+        onClick={onOpen}
+      >
         Find transpositions
       </Button>
 
@@ -320,11 +333,11 @@ function FindTranspositionsButton(props: { onScan: () => void }) {
 
             <Dialog.Body>
               This is an expensive operation that will scan the entire db.
-              Please don't spam it &hearts;
+              Please don&apos;t spam it &hearts;
             </Dialog.Body>
 
             <Dialog.Footer>
-              <Button ref={cancelRef as any} onClick={onClose}>
+              <Button ref={cancelRef} onClick={onClose}>
                 Cancel
               </Button>
               <Button colorScheme="blue" onClick={onConfirm} ml={3}>
