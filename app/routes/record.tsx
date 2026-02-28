@@ -10,6 +10,7 @@ import {
   Dialog,
   Box,
   Button,
+  Flex,
   GridItem,
   Heading,
   Spinner,
@@ -27,7 +28,7 @@ import { MdYoutubeSearchedFor } from 'react-icons/md';
 
 import Moves from '../components/moves';
 
-import { ChessGrid } from '~/components/chess-grid';
+import { ChessGrid, useBoardWidth } from '~/components/chess-grid';
 import { ExploreButton } from '~/components/explore-button';
 import { FlipBoardButton } from '~/components/flip-board-button';
 import { SaveMoveInputSchema } from '~/routes/api.moves.create';
@@ -48,6 +49,31 @@ export const meta: MetaFunction = () => {
     { name: 'description', content: 'Update your repertoire' },
   ];
 };
+
+function MovesSection(props: {
+  bookMoves: string[];
+  comment: string;
+  onDelete: (move: Move) => void;
+}) {
+  const boardWidth = useBoardWidth();
+  return (
+    <GridItem
+      gridArea="moves"
+      maxW={{ base: `${boardWidth}px`, lg: "300px" }}
+      minW={{ base: `${boardWidth}px`, lg: "300px" }}
+      justifySelf={{ base: "center", lg: "start" }}
+    >
+      <Moves
+        comments={props.comment}
+        bookMoves={props.bookMoves}
+        showBookMoves={true}
+        showComments={true}
+        allowDelete={true}
+        onDelete={props.onDelete}
+      ></Moves>
+    </GridItem>
+  );
+}
 
 export default function Record() {
   const { fen, turn, makeMove, orientation } = useContext(GameContext);
@@ -178,23 +204,18 @@ export default function Record() {
         </Box>
       </GridItem>
 
-      <GridItem gridArea="moves" maxW="300px">
-        <Moves
-          comments={comment}
-          bookMoves={bookMoves}
-          showBookMoves={true}
-          showComments={true}
-          allowDelete={true}
-          onDelete={deleteMove}
-        ></Moves>
-      </GridItem>
+      <MovesSection
+        bookMoves={bookMoves}
+        comment={comment}
+        onDelete={deleteMove}
+      />
 
-      <GridItem gridArea="actions">
-        <Wrap align="center" justify="center">
+      <GridItem gridArea="actions" minWidth={0}>
+        <Flex align="center" justify="center" wrap="wrap" gap={2} width="100%">
           <FlipBoardButton />
           {FindTranspositionsButton({ onScan })}
           {LoadPGNButton({ orientation })}
-        </Wrap>
+        </Flex>
       </GridItem>
     </ChessGrid>
   );
@@ -248,7 +269,7 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
 
   return (
     <>
-      <Button variant="outline" onClick={onOpen}>
+      <Button variant="outline" onClick={onOpen} flexShrink={0}>
         <BiCloudUpload />
         Upload PGN
       </Button>
@@ -311,7 +332,7 @@ function FindTranspositionsButton(props: { onScan: () => void }) {
   }
   return (
     <>
-      <Button variant="outline" onClick={onOpen}>
+      <Button variant="outline" onClick={onOpen} flexShrink={0}>
         <MdYoutubeSearchedFor />
         Find transpositions
       </Button>

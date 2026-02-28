@@ -5,6 +5,7 @@ import type { BookPosition } from '~/schemas/position';
 
 import {
   Button,
+  Flex,
   GridItem,
   Heading,
   Spinner,
@@ -188,11 +189,11 @@ export default function Anki() {
         {fetcher.state === 'loading' && <Spinner />}
       </GridItem>
 
-      <GridItem gridArea="actions">
-        <Wrap align="center" justify="center">
+      <GridItem gridArea="actions" minWidth={0}>
+        <Flex align="center" justify="center" wrap="wrap" gap={2} width="100%">
           <ExploreButton />
           <TrainButton />
-          <Button variant="outline" onClick={showHint}>
+          <Button variant="outline" onClick={showHint} flexShrink={0}>
             <GoLightBulb />
             get hint
           </Button>
@@ -202,6 +203,7 @@ export default function Anki() {
             onCheckedChange={(e) =>
               toggleNovelties({ target: { checked: e.checked } })
             }
+            flexShrink={0}
           >
             <Switch.Control>
               <Switch.Thumb />
@@ -210,7 +212,7 @@ export default function Anki() {
               Include positions you haven&apos;t yet played
             </Switch.Label>
           </Switch.Root>
-        </Wrap>
+        </Flex>
       </GridItem>
     </ChessGrid>
   );

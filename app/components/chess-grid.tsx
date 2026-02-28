@@ -4,10 +4,16 @@ import type {
 } from 'react-chessboard/dist/chessboard/types';
 
 import { Box, Grid, GridItem } from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 
 import { FenEditor } from './fen-editor';
+
+const BoardWidthContext = createContext<number>(400);
+
+export function useBoardWidth() {
+  return useContext(BoardWidthContext);
+}
 
 export function ChessGrid(props: {
   children: React.ReactNode;
@@ -35,40 +41,57 @@ export function ChessGrid(props: {
   }, []);
 
   return (
-    <Grid
-      templateAreas={`"title title title"
-        "message message message"
-        "spacer board moves"
-        "spacer fen moves"
-        "actions actions actions"`}
-      gridTemplateRows="auto auto 1fr auto auto"
-      gridTemplateColumns="1fr auto minmax(400px, 500px)"
-      gap="8"
-      p="2"
-    >
-      {props.children}
-
-      <GridItem gridArea="fen" justifySelf="center">
-        <FenEditor width={boardWidth} />
-      </GridItem>
-
-      <GridItem
-        gridArea="board"
-        ref={boardContainerRef}
-        display="flex"
-        justifyContent="center"
-        alignItems="start"
-        justifySelf="center"
+    <BoardWidthContext.Provider value={boardWidth}>
+      <Grid
+        templateAreas={{
+          base: `"title"
+                 "message"
+                 "board"
+                 "fen"
+                 "moves"
+                 "actions"`,
+          lg: `"title title title"
+               "message message message"
+               "spacer board moves"
+               "spacer fen moves"
+               "actions actions actions"`,
+        }}
+        gridTemplateRows={{
+          base: 'auto auto auto auto auto auto',
+          lg: 'auto auto 1fr auto auto',
+        }}
+        gridTemplateColumns={{
+          base: '1fr',
+          lg: '1fr auto minmax(0, 500px)',
+        }}
+        gap="8"
+        p="2"
+        minWidth={0}
       >
-        <Box w={boardWidth} h={boardWidth}>
-          <Chessboard
-            position={props.fen}
-            onPieceDrop={props.onPieceDrop}
-            boardWidth={boardWidth}
-            boardOrientation={props.orientation}
-          />
-        </Box>
-      </GridItem>
-    </Grid>
+        {props.children}
+
+        <GridItem gridArea="fen" justifySelf="center">
+          <FenEditor width={boardWidth} />
+        </GridItem>
+
+        <GridItem
+          gridArea="board"
+          ref={boardContainerRef}
+          display="flex"
+          justifyContent="center"
+          alignItems="start"
+          justifySelf="center"
+        >
+          <Box w={boardWidth} h={boardWidth}>
+            <Chessboard
+              position={props.fen}
+              onPieceDrop={props.onPieceDrop}
+              boardWidth={boardWidth}
+              boardOrientation={props.orientation}
+            />
+          </Box>
+        </GridItem>
+      </Grid>
+    </BoardWidthContext.Provider>
   );
 }

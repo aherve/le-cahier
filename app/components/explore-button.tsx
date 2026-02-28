@@ -32,7 +32,7 @@ export function ExploreButton(props: {
 
   if (variant === 'button') {
     return (
-      <Button variant="outline" onClick={explore}>
+      <Button variant="outline" onClick={explore} flexShrink={0}>
         <VscBook />
         Explore
       </Button>
@@ -41,7 +41,7 @@ export function ExploreButton(props: {
     return (
       <Tooltip.Root>
         <Tooltip.Trigger asChild>
-          <Button onClick={explore} variant="plain">
+          <Button onClick={explore} variant="plain" flexShrink={0}>
             <VscBook />
           </Button>
         </Tooltip.Trigger>

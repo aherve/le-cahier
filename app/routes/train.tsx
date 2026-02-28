@@ -3,7 +3,7 @@ import type { MetaFunction } from '@remix-run/node';
 import type { Square } from 'react-chessboard/dist/chessboard/types';
 import type { GetChallengeOutput } from '~/routes/api.moves.challenge';
 
-import { Button, GridItem, Heading, Tooltip, Wrap } from '@chakra-ui/react';
+import { Button, Flex, GridItem, Heading, Tooltip, Wrap } from '@chakra-ui/react';
 import { useFetcher, useSearchParams } from '@remix-run/react';
 import { Chess } from 'chess.js';
 import mixpanel from 'mixpanel-browser';
@@ -17,7 +17,7 @@ import LichessLink from '../components/lichess-link';
 import Moves from '../components/moves';
 import TrainMessage, { TrainMessageInput } from '../components/train-message';
 
-import { ChessGrid } from '~/components/chess-grid';
+import { ChessGrid, useBoardWidth } from '~/components/chess-grid';
 import { ExploreButton } from '~/components/explore-button';
 import { FlipBoardButton } from '~/components/flip-board-button';
 import { GetChallengeOutputSchema } from '~/routes/api.moves.challenge';
@@ -29,6 +29,20 @@ export const meta: MetaFunction = () => {
     { name: 'description', content: 'How well do you know your openings?' },
   ];
 };
+
+function MovesSection() {
+  const boardWidth = useBoardWidth();
+  return (
+    <GridItem
+      gridArea="moves"
+      maxW={{ base: `${boardWidth}px`, lg: "300px" }}
+      minW={{ base: `${boardWidth}px`, lg: "300px" }}
+      justifySelf={{ base: "center", lg: "start" }}
+    >
+      <Moves showBookMoves={false} showComments={false}></Moves>
+    </GridItem>
+  );
+}
 
 export default function Train() {
   const {
@@ -173,16 +187,14 @@ export default function Train() {
         <TrainMessage type={msg} hints={hints} />
       </GridItem>
 
-      <GridItem gridArea="moves" maxW="300px">
-        <Moves showBookMoves={false} showComments={false}></Moves>
-      </GridItem>
+      <MovesSection />
 
-      <GridItem gridArea="actions">
-        <Wrap align="center" justify="center">
+      <GridItem gridArea="actions" minWidth={0}>
+        <Flex align="center" justify="center" wrap="wrap" gap={2} width="100%">
           <FlipBoardButton />
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button variant="outline" onClick={anchor}>
+              <Button variant="outline" onClick={anchor} flexShrink={0}>
                 <FaAnchor />
               </Button>
             </Tooltip.Trigger>
@@ -194,7 +206,7 @@ export default function Train() {
           </Tooltip.Root>
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button variant="outline" onClick={again}>
+              <Button variant="outline" onClick={again} flexShrink={0}>
                 <VscDebugRestart />
                 Again
               </Button>
@@ -205,13 +217,13 @@ export default function Train() {
               </Tooltip.Content>
             </Tooltip.Positioner>
           </Tooltip.Root>
-          <Button variant="outline" onClick={showHint}>
+          <Button variant="outline" onClick={showHint} flexShrink={0}>
             <GoLightBulb />
             get hint
           </Button>
           <ExploreButton />
           <LichessLink fen={fen}></LichessLink>
-        </Wrap>
+        </Flex>
       </GridItem>
     </ChessGrid>
   );

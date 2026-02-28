@@ -1,7 +1,7 @@
 import type { MetaFunction } from '@remix-run/node';
 import type { Square } from 'chess.js';
 
-import { Alert, GridItem, Heading, Link, Wrap } from '@chakra-ui/react';
+import { Alert, Flex, GridItem, Heading, Link, Wrap } from '@chakra-ui/react';
 import { DEFAULT_POSITION } from 'chess.js';
 import mixpanel from 'mixpanel-browser';
 import { useContext, useEffect, useState } from 'react';
@@ -10,7 +10,7 @@ import { VscBook } from 'react-icons/vsc';
 import LichessLink from '../components/lichess-link';
 import Moves from '../components/moves';
 
-import { ChessGrid } from '~/components/chess-grid';
+import { ChessGrid, useBoardWidth } from '~/components/chess-grid';
 import { FlipBoardButton } from '~/components/flip-board-button';
 import { RecordButton } from '~/components/record-button';
 import { TrainButton } from '~/components/train-button';
@@ -24,6 +24,25 @@ export const meta: MetaFunction = () => {
     { name: 'description', content: 'Browse your repertoire' },
   ];
 };
+
+function MovesSection(props: { bookMoves: string[]; comment: string }) {
+  const boardWidth = useBoardWidth();
+  return (
+    <GridItem
+      gridArea="moves"
+      maxW={{ base: `${boardWidth}px`, lg: "300px" }}
+      minW={{ base: `${boardWidth}px`, lg: "300px" }}
+      justifySelf={{ base: "center", lg: "start" }}
+    >
+      <Moves
+        bookMoves={props.bookMoves}
+        showBookMoves={true}
+        comments={props.comment}
+        showComments={true}
+      ></Moves>
+    </GridItem>
+  );
+}
 
 export default function Explore() {
   const { fen, turn, makeMove, orientation } = useContext(GameContext);
@@ -101,21 +120,14 @@ export default function Explore() {
         </Wrap>
       </GridItem>
 
-      <GridItem gridArea="moves" maxW="300px">
-        <Moves
-          bookMoves={bookMoves}
-          showBookMoves={true}
-          comments={comment}
-          showComments={true}
-        ></Moves>
-      </GridItem>
-      <GridItem gridArea="actions">
-        <Wrap align="center" justify="center">
+      <MovesSection bookMoves={bookMoves} comment={comment} />
+      <GridItem gridArea="actions" minWidth={0}>
+        <Flex align="center" justify="center" wrap="wrap" gap={2} width="100%">
           <FlipBoardButton />
           <TrainButton />
           <RecordButton />
           <LichessLink fen={fen}></LichessLink>
-        </Wrap>
+        </Flex>
       </GridItem>
     </ChessGrid>
   );

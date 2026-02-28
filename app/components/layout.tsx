@@ -39,14 +39,15 @@ export function LCLayout(props: { user: AmplifyUser | undefined }) {
           gridTemplateRows="auto 1fr auto"
           gridTemplateColumns="1fr"
           h="100vh"
+          minWidth={0}
         >
-          <GridItem gridArea="header">
+          <GridItem w="100%" gridArea="header" minWidth={0}>
             <LCMenu />
           </GridItem>
-          <GridItem w="100%" gridArea="main" justifySelf="center">
+          <GridItem w="100%" gridArea="main" justifySelf="center" minWidth={0}>
             <Outlet />
           </GridItem>
-          <GridItem gridArea="footer" justifySelf="center">
+          <GridItem w="100%" gridArea="footer" justifySelf="center" minWidth={0}>
             <Footer />
           </GridItem>
         </Grid>
