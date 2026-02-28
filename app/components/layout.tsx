@@ -36,9 +36,8 @@ export function LCLayout(props: { user: AmplifyUser | undefined }) {
         <Grid
           padding="10px"
           templateAreas={'"header" "main" "footer"'}
-          gridTemplateRows="auto 1fr auto"
+          gridTemplateRows="auto auto auto"
           gridTemplateColumns="1fr"
-          h="100vh"
           minWidth={0}
           maxWidth="100vw"
           overflowX="hidden"
@@ -51,7 +50,6 @@ export function LCLayout(props: { user: AmplifyUser | undefined }) {
             gridArea="main"
             justifySelf="center"
             minWidth={0}
-            overflowY="auto"
           >
             <Outlet />
           </GridItem>

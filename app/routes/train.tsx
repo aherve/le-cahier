@@ -23,8 +23,10 @@ import { FlipBoardButton } from '~/components/flip-board-button';
 import { GetChallengeOutputSchema } from '~/routes/api.moves.challenge';
 import { GameContext } from '~/with-game';
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = ({ matches }) => {
+  const parentMeta = matches.flatMap(match => match.meta ?? []);
   return [
+    ...parentMeta.filter(meta => !('title' in meta) && !(('name' in meta) && meta.name === 'description')),
     { title: 'Train | Le Cahier' },
     { name: 'description', content: 'How well do you know your openings?' },
   ];

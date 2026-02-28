@@ -27,13 +27,12 @@ import { ExploreButton } from '~/components/explore-button';
 import { TrainButton } from '~/components/train-button';
 import { GameContext } from '~/with-game';
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = ({ matches }) => {
+  const parentMeta = matches.flatMap(match => match.meta ?? []);
   return [
+    ...parentMeta.filter(meta => !('title' in meta) && !(('name' in meta) && meta.name === 'description')),
     { title: 'Review mistakes | Le Cahier' },
-    {
-      name: 'description',
-      content: 'Reviewing positions you might have missed',
-    },
+    { name: 'description', content: 'Reviewing positions you might have missed' },
   ];
 };
 

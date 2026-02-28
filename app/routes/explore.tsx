@@ -18,8 +18,10 @@ import { BookPositionSchema } from '~/schemas/position';
 import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = ({ matches }) => {
+  const parentMeta = matches.flatMap(match => match.meta ?? []);
   return [
+    ...parentMeta.filter(meta => !('title' in meta) && !(('name' in meta) && meta.name === 'description')),
     { title: 'Explore | Le Cahier' },
     { name: 'description', content: 'Browse your repertoire' },
   ];

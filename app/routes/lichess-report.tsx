@@ -29,8 +29,10 @@ import { ExploreButton } from '~/components/explore-button';
 import { GameReportSchema, MissedMoveSchema } from '~/schemas/game-report';
 import { LichessGameSchema } from '~/schemas/lichess';
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = ({ matches }) => {
+  const parentMeta = matches.flatMap(match => match.meta ?? []);
   return [
+    ...parentMeta.filter(meta => !('title' in meta) && !(('name' in meta) && meta.name === 'description')),
     { title: 'Lichess Report | Le Cahier' },
     { name: 'description', content: 'Analyzing your lichess games' },
   ];
