@@ -1,5 +1,5 @@
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import { Button, Flex, Menu, Wrap, WrapItem } from '@chakra-ui/react';
+import { Button, Menu, Wrap, WrapItem } from '@chakra-ui/react';
 import { useNavigate } from '@remix-run/react';
 import { useContext } from 'react';
 import { GiFalling, GiHamburgerMenu } from 'react-icons/gi';

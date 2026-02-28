@@ -30,9 +30,9 @@ function MovesSection(props: { bookMoves: string[]; comment: string }) {
   return (
     <GridItem
       gridArea="moves"
-      maxW={{ base: `${boardWidth}px`, lg: "300px" }}
-      minW={{ base: `${boardWidth}px`, lg: "300px" }}
-      justifySelf={{ base: "center", lg: "start" }}
+      maxW={{ base: `${boardWidth}px`, lg: '300px' }}
+      minW={{ base: `${boardWidth}px`, lg: '300px' }}
+      justifySelf={{ base: 'center', lg: 'start' }}
     >
       <Moves
         bookMoves={props.bookMoves}
