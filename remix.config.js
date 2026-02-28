@@ -5,5 +5,6 @@ module.exports = {
   // assetsBuildDirectory: "public/build",
   // serverBuildPath: "build/index.js",
   // publicPath: "/build/",
-  serverDependenciesToBundle: ['chess.js'],
+  serverModuleFormat: 'cjs',
+  serverDependenciesToBundle: ['chess.js', 'react-chessboard'],
 };

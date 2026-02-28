@@ -2,17 +2,10 @@ import type { MetaFunction } from '@remix-run/node';
 import type { GameReport } from '~/schemas/game-report';
 import type { LichessGame } from '~/schemas/lichess';
 
-import { RepeatIcon } from '@chakra-ui/icons';
 import {
   Text,
   Flex,
   Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
   Box,
   Tag,
   Button,
@@ -23,6 +16,7 @@ import {
   WrapItem,
   Tooltip,
 } from '@chakra-ui/react';
+import { MdRefresh } from 'react-icons/md';
 import { useFetcher } from '@remix-run/react';
 import mixpanel from 'mixpanel-browser';
 import moment from 'moment';
@@ -38,10 +32,10 @@ import { GameReportSchema, MissedMoveSchema } from '~/schemas/game-report';
 import { LichessGameSchema } from '~/schemas/lichess';
 
 export const meta: MetaFunction = () => {
-  return {
-    title: 'Lichess Report | Le Cahier',
-    description: 'Analyzing your lichess games',
-  };
+  return [
+    { title: 'Lichess Report | Le Cahier' },
+    { name: 'description', content: 'Analyzing your lichess games' },
+  ];
 };
 
 export default function LichessReport() {
@@ -50,7 +44,9 @@ export default function LichessReport() {
 
   useEffect(() => {
     if (gameListFetcher.state === 'idle' && gameListFetcher.data == null) {
-      mixpanel.track('get lichess report');
+      if (mixpanel.config) {
+        mixpanel.track('get lichess report');
+      }
       gameListFetcher.load('/api/lichess/games');
     }
   }, [gameListFetcher]);
@@ -69,32 +65,32 @@ export default function LichessReport() {
   }
 
   function LoadMore() {
-    mixpanel.track('load more lichess games');
+    if (mixpanel.config) {
+      mixpanel.track('load more lichess games');
+    }
     const oldTimestamp = Math.min(...games.map((g) => g.createdAt));
     gameListFetcher.load(`/api/lichess/games?until=${oldTimestamp}`);
   }
 
   return (
     <>
-      <VStack spacing={5} paddingTop="10">
-        <TableContainer>
-          <Table size="sm" variant="simple">
-            <Thead>
-              <Tr>
-                <Th> Date</Th>
-                <Th> Type</Th>
-                <Th> Opening</Th>
-                <Th> report</Th>
-                <Th> </Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {games.map((game) => (
-                <GameItem game={game} key={game.id}></GameItem>
-              ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
+      <VStack gap={5} p="10">
+        <Table.Root size="sm" striped interactive>
+          <Table.Header>
+            <Table.Row>
+              <Table.ColumnHeader> Date</Table.ColumnHeader>
+              <Table.ColumnHeader> Type</Table.ColumnHeader>
+              <Table.ColumnHeader> Opening</Table.ColumnHeader>
+              <Table.ColumnHeader> report</Table.ColumnHeader>
+              <Table.ColumnHeader> </Table.ColumnHeader>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {games.map((game) => (
+              <GameItem game={game} key={game.id}></GameItem>
+            ))}
+          </Table.Body>
+        </Table.Root>
         <Box>
           {gameListFetcher.state !== 'idle' && <Spinner />}
           {gameListFetcher.state === 'idle' && (
@@ -133,23 +129,23 @@ function GameItem(props: { game: LichessGame }) {
       1 ?? 0;
 
   return (
-    <Tr>
-      <Td>{moment(game.createdAt).fromNow()}</Td>
-      <Td>
+    <Table.Row>
+      <Table.Cell>{moment(game.createdAt).fromNow()}</Table.Cell>
+      <Table.Cell>
         <Flex direction="row" justify="space-between">
           {game.speed === 'blitz' && <SiStackblitz />}
           {game.speed === 'bullet' && <GiBulletBill />}
           {game.speed === 'rapid' && <GiRabbit />}
         </Flex>
-      </Td>
-      <Td>
+      </Table.Cell>
+      <Table.Cell>
         <Wrap>
           {getPlayerOrientation(game, report) === 'white' && <BsCircle />}
           {getPlayerOrientation(game, report) === 'black' && <BsCircleFill />}
           <WrapItem>{game.opening.name}</WrapItem>
         </Wrap>
-      </Td>
-      <Td>
+      </Table.Cell>
+      <Table.Cell>
         {fetcher.state === 'loading' && <Spinner size="sm" />}
         {!!report && (
           <GameReportComponent
@@ -157,9 +153,9 @@ function GameItem(props: { game: LichessGame }) {
             report={report}
           ></GameReportComponent>
         )}
-      </Td>
-      <Td>
-        <Wrap>
+      </Table.Cell>
+      <Table.Cell>
+        <Wrap align="center">
           <WrapItem>
             <LichessLink
               gameId={game.id}
@@ -169,15 +165,20 @@ function GameItem(props: { game: LichessGame }) {
           </WrapItem>
           <WrapItem>{GameExploreButton({ game, report })}</WrapItem>
         </Wrap>
-      </Td>
-      <Td>
-        <Tooltip label="reset game analysis">
-          <Button size="xs" onClick={cleanGameReport} variant="ghost">
-            <RepeatIcon />
-          </Button>
-        </Tooltip>
-      </Td>
-    </Tr>
+      </Table.Cell>
+      <Table.Cell>
+        <Tooltip.Root>
+          <Tooltip.Trigger asChild>
+            <Button size="xs" onClick={cleanGameReport} variant="ghost">
+              <MdRefresh />
+            </Button>
+          </Tooltip.Trigger>
+          <Tooltip.Positioner>
+            <Tooltip.Content>reset game analysis</Tooltip.Content>
+          </Tooltip.Positioner>
+        </Tooltip.Root>
+      </Table.Cell>
+    </Table.Row>
   );
 }
 
@@ -200,9 +201,9 @@ function GameReportComponent(props: { game: LichessGame; report: GameReport }) {
         <Flex direction="row" justify="space-between">
           <Box color="green.500">{successCount} moves played</Box>
           {successCount < 4 && (
-            <Tag colorScheme="orange" size="sm">
-              Unknown variation
-            </Tag>
+            <Tag.Root colorPalette="orange" size="sm">
+              <Tag.Label>Unknown variation</Tag.Label>
+            </Tag.Root>
           )}
         </Flex>
       </>
@@ -261,42 +262,40 @@ function getPlayerOrientation(game: LichessGame, report?: GameReport | null) {
 
 function TableSkeleton() {
   return (
-    <VStack spacing={5} paddingTop="10">
-      <TableContainer>
-        <Table size="sm" variant="simple">
-          <Thead>
-            <Tr>
-              <Th> Date</Th>
-              <Th> Type</Th>
-              <Th> white</Th>
-              <Th> black</Th>
-              <Th> report</Th>
-              <Th> </Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {[1, 2, 3, 4, 5].map((i) => (
-              <Tr key={i}>
-                <Td>
-                  <SkeletonText width="5em" />
-                </Td>
-                <Td>
-                  <SkeletonText width="3em" />
-                </Td>
-                <Td>
-                  <SkeletonText width="18em" />
-                </Td>
-                <Td>
-                  <SkeletonText width="18em" />
-                </Td>
-                <Td>
-                  <SkeletonText width="4em" />
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </TableContainer>
+    <VStack gap={5} p="10">
+      <Table.Root size="sm" striped interactive>
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeader> Date</Table.ColumnHeader>
+            <Table.ColumnHeader> Type</Table.ColumnHeader>
+            <Table.ColumnHeader> white</Table.ColumnHeader>
+            <Table.ColumnHeader> black</Table.ColumnHeader>
+            <Table.ColumnHeader> report</Table.ColumnHeader>
+            <Table.ColumnHeader> </Table.ColumnHeader>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Table.Row key={i}>
+              <Table.Cell>
+                <SkeletonText width="5em" />
+              </Table.Cell>
+              <Table.Cell>
+                <SkeletonText width="3em" />
+              </Table.Cell>
+              <Table.Cell>
+                <SkeletonText width="18em" />
+              </Table.Cell>
+              <Table.Cell>
+                <SkeletonText width="18em" />
+              </Table.Cell>
+              <Table.Cell>
+                <SkeletonText width="4em" />
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
     </VStack>
   );
 }

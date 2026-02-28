@@ -2,7 +2,7 @@ import type { LinksFunction, MetaFunction } from '@remix-run/node';
 
 import { Authenticator } from '@aws-amplify/ui-react';
 import styles from '@aws-amplify/ui-react/styles.css';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, defaultSystem } from '@chakra-ui/react';
 import { json } from '@remix-run/node';
 import {
   Links,
@@ -21,13 +21,20 @@ import { LCLayout } from './components/layout';
 import { WithAnalytics } from './components/with-analytics';
 import amplifyConfig from '../infra/aws-export.json';
 
-Amplify.configure(amplifyConfig);
-
-export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  title: 'Le Cahier',
-  viewport: 'width=device-width,initial-scale=1',
+Amplify.configure({
+  Auth: {
+    Cognito: {
+      userPoolId: amplifyConfig.userPoolId,
+      userPoolClientId: amplifyConfig.userPoolWebClientId,
+    },
+  },
 });
+
+export const meta: MetaFunction = () => [
+  { charset: 'utf-8' },
+  { title: 'Le Cahier' },
+  { name: 'viewport', content: 'width=device-width,initial-scale=1' },
+];
 
 export const links: LinksFunction = () => {
   return [
@@ -52,7 +59,7 @@ export default function App() {
   }
 
   useEffect(() => {
-    if (mixpanelToken && mixpanelToken.length) {
+    if (mixpanelToken && mixpanelToken.length && mixpanel.config) {
       mixpanel.track(`View ${location.pathname}`);
     }
   }, [location.pathname, mixpanelToken]);
@@ -64,7 +71,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <ChakraProvider>
+        <ChakraProvider value={defaultSystem}>
           <Authenticator signUpAttributes={['email']}>
             {({ user }) => {
               return (

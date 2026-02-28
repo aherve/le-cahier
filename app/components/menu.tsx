@@ -2,9 +2,6 @@ import { useAuthenticator } from '@aws-amplify/ui-react';
 import {
   Button,
   Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Wrap,
   WrapItem,
 } from '@chakra-ui/react';
@@ -79,26 +76,30 @@ export function LCMenu() {
         </WrapItem>
 
         <WrapItem>
-          <Menu>
-            <MenuButton as={Button} variant="outline">
-              <GiHamburgerMenu />
-            </MenuButton>
-            <MenuList>
-              <MenuItem onClick={toggleSound}>
-                <ToggleSoundMenuItem />
-              </MenuItem>
-              <MenuItem onClick={lichessLogin}>
-                <Wrap align="center">
-                  <SiLichess /> <WrapItem>Lichess login</WrapItem>
-                </Wrap>
-              </MenuItem>
-              <MenuItem onClick={signOut}>
-                <Wrap align="center">
-                  <MdLogout /> <WrapItem>Logout</WrapItem>
-                </Wrap>
-              </MenuItem>
-            </MenuList>
-          </Menu>
+          <Menu.Root positioning={{ placement: 'bottom-end' }}>
+            <Menu.Trigger asChild>
+              <Button variant="outline">
+                <GiHamburgerMenu />
+              </Button>
+            </Menu.Trigger>
+            <Menu.Positioner>
+              <Menu.Content>
+                <Menu.Item onClick={toggleSound}>
+                  <ToggleSoundMenuItem />
+                </Menu.Item>
+                <Menu.Item onClick={lichessLogin}>
+                  <Wrap align="center">
+                    <SiLichess /> <WrapItem>Lichess login</WrapItem>
+                  </Wrap>
+                </Menu.Item>
+                <Menu.Item onClick={signOut}>
+                  <Wrap align="center">
+                    <MdLogout /> <WrapItem>Logout</WrapItem>
+                  </Wrap>
+                </Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Menu.Root>
         </WrapItem>
       </Wrap>
     </>

@@ -4,7 +4,7 @@ import type {
 } from '@aws-sdk/client-dynamodb';
 import type { Move } from 'chess.js';
 import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
-import type { SaveMoveInput } from '~/routes/api/moves/create';
+import type { SaveMoveInput } from '~/routes/api.moves.create';
 import type { AdminReport } from '~/schemas/admin-report';
 import type { GameReport } from '~/schemas/game-report';
 import type { LichessGame } from '~/schemas/lichess';

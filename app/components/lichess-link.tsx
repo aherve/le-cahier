@@ -27,12 +27,15 @@ export default function LichessLink(
   }
 
   return (
-    <>
-      <Tooltip label="Open in Lichess">
-        <Link href={link} isExternal>
+    <Tooltip.Root>
+      <Tooltip.Trigger asChild>
+        <Link href={link} target="_blank" rel="noopener noreferrer">
           <SiLichess />
         </Link>
-      </Tooltip>
-    </>
+      </Tooltip.Trigger>
+      <Tooltip.Positioner>
+        <Tooltip.Content>Open in Lichess</Tooltip.Content>
+      </Tooltip.Positioner>
+    </Tooltip.Root>
   );
 }

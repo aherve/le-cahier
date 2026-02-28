@@ -3,11 +3,15 @@ import type {
   Square,
 } from 'react-chessboard/dist/chessboard/types';
 
-import { Flex, Grid, GridItem, Show } from '@chakra-ui/react';
+import { Box, Grid, GridItem } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 
 import { FenEditor } from './fen-editor';
+
+const MAX_BOARD_WIDTH = 550;
+const SIDEBAR_WIDTH = '400px';
+const CONTAINER_MAX_WIDTH = '1200px';
 
 export function ChessGrid(props: {
   children: React.ReactNode;
@@ -16,25 +20,24 @@ export function ChessGrid(props: {
   orientation: BoardOrientation;
 }) {
   const boardContainerRef = useRef<any>();
-  const [boardWidthContainer, setBoardWidthContainer] = useState(400);
-  const [fixBoardSize, setFixBoardSize] = useState(false);
+  const [boardWidth, setBoardWidth] = useState(400);
 
   useEffect(() => {
-    if (fixBoardSize) {
-      return;
-    }
-    setFixBoardSize(true);
-    setBoardWidthContainer(
-      Math.min(
-        boardContainerRef?.current?.clientWidth,
-        boardContainerRef?.current?.clientHeight,
-      ),
-    );
-  }, [
-    boardContainerRef?.current?.clientWidth,
-    boardContainerRef?.current?.clientHeight,
-    fixBoardSize,
-  ]);
+    const updateBoardWidth = () => {
+      if (boardContainerRef.current) {
+        const width = Math.min(
+          boardContainerRef.current.clientWidth,
+          boardContainerRef.current.clientHeight,
+          MAX_BOARD_WIDTH
+        );
+        setBoardWidth(width);
+      }
+    };
+
+    updateBoardWidth();
+    window.addEventListener('resize', updateBoardWidth);
+    return () => window.removeEventListener('resize', updateBoardWidth);
+  }, []);
 
   return (
     <Grid
@@ -42,36 +45,37 @@ export function ChessGrid(props: {
         "message message"
         "board moves"
         "fen moves"
-        "actions actions"
-        `}
-      gridTemplateRows="50px 10px 1fr auto auto auto auto"
-      gridTemplateColumns="2fr 1fr"
-      columnGap="8"
-      rowGap="8"
-      h="100%"
+        "actions actions"`}
+      gridTemplateRows="auto auto 1fr auto auto"
+      gridTemplateColumns={`1fr ${SIDEBAR_WIDTH}`}
+      gap="4"
+      maxW={CONTAINER_MAX_WIDTH}
+      mx="auto"
+      p="4"
     >
       {props.children}
 
-      <Show above="sm">
-        <GridItem
-          marginTop="-20px"
-          gridArea="fen"
-          alignSelf="start"
-          justifySelf="end"
-        >
-          <FenEditor width={boardWidthContainer} />
-        </GridItem>
-      </Show>
+      <GridItem gridArea="fen" justifySelf="center">
+        <FenEditor width={boardWidth} />
+      </GridItem>
 
-      <GridItem gridArea="board" ref={boardContainerRef} minW="200px">
-        <Flex>
+      <GridItem
+        gridArea="board"
+        ref={boardContainerRef}
+        display="flex"
+        justifyContent="center"
+        alignItems="start"
+        maxW={`${MAX_BOARD_WIDTH}px`}
+        justifySelf="center"
+      >
+        <Box w={boardWidth} h={boardWidth}>
           <Chessboard
             position={props.fen}
             onPieceDrop={props.onPieceDrop}
-            boardWidth={boardWidthContainer}
+            boardWidth={boardWidth}
             boardOrientation={props.orientation}
           />
-        </Flex>
+        </Box>
       </GridItem>
     </Grid>
   );

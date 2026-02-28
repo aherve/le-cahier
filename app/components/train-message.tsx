@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/react';
+import { Alert } from '@chakra-ui/react';
 import { z } from 'zod';
 
 export const TrainMessageInput = z.enum([
@@ -18,31 +18,31 @@ export default function TrainMessage(props: {
   switch (props.type) {
     case TrainMessageInput.enum.yourTurn:
       return (
-        <Alert status="success">
-          <AlertIcon />
-          <AlertDescription>It's your turn</AlertDescription>
-        </Alert>
+        <Alert.Root status="success">
+          <Alert.Indicator />
+          <Alert.Description>It's your turn</Alert.Description>
+        </Alert.Root>
       );
     case TrainMessageInput.enum.nope:
       return (
-        <Alert status="error">
-          <AlertIcon />
-          <AlertDescription>Nope</AlertDescription>
-        </Alert>
+        <Alert.Root status="error">
+          <Alert.Indicator />
+          <Alert.Description>Nope</Alert.Description>
+        </Alert.Root>
       );
     case TrainMessageInput.enum.noMoreData:
       return (
-        <Alert status="info">
-          <AlertIcon />
-          <AlertDescription>Success ! The book ends here</AlertDescription>
-        </Alert>
+        <Alert.Root status="info">
+          <Alert.Indicator />
+          <Alert.Description>Success ! The book ends here</Alert.Description>
+        </Alert.Root>
       );
     case TrainMessageInput.enum.hint:
       return (
-        <Alert status="info">
-          <AlertIcon />
-          <AlertDescription>{hintsStr}</AlertDescription>
-        </Alert>
+        <Alert.Root status="info">
+          <Alert.Indicator />
+          <Alert.Description>{hintsStr}</Alert.Description>
+        </Alert.Root>
       );
     default:
       return null;

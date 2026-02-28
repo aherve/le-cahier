@@ -28,10 +28,10 @@ import { TrainButton } from '~/components/train-button';
 import { GameContext } from '~/with-game';
 
 export const meta: MetaFunction = () => {
-  return {
-    title: 'Review mistakes | Le Cahier',
-    description: 'Reviewing positions you might have missed',
-  };
+  return [
+    { title: 'Review mistakes | Le Cahier' },
+    { name: 'description', content: 'Reviewing positions you might have missed' },
+  ];
 };
 
 export default function Anki() {
@@ -82,7 +82,9 @@ export default function Anki() {
 
   useEffect(() => {
     if (fetcher.state === 'idle' && fetcher.data == null) {
-      mixpanel.track('getAnki');
+      if (mixpanel.config) {
+        mixpanel.track('getAnki');
+      }
       fetcher.load(`/api/moves/get-anki?skipNovelties=${!includeNovelties}`);
     }
   }, [fetcher, includeNovelties]);
@@ -189,9 +191,12 @@ export default function Anki() {
             get hint
           </Button>
           <LichessLink fen={fen}></LichessLink>
-          <Switch isChecked={includeNovelties} onChange={toggleNovelties}>
-            Include positions you haven't yet played
-          </Switch>
+          <Switch.Root checked={includeNovelties} onCheckedChange={(e) => toggleNovelties({ target: { checked: e.checked } })}>
+            <Switch.Control>
+              <Switch.Thumb />
+            </Switch.Control>
+            <Switch.Label>Include positions you haven't yet played</Switch.Label>
+          </Switch.Root>
         </Wrap>
       </GridItem>
     </ChessGrid>
