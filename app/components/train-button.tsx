@@ -19,7 +19,7 @@ export function TrainButton(props: { reset?: boolean }) {
   }
 
   return (
-    <Button variant="outline" onClick={train} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
+    <Button variant="outline" onClick={train} fontSize="md" flexShrink={0}>
       <MdOutlineSmartToy />
       Train {props.reset ? '' : ' from here'}
     </Button>

@@ -49,18 +49,18 @@ export function LCMenu() {
     <Wrap justify="center" gap={2} width="100%">
       <ExploreButton reset={true} />
       <TrainButton reset={true} />
-      <Button variant="outline" onClick={anki} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
+      <Button variant="outline" onClick={anki} fontSize="md" flexShrink={0}>
         <GiFalling />
         Review mistakes
       </Button>
       <RecordButton reset={true} />
-      <Button variant="outline" onClick={lichessReport} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
+      <Button variant="outline" onClick={lichessReport} fontSize="md" flexShrink={0}>
         <SiLichess />
         lichess report
       </Button>
       <Menu.Root positioning={{ placement: 'bottom-end' }}>
         <Menu.Trigger asChild>
-          <Button variant="outline" fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
+          <Button variant="outline" fontSize="md" flexShrink={0}>
             <GiHamburgerMenu />
           </Button>
         </Menu.Trigger>

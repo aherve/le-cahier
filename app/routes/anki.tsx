@@ -192,7 +192,7 @@ export default function Anki() {
         <Wrap align="center" justify="center" gap={2} width="100%">
           <ExploreButton />
           <TrainButton />
-          <Button variant="outline" onClick={showHint} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
+          <Button variant="outline" onClick={showHint} fontSize="md" flexShrink={0}>
             <GoLightBulb />
             get hint
           </Button>

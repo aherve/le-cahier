@@ -194,7 +194,7 @@ export default function Train() {
           <FlipBoardButton />
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button variant="outline" onClick={anchor} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
+              <Button variant="outline" onClick={anchor} fontSize="md" flexShrink={0}>
                 <FaAnchor />
               </Button>
             </Tooltip.Trigger>
@@ -206,7 +206,7 @@ export default function Train() {
           </Tooltip.Root>
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button variant="outline" onClick={again} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
+              <Button variant="outline" onClick={again} fontSize="md" flexShrink={0}>
                 <VscDebugRestart />
                 Again
               </Button>
@@ -217,7 +217,7 @@ export default function Train() {
               </Tooltip.Content>
             </Tooltip.Positioner>
           </Tooltip.Root>
-          <Button variant="outline" onClick={showHint} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
+          <Button variant="outline" onClick={showHint} fontSize="md" flexShrink={0}>
             <GoLightBulb />
             get hint
           </Button>

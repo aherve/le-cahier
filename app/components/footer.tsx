@@ -5,11 +5,11 @@ import { MdOutlineEmail } from 'react-icons/md';
 export function Footer() {
   return (
     <Wrap align="center" gap={2} marginTop="5" justify="center" width="100%">
-      <Text fontSize={{ base: "lg", md: "md" }}>&copy; {new Date().getFullYear()} Aurélien Hervé</Text>
-      <Link href="mailto:mail@aurelien-herve.com" fontSize={{ base: "lg", md: "md" }}>
+      <Text fontSize="md">&copy; {new Date().getFullYear()} Aurélien Hervé</Text>
+      <Link href="mailto:mail@aurelien-herve.com" fontSize="md">
         <MdOutlineEmail />
       </Link>
-      <Link href="https://github.com/aherve/le-cahier" isExternal={true} fontSize={{ base: "lg", md: "md" }}>
+      <Link href="https://github.com/aherve/le-cahier" isExternal={true} fontSize="md">
         <BsGithub />
       </Link>
     </Wrap>

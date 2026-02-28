@@ -71,6 +71,13 @@ export default function App() {
       <head>
         <Meta />
         <Links />
+        <style>{`
+          @media (max-width: 768px) {
+            html {
+              font-size: 18px;
+            }
+          }
+        `}</style>
       </head>
       <body>
         <DndProvider options={HTML5toTouch}>

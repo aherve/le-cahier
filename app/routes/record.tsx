@@ -268,7 +268,7 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
 
   return (
     <>
-      <Button variant="outline" onClick={onOpen} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
+      <Button variant="outline" onClick={onOpen} fontSize="md" flexShrink={0}>
         <BiCloudUpload />
         Upload PGN
       </Button>
@@ -331,7 +331,7 @@ function FindTranspositionsButton(props: { onScan: () => void }) {
   }
   return (
     <>
-      <Button variant="outline" onClick={onOpen} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
+      <Button variant="outline" onClick={onOpen} fontSize="md" flexShrink={0}>
         <MdYoutubeSearchedFor />
         Find transpositions
       </Button>
