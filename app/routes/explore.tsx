@@ -101,9 +101,9 @@ export default function Explore() {
         justifySelf="center"
         paddingTop="5"
       >
-        <Wrap>
+        <Wrap align="center" gap="3">
           <VscBook size="40" />
-          <Heading size="lg">Browsing moves</Heading>
+          <Heading size="xl">Browsing moves</Heading>
         </Wrap>
       </GridItem>
 

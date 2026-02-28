@@ -163,9 +163,9 @@ export default function Train() {
         justifySelf="center"
         paddingTop="5"
       >
-        <Wrap>
+        <Wrap align="center" gap="3">
           <MdOutlineSmartToy size="40" />
-          <Heading size="lg">Training mode</Heading>
+          <Heading size="xl">Training mode</Heading>
         </Wrap>
       </GridItem>
 
@@ -182,7 +182,7 @@ export default function Train() {
           <FlipBoardButton />
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button onClick={anchor}>
+              <Button variant="outline" onClick={anchor}>
                 <FaAnchor />
               </Button>
             </Tooltip.Trigger>
@@ -192,7 +192,7 @@ export default function Train() {
           </Tooltip.Root>
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button leftIcon={<VscDebugRestart />} onClick={again}>
+              <Button variant="outline" leftIcon={<VscDebugRestart />} onClick={again}>
                 Again
               </Button>
             </Tooltip.Trigger>
@@ -200,7 +200,7 @@ export default function Train() {
               <Tooltip.Content>(re)start from anchored or starting position</Tooltip.Content>
             </Tooltip.Positioner>
           </Tooltip.Root>
-          <Button leftIcon={<GoLightBulb />} onClick={showHint}>
+          <Button variant="outline" leftIcon={<GoLightBulb />} onClick={showHint}>
             get hint
           </Button>
           <ExploreButton />

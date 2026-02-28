@@ -104,8 +104,8 @@ function DisplayEdit(props: {
           value={comments}
         />
         <Wrap alignSelf="end">
-          <Button onClick={cancel}>Cancel</Button>
-          <Button leftIcon={<FaRegSave />} type="submit">
+          <Button variant="outline" onClick={cancel}>Cancel</Button>
+          <Button variant="outline" leftIcon={<FaRegSave />} type="submit">
             Save
           </Button>
         </Wrap>
@@ -122,7 +122,7 @@ function DisplayComment(props: { comments: string; setEditMode: () => void }) {
           <Text>{props.comments}</Text>
         </WrapItem>
       </Wrap>
-      <Button onClick={props.setEditMode} leftIcon={<FaRegEdit />} size="xs">
+      <Button variant="outline" onClick={props.setEditMode} leftIcon={<FaRegEdit />} size="xs">
         {props.comments ? 'Edit' : 'Add comments'}
       </Button>
     </Stack>

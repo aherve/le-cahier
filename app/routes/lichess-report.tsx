@@ -22,7 +22,7 @@ import mixpanel from 'mixpanel-browser';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { BsCircle, BsCircleFill } from 'react-icons/bs';
-import { GiBulletBill, GiRabbit } from 'react-icons/gi';
+import { GiBulletBill, GiRabbit, GiTortoise } from 'react-icons/gi';
 import { SiStackblitz } from 'react-icons/si';
 
 import LichessLink from '../components/lichess-link';
@@ -74,7 +74,7 @@ export default function LichessReport() {
 
   return (
     <>
-      <VStack gap={5} p="10">
+      <VStack gap={5} p="10" maxW="1200px" mx="auto">
         <Table.Root size="sm" striped interactive>
           <Table.Header>
             <Table.Row>
@@ -94,7 +94,7 @@ export default function LichessReport() {
         <Box>
           {gameListFetcher.state !== 'idle' && <Spinner />}
           {gameListFetcher.state === 'idle' && (
-            <Button onClick={LoadMore}>Load More</Button>
+            <Button variant="outline" onClick={LoadMore}>Load More</Button>
           )}
         </Box>
       </VStack>
@@ -132,39 +132,43 @@ function GameItem(props: { game: LichessGame }) {
     <Table.Row>
       <Table.Cell>{moment(game.createdAt).fromNow()}</Table.Cell>
       <Table.Cell>
-        <Flex direction="row" justify="space-between">
+        <Flex align="center" justify="center">
           {game.speed === 'blitz' && <SiStackblitz />}
           {game.speed === 'bullet' && <GiBulletBill />}
           {game.speed === 'rapid' && <GiRabbit />}
+          {game.speed === 'classical' && <GiTortoise />}
         </Flex>
       </Table.Cell>
       <Table.Cell>
-        <Wrap>
-          {getPlayerOrientation(game, report) === 'white' && <BsCircle />}
-          {getPlayerOrientation(game, report) === 'black' && <BsCircleFill />}
-          <WrapItem>{game.opening.name}</WrapItem>
-        </Wrap>
+        <Flex align="center" gap="2">
+          <Box flexShrink={0}>
+            {getPlayerOrientation(game, report) === 'white' && <BsCircle />}
+            {getPlayerOrientation(game, report) === 'black' && <BsCircleFill />}
+          </Box>
+          <Text>{game.opening.name}</Text>
+        </Flex>
       </Table.Cell>
       <Table.Cell>
-        {fetcher.state === 'loading' && <Spinner size="sm" />}
-        {!!report && (
-          <GameReportComponent
-            game={game}
-            report={report}
-          ></GameReportComponent>
+        {fetcher.state === 'loading' ? (
+          <Spinner size="sm" />
+        ) : (
+          !!report && (
+            <GameReportComponent
+              game={game}
+              report={report}
+            ></GameReportComponent>
+          )
         )}
       </Table.Cell>
       <Table.Cell>
-        <Wrap align="center">
-          <WrapItem>
-            <LichessLink
-              gameId={game.id}
-              moveIndex={firstFailIndex(report) || firstDeviationIndex}
-              orientation={getPlayerOrientation(game, report) ?? 'white'}
-            ></LichessLink>
-          </WrapItem>
-          <WrapItem>{GameExploreButton({ game, report })}</WrapItem>
-        </Wrap>
+        <Flex align="center" gap="2">
+          <LichessLink
+            gameId={game.id}
+            moveIndex={firstFailIndex(report) || firstDeviationIndex}
+            orientation={getPlayerOrientation(game, report) ?? 'white'}
+          ></LichessLink>
+          {GameExploreButton({ game, report })}
+        </Flex>
       </Table.Cell>
       <Table.Cell>
         <Tooltip.Root>
@@ -262,7 +266,7 @@ function getPlayerOrientation(game: LichessGame, report?: GameReport | null) {
 
 function TableSkeleton() {
   return (
-    <VStack gap={5} p="10">
+    <VStack gap={5} p="10" maxW="1200px" mx="auto">
       <Table.Root size="sm" striped interactive>
         <Table.Header>
           <Table.Row>

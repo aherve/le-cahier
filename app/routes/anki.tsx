@@ -171,9 +171,9 @@ export default function Anki() {
         justifySelf="center"
         paddingTop="5"
       >
-        <Wrap>
+        <Wrap align="center" gap="3">
           <GiFalling size="40" />
-          <Heading size="lg">Reviewing failed moves</Heading>
+          <Heading size="xl">Reviewing failed moves</Heading>
         </Wrap>
       </GridItem>
 
@@ -187,7 +187,7 @@ export default function Anki() {
         <Wrap align="center" justify="center">
           <ExploreButton />
           <TrainButton />
-          <Button leftIcon={<GoLightBulb />} onClick={showHint}>
+          <Button variant="outline" leftIcon={<GoLightBulb />} onClick={showHint}>
             get hint
           </Button>
           <LichessLink fen={fen}></LichessLink>

@@ -195,10 +195,10 @@ function DeleteWithConfirm(props: { text: string; onConfirm: () => void }) {
             <Dialog.Body>Confirm move deletion ?</Dialog.Body>
 
             <Dialog.Footer>
-              <Button ref={cancelRef} onClick={onClose}>
+              <Button variant="outline" ref={cancelRef} onClick={onClose}>
                 Abort !
               </Button>
-              <Button colorScheme="red" onClick={onConfirm} ml={3}>
+              <Button variant="outline" colorPalette="red" onClick={onConfirm} ml={3}>
                 Yes, delete move
               </Button>
             </Dialog.Footer>

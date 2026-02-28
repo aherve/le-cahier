@@ -165,9 +165,9 @@ export default function Record() {
         justifySelf="center"
         paddingTop="5"
       >
-        <Wrap>
+        <Wrap align="center" gap="3">
           <BsRecordCircle color="red" size="40" />
-          <Heading size="lg">Recording moves</Heading>
+          <Heading size="xl">Recording moves</Heading>
         </Wrap>
       </GridItem>
 
@@ -248,7 +248,7 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
 
   return (
     <>
-      <Button leftIcon={<BiCloudUpload />} onClick={onOpen}>
+      <Button variant="outline" leftIcon={<BiCloudUpload />} onClick={onOpen}>
         Upload PGN
       </Button>
 
@@ -274,10 +274,10 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
             </Dialog.Body>
 
             <Dialog.Footer>
-              <Button ref={cancelRef as any} onClick={cancel}>
+              <Button variant="outline" ref={cancelRef as any} onClick={cancel}>
                 Cancel
               </Button>
-              <Button colorScheme="blue" onClick={onConfirm} ml={3}>
+              <Button variant="outline" colorPalette="blue" onClick={onConfirm} ml={3}>
                 Upload & save
               </Button>
             </Dialog.Footer>
@@ -301,7 +301,7 @@ function FindTranspositionsButton(props: { onScan: () => void }) {
   }
   return (
     <>
-      <Button leftIcon={<MdYoutubeSearchedFor />} onClick={onOpen}>
+      <Button variant="outline" leftIcon={<MdYoutubeSearchedFor />} onClick={onOpen}>
         Find transpositions
       </Button>
 
