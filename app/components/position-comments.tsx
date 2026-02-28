@@ -58,7 +58,7 @@ export function PositionComments(props: {
   }
 
   return (
-    <Stack alignItems="center">
+    <Stack alignItems="stretch" h="100%">
       {editMode && !isSaving && (
         <DisplayEdit
           comments={comments}
@@ -116,7 +116,7 @@ function DisplayEdit(props: {
 
 function DisplayComment(props: { comments: string; setEditMode: () => void }) {
   return (
-    <Stack>
+    <Stack gap="4" align="stretch" h="100%" justifyContent="space-between">
       <Wrap>
         <WrapItem whiteSpace="pre-wrap">
           <Text>{props.comments}</Text>

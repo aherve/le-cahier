@@ -66,9 +66,9 @@ export default function Moves(props: {
 
   return (
     <>
-      <Card.Root h="100%">
-        <Card.Body>
-          <Stack separator={<Separator />} gap="10">
+      <Card.Root h="100%" display="flex" flexDirection="column">
+        <Card.Body flex="1" display="flex" flexDirection="column">
+          <Stack separator={<Separator />} gap="10" flex="1">
             {props.showBookMoves && (
               <>
                 <Wrap justify="space-between">
@@ -126,14 +126,14 @@ export default function Moves(props: {
               </Stack>
             </>
             {props.showComments && (
-              <>
+              <Stack flex="1" minH="0">
                 <PositionComments
                   orientation={orientation}
                   comments={props.comments}
                   key={props.comments}
                   fen={fen}
                 />
-              </>
+              </Stack>
             )}
           </Stack>
         </Card.Body>

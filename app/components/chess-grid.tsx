@@ -10,10 +10,6 @@ import { ClientOnly } from 'remix-utils/client-only';
 
 import { FenEditor } from './fen-editor';
 
-const MAX_BOARD_WIDTH = 550;
-const SIDEBAR_WIDTH = '400px';
-const CONTAINER_MAX_WIDTH = '1200px';
-
 export function ChessGrid(props: {
   children: React.ReactNode;
   fen: string;
@@ -28,8 +24,7 @@ export function ChessGrid(props: {
       if (boardContainerRef.current) {
         const width = Math.min(
           boardContainerRef.current.clientWidth,
-          boardContainerRef.current.clientHeight,
-          MAX_BOARD_WIDTH
+          boardContainerRef.current.clientHeight
         );
         setBoardWidth(width);
       }
@@ -42,17 +37,15 @@ export function ChessGrid(props: {
 
   return (
     <Grid
-      templateAreas={`"title title"
-        "message message"
-        "board moves"
-        "fen moves"
-        "actions actions"`}
+      templateAreas={`"title title title"
+        "message message message"
+        "spacer board moves"
+        "spacer fen moves"
+        "actions actions actions"`}
       gridTemplateRows="auto auto 1fr auto auto"
-      gridTemplateColumns={`1fr ${SIDEBAR_WIDTH}`}
-      gap="4"
-      maxW={CONTAINER_MAX_WIDTH}
-      mx="auto"
-      p="4"
+      gridTemplateColumns="1fr auto minmax(400px, 500px)"
+      gap="8"
+      p="2"
     >
       {props.children}
 
@@ -66,7 +59,6 @@ export function ChessGrid(props: {
         display="flex"
         justifyContent="center"
         alignItems="start"
-        maxW={`${MAX_BOARD_WIDTH}px`}
         justifySelf="center"
       >
         <Box w={boardWidth} h={boardWidth}>

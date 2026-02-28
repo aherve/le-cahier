@@ -15,7 +15,7 @@ import {
 } from '@remix-run/react';
 import { Amplify } from 'aws-amplify';
 import mixpanel from 'mixpanel-browser';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -55,11 +55,6 @@ export const loader = async () => {
 export default function App() {
   const location = useLocation();
   const { mixpanelToken } = useLoaderData<typeof loader>();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   if (mixpanelToken && mixpanelToken.length) {
     mixpanel.init(mixpanelToken, { ignore_dnt: true });
@@ -78,21 +73,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        {isClient ? (
-          <DndProvider backend={HTML5Backend}>
-            <ChakraProvider value={defaultSystem}>
-              <Authenticator signUpAttributes={['email']}>
-                {({ user }) => {
-                  return (
-                    <WithAnalytics>
-                      <LCLayout user={user} />
-                    </WithAnalytics>
-                  );
-                }}
-              </Authenticator>
-            </ChakraProvider>
-          </DndProvider>
-        ) : (
+        <DndProvider backend={HTML5Backend}>
           <ChakraProvider value={defaultSystem}>
             <Authenticator signUpAttributes={['email']}>
               {({ user }) => {
@@ -104,7 +85,7 @@ export default function App() {
               }}
             </Authenticator>
           </ChakraProvider>
-        )}
+        </DndProvider>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

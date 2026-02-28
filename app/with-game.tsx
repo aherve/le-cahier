@@ -53,7 +53,14 @@ export function WithGame(props: { children: ReactNode }) {
     (move: string | { from: string; to: string; promotion?: string }) => {
       const moveSound = new Audio('sounds/Move.ogg');
       const captureSound = new Audio('sounds/Capture.ogg');
-      const newGame = new Chess(game.fen());
+
+      // Create new game and replay all history to maintain move list
+      const history = game.history({ verbose: true });
+      const newGame = new Chess();
+      for (const m of history) {
+        newGame.move({ from: m.from, to: m.to, promotion: m.promotion });
+      }
+
       const m = newGame.move(move);
       if (!noSound) {
         m.captured ? captureSound.play() : moveSound.play();
@@ -70,12 +77,18 @@ export function WithGame(props: { children: ReactNode }) {
   );
 
   const undo = useCallback(() => {
-    const newGame = new Chess(game.fen());
-    const undone = newGame.undo();
-    if (undone) {
-      setForwardMoveStack((moves) => [undone, ...moves]);
-      setGame(newGame);
+    const history = game.history({ verbose: true });
+    if (history.length === 0) return;
+
+    const newGame = new Chess();
+    // Replay all moves except the last one
+    for (let i = 0; i < history.length - 1; i++) {
+      newGame.move({ from: history[i].from, to: history[i].to, promotion: history[i].promotion });
     }
+
+    const undone = history[history.length - 1];
+    setForwardMoveStack((moves) => [undone, ...moves]);
+    setGame(newGame);
   }, [game, setForwardMoveStack]);
 
   useEffect(() => {
