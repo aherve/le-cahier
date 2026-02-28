@@ -210,7 +210,7 @@ export default function Record() {
       />
 
       <GridItem gridArea="actions" minWidth={0}>
-        <Wrap align="center" justify="center" gap={2}>
+        <Wrap align="center" justify="center" gap={2} width="100%">
           <FlipBoardButton />
           {FindTranspositionsButton({ onScan })}
           {LoadPGNButton({ orientation })}
@@ -268,7 +268,7 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
 
   return (
     <>
-      <Button variant="outline" onClick={onOpen} fontSize="md">
+      <Button variant="outline" onClick={onOpen} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
         <BiCloudUpload />
         Upload PGN
       </Button>
@@ -331,7 +331,7 @@ function FindTranspositionsButton(props: { onScan: () => void }) {
   }
   return (
     <>
-      <Button variant="outline" onClick={onOpen} fontSize="md">
+      <Button variant="outline" onClick={onOpen} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
         <MdYoutubeSearchedFor />
         Find transpositions
       </Button>

@@ -32,7 +32,7 @@ export function ExploreButton(props: {
 
   if (variant === 'button') {
     return (
-      <Button variant="outline" onClick={explore} fontSize="md">
+      <Button variant="outline" onClick={explore} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
         <VscBook />
         Explore
       </Button>
@@ -41,7 +41,7 @@ export function ExploreButton(props: {
     return (
       <Tooltip.Root>
         <Tooltip.Trigger asChild>
-          <Button onClick={explore} variant="plain" fontSize="md">
+          <Button onClick={explore} variant="plain" fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
             <VscBook />
           </Button>
         </Tooltip.Trigger>

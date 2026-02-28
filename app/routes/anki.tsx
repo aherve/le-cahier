@@ -189,10 +189,10 @@ export default function Anki() {
       </GridItem>
 
       <GridItem gridArea="actions" minWidth={0}>
-        <Wrap align="center" justify="center" gap={2}>
+        <Wrap align="center" justify="center" gap={2} width="100%">
           <ExploreButton />
           <TrainButton />
-          <Button variant="outline" onClick={showHint} fontSize="md">
+          <Button variant="outline" onClick={showHint} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
             <GoLightBulb />
             get hint
           </Button>

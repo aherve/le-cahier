@@ -190,11 +190,11 @@ export default function Train() {
       <MovesSection />
 
       <GridItem gridArea="actions" minWidth={0}>
-        <Wrap align="center" justify="center" gap={2}>
+        <Wrap align="center" justify="center" gap={2} width="100%">
           <FlipBoardButton />
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button variant="outline" onClick={anchor} fontSize="md">
+              <Button variant="outline" onClick={anchor} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
                 <FaAnchor />
               </Button>
             </Tooltip.Trigger>
@@ -206,7 +206,7 @@ export default function Train() {
           </Tooltip.Root>
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button variant="outline" onClick={again} fontSize="md">
+              <Button variant="outline" onClick={again} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
                 <VscDebugRestart />
                 Again
               </Button>
@@ -217,7 +217,7 @@ export default function Train() {
               </Tooltip.Content>
             </Tooltip.Positioner>
           </Tooltip.Root>
-          <Button variant="outline" onClick={showHint} fontSize="md">
+          <Button variant="outline" onClick={showHint} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
             <GoLightBulb />
             get hint
           </Button>

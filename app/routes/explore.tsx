@@ -122,7 +122,7 @@ export default function Explore() {
 
       <MovesSection bookMoves={bookMoves} comment={comment} />
       <GridItem gridArea="actions" minWidth={0}>
-        <Wrap align="center" justify="center" gap={2}>
+        <Wrap align="center" justify="center" gap={2} width="100%">
           <FlipBoardButton />
           <TrainButton />
           <RecordButton />

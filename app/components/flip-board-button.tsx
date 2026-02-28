@@ -16,7 +16,7 @@ export function FlipBoardButton() {
   }
 
   return (
-    <Button variant="outline" onClick={flip} fontSize="md">
+    <Button variant="outline" onClick={flip} fontSize={{ base: "lg", md: "md" }} flexShrink={0}>
       <ImShuffle />
       flip board
     </Button>
