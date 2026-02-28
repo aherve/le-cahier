@@ -3,7 +3,7 @@ import type { MetaFunction } from '@remix-run/node';
 import type { Square } from 'react-chessboard/dist/chessboard/types';
 import type { GetChallengeOutput } from '~/routes/api.moves.challenge';
 
-import { Button, Flex, GridItem, Heading, Tooltip, Wrap } from '@chakra-ui/react';
+import { Button, GridItem, Heading, Tooltip, Wrap } from '@chakra-ui/react';
 import { useFetcher, useSearchParams } from '@remix-run/react';
 import { Chess } from 'chess.js';
 import mixpanel from 'mixpanel-browser';
@@ -190,11 +190,11 @@ export default function Train() {
       <MovesSection />
 
       <GridItem gridArea="actions" minWidth={0}>
-        <Flex align="center" justify="center" wrap="wrap" gap={2} width="100%">
+        <Wrap align="center" justify="center" gap={2}>
           <FlipBoardButton />
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button variant="outline" onClick={anchor} flexShrink={0}>
+              <Button variant="outline" onClick={anchor} fontSize="md">
                 <FaAnchor />
               </Button>
             </Tooltip.Trigger>
@@ -206,7 +206,7 @@ export default function Train() {
           </Tooltip.Root>
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button variant="outline" onClick={again} flexShrink={0}>
+              <Button variant="outline" onClick={again} fontSize="md">
                 <VscDebugRestart />
                 Again
               </Button>
@@ -217,13 +217,13 @@ export default function Train() {
               </Tooltip.Content>
             </Tooltip.Positioner>
           </Tooltip.Root>
-          <Button variant="outline" onClick={showHint} flexShrink={0}>
+          <Button variant="outline" onClick={showHint} fontSize="md">
             <GoLightBulb />
             get hint
           </Button>
           <ExploreButton />
           <LichessLink fen={fen}></LichessLink>
-        </Flex>
+        </Wrap>
       </GridItem>
     </ChessGrid>
   );

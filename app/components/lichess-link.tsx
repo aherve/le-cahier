@@ -29,7 +29,7 @@ export default function LichessLink(
   return (
     <Tooltip.Root>
       <Tooltip.Trigger asChild>
-        <Button variant="outline" asChild flexShrink={0}>
+        <Button variant="outline" asChild fontSize="md">
           <a href={link} target="_blank" rel="noopener noreferrer">
             <SiLichess />
           </a>

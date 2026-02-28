@@ -46,21 +46,21 @@ export function LCMenu() {
   }
 
   return (
-    <Flex justify="center" wrap="wrap" gap={2} width="100%">
+    <Wrap justify="center" gap={2}>
       <ExploreButton reset={true} />
       <TrainButton reset={true} />
-      <Button variant="outline" onClick={anki} flexShrink={0}>
+      <Button variant="outline" onClick={anki} fontSize="md">
         <GiFalling />
         Review mistakes
       </Button>
       <RecordButton reset={true} />
-      <Button variant="outline" onClick={lichessReport} flexShrink={0}>
+      <Button variant="outline" onClick={lichessReport} fontSize="md">
         <SiLichess />
         lichess report
       </Button>
       <Menu.Root positioning={{ placement: 'bottom-end' }}>
         <Menu.Trigger asChild>
-          <Button variant="outline" flexShrink={0}>
+          <Button variant="outline" fontSize="md">
             <GiHamburgerMenu />
           </Button>
         </Menu.Trigger>
@@ -82,6 +82,6 @@ export function LCMenu() {
           </Menu.Content>
         </Menu.Positioner>
       </Menu.Root>
-    </Flex>
+    </Wrap>
   );
 }

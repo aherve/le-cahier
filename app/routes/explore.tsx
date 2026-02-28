@@ -1,7 +1,7 @@
 import type { MetaFunction } from '@remix-run/node';
 import type { Square } from 'chess.js';
 
-import { Alert, Flex, GridItem, Heading, Link, Wrap } from '@chakra-ui/react';
+import { Alert, GridItem, Heading, Link, Wrap } from '@chakra-ui/react';
 import { DEFAULT_POSITION } from 'chess.js';
 import mixpanel from 'mixpanel-browser';
 import { useContext, useEffect, useState } from 'react';
@@ -122,12 +122,12 @@ export default function Explore() {
 
       <MovesSection bookMoves={bookMoves} comment={comment} />
       <GridItem gridArea="actions" minWidth={0}>
-        <Flex align="center" justify="center" wrap="wrap" gap={2} width="100%">
+        <Wrap align="center" justify="center" gap={2}>
           <FlipBoardButton />
           <TrainButton />
           <RecordButton />
           <LichessLink fen={fen}></LichessLink>
-        </Flex>
+        </Wrap>
       </GridItem>
     </ChessGrid>
   );

@@ -10,7 +10,6 @@ import {
   Dialog,
   Box,
   Button,
-  Flex,
   GridItem,
   Heading,
   Spinner,
@@ -211,11 +210,11 @@ export default function Record() {
       />
 
       <GridItem gridArea="actions" minWidth={0}>
-        <Flex align="center" justify="center" wrap="wrap" gap={2} width="100%">
+        <Wrap align="center" justify="center" gap={2}>
           <FlipBoardButton />
           {FindTranspositionsButton({ onScan })}
           {LoadPGNButton({ orientation })}
-        </Flex>
+        </Wrap>
       </GridItem>
     </ChessGrid>
   );
@@ -269,7 +268,7 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
 
   return (
     <>
-      <Button variant="outline" onClick={onOpen} flexShrink={0}>
+      <Button variant="outline" onClick={onOpen} fontSize="md">
         <BiCloudUpload />
         Upload PGN
       </Button>
@@ -332,7 +331,7 @@ function FindTranspositionsButton(props: { onScan: () => void }) {
   }
   return (
     <>
-      <Button variant="outline" onClick={onOpen} flexShrink={0}>
+      <Button variant="outline" onClick={onOpen} fontSize="md">
         <MdYoutubeSearchedFor />
         Find transpositions
       </Button>
