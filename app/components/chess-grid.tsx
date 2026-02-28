@@ -6,6 +6,7 @@ import type {
 import { Box, Grid, GridItem } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
+import { ClientOnly } from 'remix-utils/client-only';
 
 import { FenEditor } from './fen-editor';
 
@@ -69,12 +70,16 @@ export function ChessGrid(props: {
         justifySelf="center"
       >
         <Box w={boardWidth} h={boardWidth}>
-          <Chessboard
-            position={props.fen}
-            onPieceDrop={props.onPieceDrop}
-            boardWidth={boardWidth}
-            boardOrientation={props.orientation}
-          />
+          <ClientOnly fallback={<div style={{ width: boardWidth, height: boardWidth, background: '#eee' }} />}>
+            {() => (
+              <Chessboard
+                position={props.fen}
+                onPieceDrop={props.onPieceDrop}
+                boardWidth={boardWidth}
+                boardOrientation={props.orientation}
+              />
+            )}
+          </ClientOnly>
         </Box>
       </GridItem>
     </Grid>

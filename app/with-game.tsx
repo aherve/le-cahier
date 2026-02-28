@@ -53,7 +53,8 @@ export function WithGame(props: { children: ReactNode }) {
     (move: string | { from: string; to: string; promotion?: string }) => {
       const moveSound = new Audio('sounds/Move.ogg');
       const captureSound = new Audio('sounds/Capture.ogg');
-      const m = game.move(move);
+      const newGame = new Chess(game.fen());
+      const m = newGame.move(move);
       if (!noSound) {
         m.captured ? captureSound.play() : moveSound.play();
       }
@@ -62,15 +63,18 @@ export function WithGame(props: { children: ReactNode }) {
       } else {
         setForwardMoveStack([]);
       }
+      setGame(newGame);
       return m;
     },
     [game, forwardMoveStack, setForwardMoveStack, noSound],
   );
 
   const undo = useCallback(() => {
-    const undone = game.undo();
+    const newGame = new Chess(game.fen());
+    const undone = newGame.undo();
     if (undone) {
       setForwardMoveStack((moves) => [undone, ...moves]);
+      setGame(newGame);
     }
   }, [game, setForwardMoveStack]);
 

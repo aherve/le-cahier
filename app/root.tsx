@@ -15,7 +15,9 @@ import {
 } from '@remix-run/react';
 import { Amplify } from 'aws-amplify';
 import mixpanel from 'mixpanel-browser';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { LCLayout } from './components/layout';
 import { WithAnalytics } from './components/with-analytics';
@@ -53,6 +55,11 @@ export const loader = async () => {
 export default function App() {
   const location = useLocation();
   const { mixpanelToken } = useLoaderData<typeof loader>();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   if (mixpanelToken && mixpanelToken.length) {
     mixpanel.init(mixpanelToken, { ignore_dnt: true });
@@ -71,17 +78,33 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <ChakraProvider value={defaultSystem}>
-          <Authenticator signUpAttributes={['email']}>
-            {({ user }) => {
-              return (
-                <WithAnalytics>
-                  <LCLayout user={user} />
-                </WithAnalytics>
-              );
-            }}
-          </Authenticator>
-        </ChakraProvider>
+        {isClient ? (
+          <DndProvider backend={HTML5Backend}>
+            <ChakraProvider value={defaultSystem}>
+              <Authenticator signUpAttributes={['email']}>
+                {({ user }) => {
+                  return (
+                    <WithAnalytics>
+                      <LCLayout user={user} />
+                    </WithAnalytics>
+                  );
+                }}
+              </Authenticator>
+            </ChakraProvider>
+          </DndProvider>
+        ) : (
+          <ChakraProvider value={defaultSystem}>
+            <Authenticator signUpAttributes={['email']}>
+              {({ user }) => {
+                return (
+                  <WithAnalytics>
+                    <LCLayout user={user} />
+                  </WithAnalytics>
+                );
+              }}
+            </Authenticator>
+          </ChakraProvider>
+        )}
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
