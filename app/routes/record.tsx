@@ -40,7 +40,7 @@ import { BookPositionSchema } from '~/schemas/position';
 import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
 
-const enableFindTranspositions = false; // todo: scale function
+const enableFindTranspositions = true; // todo: scale function
 
 export const meta: MetaFunction = () => {
   return {
