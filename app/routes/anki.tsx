@@ -192,11 +192,8 @@ export default function Anki() {
         <Wrap align="center" justify="center">
           <ExploreButton />
           <TrainButton />
-          <Button
-            variant="outline"
-            leftIcon={<GoLightBulb />}
-            onClick={showHint}
-          >
+          <Button variant="outline" onClick={showHint}>
+            <GoLightBulb />
             get hint
           </Button>
           <LichessLink fen={fen}></LichessLink>

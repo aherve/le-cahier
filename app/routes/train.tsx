@@ -194,11 +194,8 @@ export default function Train() {
           </Tooltip.Root>
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button
-                variant="outline"
-                leftIcon={<VscDebugRestart />}
-                onClick={again}
-              >
+              <Button variant="outline" onClick={again}>
+                <VscDebugRestart />
                 Again
               </Button>
             </Tooltip.Trigger>
@@ -208,11 +205,8 @@ export default function Train() {
               </Tooltip.Content>
             </Tooltip.Positioner>
           </Tooltip.Root>
-          <Button
-            variant="outline"
-            leftIcon={<GoLightBulb />}
-            onClick={showHint}
-          >
+          <Button variant="outline" onClick={showHint}>
+            <GoLightBulb />
             get hint
           </Button>
           <ExploreButton />

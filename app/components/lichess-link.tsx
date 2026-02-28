@@ -1,6 +1,6 @@
 import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 
-import { Link, Tooltip } from '@chakra-ui/react';
+import { Button, Tooltip } from '@chakra-ui/react';
 import { useContext } from 'react';
 import { SiLichess } from 'react-icons/si';
 
@@ -29,9 +29,14 @@ export default function LichessLink(
   return (
     <Tooltip.Root>
       <Tooltip.Trigger asChild>
-        <Link href={link} target="_blank" rel="noopener noreferrer">
-          <SiLichess />
-        </Link>
+        <Button
+          variant="outline"
+          asChild
+        >
+          <a href={link} target="_blank" rel="noopener noreferrer">
+            <SiLichess />
+          </a>
+        </Button>
       </Tooltip.Trigger>
       <Tooltip.Positioner>
         <Tooltip.Content>Open in Lichess</Tooltip.Content>

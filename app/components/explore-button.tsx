@@ -32,7 +32,8 @@ export function ExploreButton(props: {
 
   if (variant === 'button') {
     return (
-      <Button variant="outline" leftIcon={<VscBook />} onClick={explore}>
+      <Button variant="outline" onClick={explore}>
+        <VscBook />
         Explore
       </Button>
     );

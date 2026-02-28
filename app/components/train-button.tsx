@@ -19,7 +19,8 @@ export function TrainButton(props: { reset?: boolean }) {
   }
 
   return (
-    <Button variant="outline" leftIcon={<MdOutlineSmartToy />} onClick={train}>
+    <Button variant="outline" onClick={train}>
+      <MdOutlineSmartToy />
       Train {props.reset ? '' : ' from here'}
     </Button>
   );

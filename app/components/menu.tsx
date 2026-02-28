@@ -55,7 +55,8 @@ export function LCMenu() {
           <TrainButton reset={true} />
         </WrapItem>
         <WrapItem>
-          <Button variant="outline" onClick={anki} leftIcon={<GiFalling />}>
+          <Button variant="outline" onClick={anki}>
+            <GiFalling />
             Review mistakes
           </Button>
         </WrapItem>
@@ -65,11 +66,8 @@ export function LCMenu() {
         </WrapItem>
 
         <WrapItem>
-          <Button
-            variant="outline"
-            leftIcon={<SiLichess />}
-            onClick={lichessReport}
-          >
+          <Button variant="outline" onClick={lichessReport}>
+            <SiLichess />
             lichess report
           </Button>
         </WrapItem>
