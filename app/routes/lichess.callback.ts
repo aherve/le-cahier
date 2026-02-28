@@ -7,16 +7,20 @@ import { commitSession, getSession } from '~/session';
 
 const ONE_YEAR_IN_SECONDS = 3600 * 24 * 365;
 
+interface RequestWithUrl extends Request {
+  url?: string;
+}
+
 export const loader: LoaderFunction = async ({ request }) => {
   const code = new URL(request.url).searchParams.get('code');
   if (!code) {
     throw 'missing code';
   }
-  const parsed = parseurl.original(request as any);
+  const parsed = parseurl.original(request as RequestWithUrl);
   if (!parsed) {
     throw new Error('No parsed url');
   }
-  let protocol = parsed.hostname === 'localhost' ? 'http' : 'https';
+  const protocol = parsed.hostname === 'localhost' ? 'http' : 'https';
 
   const baseURL = protocol + '://' + parsed.host;
   const session = await getSession(request.headers.get('Cookie'));

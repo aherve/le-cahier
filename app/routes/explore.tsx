@@ -1,15 +1,7 @@
 import type { MetaFunction } from '@remix-run/node';
 import type { Square } from 'chess.js';
 
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  GridItem,
-  Heading,
-  Link,
-  Wrap,
-} from '@chakra-ui/react';
+import { Alert, GridItem, Heading, Link, Wrap } from '@chakra-ui/react';
 import { DEFAULT_POSITION } from 'chess.js';
 import mixpanel from 'mixpanel-browser';
 import { useContext, useEffect, useState } from 'react';
@@ -27,10 +19,10 @@ import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
 
 export const meta: MetaFunction = () => {
-  return {
-    title: 'Explore | Le Cahier',
-    description: 'Browse your repertoire',
-  };
+  return [
+    { title: 'Explore | Le Cahier' },
+    { name: 'description', content: 'Browse your repertoire' },
+  ];
 };
 
 export default function Explore() {
@@ -40,7 +32,9 @@ export default function Explore() {
   const [noMoreMoves, setNoMoreMoves] = useState<boolean>(false);
 
   useEffect(() => {
-    mixpanel.track('Explore');
+    if (mixpanel.config) {
+      mixpanel.track('Explore');
+    }
     fetch(`/api/moves/get?fen=${encodeURIComponent(fen)}`)
       .then((res) => res.json())
       .then((data) => {
@@ -54,8 +48,8 @@ export default function Explore() {
         setBookMoves(moves);
         setComment(
           orientation === 'white'
-            ? position?.commentForWhite ?? ''
-            : position?.commentForBlack ?? '',
+            ? (position?.commentForWhite ?? '')
+            : (position?.commentForBlack ?? ''),
         );
         setNoMoreMoves(moves.length === 0);
       });
@@ -74,12 +68,12 @@ export default function Explore() {
     <ChessGrid fen={fen} onPieceDrop={onDrop} orientation={orientation}>
       <GridItem justifySelf="center" alignSelf="center" gridArea="message">
         {noMoreMoves ? (
-          <Alert status="info">
-            <AlertIcon />
-            <AlertDescription>
+          <Alert.Root status="info">
+            <Alert.Indicator />
+            <Alert.Description>
               {fen === DEFAULT_POSITION ? (
                 <div>
-                  You don't have any saved move yet.{' '}
+                  You don&apos;t have any saved move yet.{' '}
                   <Link textDecoration="underline" href="/record">
                     Record moves
                   </Link>{' '}
@@ -88,8 +82,8 @@ export default function Explore() {
               ) : (
                 'no more moves'
               )}
-            </AlertDescription>
-          </Alert>
+            </Alert.Description>
+          </Alert.Root>
         ) : (
           <></>
         )}
@@ -101,9 +95,9 @@ export default function Explore() {
         justifySelf="center"
         paddingTop="5"
       >
-        <Wrap>
+        <Wrap align="center" gap="3">
           <VscBook size="40" />
-          <Heading size="lg">Browsing moves</Heading>
+          <Heading size="xl">Browsing moves</Heading>
         </Wrap>
       </GridItem>
 

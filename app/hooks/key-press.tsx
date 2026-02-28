@@ -7,6 +7,8 @@ export function useKeyPress(targetKey: string): boolean {
 
   // Add event listeners
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const downHandler = ({ key }: { key: string }): void => {
       if (key === targetKey) {
         setKeyPressed(true);
@@ -18,12 +20,10 @@ export function useKeyPress(targetKey: string): boolean {
         setKeyPressed(false);
       }
     };
-    console.log('adding listener');
     window.addEventListener('keydown', downHandler);
     window.addEventListener('keyup', upHandler);
     // Remove event listeners on cleanup
     return () => {
-      console.log('removing listener');
       window.removeEventListener('keydown', downHandler);
       window.removeEventListener('keyup', upHandler);
     };

@@ -32,17 +32,22 @@ export function ExploreButton(props: {
 
   if (variant === 'button') {
     return (
-      <Button leftIcon={<VscBook />} onClick={explore}>
+      <Button variant="outline" leftIcon={<VscBook />} onClick={explore}>
         Explore
       </Button>
     );
   } else {
     return (
-      <Tooltip label="browse in repertoire">
-        <Button onClick={explore} variant="link">
-          <VscBook />
-        </Button>
-      </Tooltip>
+      <Tooltip.Root>
+        <Tooltip.Trigger asChild>
+          <Button onClick={explore} variant="plain">
+            <VscBook />
+          </Button>
+        </Tooltip.Trigger>
+        <Tooltip.Positioner>
+          <Tooltip.Content>browse in repertoire</Tooltip.Content>
+        </Tooltip.Positioner>
+      </Tooltip.Root>
     );
   }
 }

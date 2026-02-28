@@ -33,5 +33,9 @@ export const loader: LoaderFunction = async ({ request }) => {
     expectedMoves: nextPos?.bookMoves ? Object.keys(nextPos.bookMoves) : [],
   };
 
-  return json(resp);
+  return json(resp, {
+    headers: {
+      'Cache-Control': 'no-store',
+    },
+  });
 };

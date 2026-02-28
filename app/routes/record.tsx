@@ -7,12 +7,7 @@ import type {
 
 import {
   Alert,
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
+  Dialog,
   Box,
   Button,
   GridItem,
@@ -20,8 +15,8 @@ import {
   Spinner,
   Textarea,
   useDisclosure,
-  useToast,
   Wrap,
+  createToaster,
 } from '@chakra-ui/react';
 import { Chess } from 'chess.js';
 import mixpanel from 'mixpanel-browser';
@@ -35,25 +30,29 @@ import Moves from '../components/moves';
 import { ChessGrid } from '~/components/chess-grid';
 import { ExploreButton } from '~/components/explore-button';
 import { FlipBoardButton } from '~/components/flip-board-button';
-import { SaveMoveInputSchema } from '~/routes/api/moves/create';
+import { SaveMoveInputSchema } from '~/routes/api.moves.create';
 import { BookPositionSchema } from '~/schemas/position';
 import { toSAN } from '~/services/utils';
 import { GameContext } from '~/with-game';
 
 const enableFindTranspositions = true; // todo: scale function
 
+const toaster = createToaster({
+  placement: 'top',
+  duration: 5000,
+});
+
 export const meta: MetaFunction = () => {
-  return {
-    title: 'Update Repertoire | Le Cahier',
-    description: 'Update your repertoire',
-  };
+  return [
+    { title: 'Update Repertoire | Le Cahier' },
+    { name: 'description', content: 'Update your repertoire' },
+  ];
 };
 
 export default function Record() {
   const { fen, turn, makeMove, orientation } = useContext(GameContext);
   const [bookMoves, setBookMoves] = useState<string[]>([]);
   const [comment, setComment] = useState<string>('');
-  const toast = useToast();
   const [lastDelete, setLastDelete] = useState(Date.now());
 
   useEffect(() => {
@@ -70,8 +69,8 @@ export default function Record() {
         );
         setComment(
           orientation === 'white'
-            ? position?.commentForWhite ?? ''
-            : position?.commentForBlack ?? '',
+            ? (position?.commentForWhite ?? '')
+            : (position?.commentForBlack ?? ''),
         );
       });
   }, [fen, orientation, turn, lastDelete]);
@@ -90,7 +89,9 @@ export default function Record() {
         move: `${validMove.from}${validMove.to}`,
       });
       console.log('recording move', payload);
-      mixpanel.track('record-move');
+      if (mixpanel.config) {
+        mixpanel.track('record-move');
+      }
       await fetch('api/moves/create', {
         method: 'POST',
         body: JSON.stringify(payload),
@@ -122,45 +123,39 @@ export default function Record() {
     }).then((r) => {
       setLastDelete(Date.now());
       if (r.ok) {
-        toast({
+        toaster.create({
           title: 'Move deleted',
           description: 'Successfully deleted move',
-          status: 'success',
-          duration: 1000,
-          isClosable: true,
+          type: 'success',
         });
       } else {
-        toast({
+        toaster.create({
           title: 'Error deleting move',
           description: 'Failed to delete move',
-          status: 'error',
-          duration: 1000,
-          isClosable: true,
+          type: 'error',
         });
       }
     });
   }
 
   const onScan = useCallback(async () => {
-    mixpanel.track('find transpositions');
-    toast({
+    if (mixpanel.config) {
+      mixpanel.track('find transpositions');
+    }
+    toaster.create({
       title: 'Scanning',
       description: 'Searching for transpositions. This might take some time...',
-      duration: 5000,
-      isClosable: true,
-      status: 'info',
+      type: 'info',
     });
     const scanRes = await fetch('/api/link-graph', { method: 'POST' }).then(
       (r) => r.json(),
     );
-    toast({
+    toaster.create({
       title: 'Scan complete',
-      duration: 5000,
-      isClosable: true,
-      status: 'success',
+      type: 'success',
       description: `found ${scanRes.newTransposition} new transpositions amongts ${scanRes.positionScanned} moves`,
     });
-  }, [toast]);
+  }, []);
 
   return (
     <ChessGrid fen={fen} onPieceDrop={onDrop} orientation={orientation}>
@@ -170,9 +165,9 @@ export default function Record() {
         justifySelf="center"
         paddingTop="5"
       >
-        <Wrap>
+        <Wrap align="center" gap="3">
           <BsRecordCircle color="red" size="40" />
-          <Heading size="lg">Recording moves</Heading>
+          <Heading size="xl">Recording moves</Heading>
         </Wrap>
       </GridItem>
 
@@ -206,16 +201,17 @@ export default function Record() {
 }
 
 function LoadPGNButton(props: { orientation: BoardOrientation }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { open, onOpen, onClose } = useDisclosure();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [pgn, setPgn] = useState('');
-  const cancelRef = useRef();
-  const toast = useToast();
+  const cancelRef = useRef<HTMLButtonElement>(null);
   const onConfirm = () => {
     console.log('submitting', pgn);
     setIsLoading(true);
-    mixpanel.track('load pgn');
+    if (mixpanel.config) {
+      mixpanel.track('load pgn');
+    }
     fetch('api/moves/create-from-pgn', {
       method: 'POST',
       body: JSON.stringify({
@@ -227,12 +223,10 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
         setPgn('');
         setError(null);
         onClose();
-        toast({
+        toaster.create({
           title: 'PGN loaded',
           description: `Successfully saved moves from PGN for ${props.orientation}`,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
+          type: 'success',
         });
       } else {
         resp.json().then((t) => setError(`Error: ${t['error']}`));
@@ -254,47 +248,58 @@ function LoadPGNButton(props: { orientation: BoardOrientation }) {
 
   return (
     <>
-      <Button leftIcon={<BiCloudUpload />} onClick={onOpen}>
+      <Button variant="outline" leftIcon={<BiCloudUpload />} onClick={onOpen}>
         Upload PGN
       </Button>
 
-      <AlertDialog
-        isOpen={isOpen}
-        leastDestructiveRef={cancelRef as any}
-        onClose={cancel}
+      <Dialog.Root
+        open={open}
+        onOpenChange={(e) => (e.open ? onOpen() : onClose())}
+        role="alertdialog"
+        initialFocusEl={() => cancelRef.current}
       >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Header fontSize="lg" fontWeight="bold">
               Load PGN file for {props.orientation}
-            </AlertDialogHeader>
+            </Dialog.Header>
 
-            <AlertDialogBody>
+            <Dialog.Body>
               {isLoading && <Spinner />}
               {!isLoading && (
                 <Textarea value={pgn} onChange={onChange}></Textarea>
               )}
-              {error && <Alert status="error">{error}</Alert>}
-            </AlertDialogBody>
+              {error && (
+                <Alert.Root status="error">
+                  <Alert.Description>{error}</Alert.Description>
+                </Alert.Root>
+              )}
+            </Dialog.Body>
 
-            <AlertDialogFooter>
-              <Button ref={cancelRef as any} onClick={cancel}>
+            <Dialog.Footer>
+              <Button variant="outline" ref={cancelRef} onClick={cancel}>
                 Cancel
               </Button>
-              <Button colorScheme="blue" onClick={onConfirm} ml={3}>
+              <Button
+                variant="outline"
+                colorPalette="blue"
+                onClick={onConfirm}
+                ml={3}
+              >
                 Upload & save
               </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Root>
       <ExploreButton />
     </>
   );
 }
 function FindTranspositionsButton(props: { onScan: () => void }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef = useRef();
+  const { open, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef<HTMLButtonElement>(null);
   const onConfirm = () => {
     props.onScan();
     onClose();
@@ -305,37 +310,43 @@ function FindTranspositionsButton(props: { onScan: () => void }) {
   }
   return (
     <>
-      <Button leftIcon={<MdYoutubeSearchedFor />} onClick={onOpen}>
+      <Button
+        variant="outline"
+        leftIcon={<MdYoutubeSearchedFor />}
+        onClick={onOpen}
+      >
         Find transpositions
       </Button>
 
-      <AlertDialog
-        isOpen={isOpen}
-        leastDestructiveRef={cancelRef as any}
-        onClose={onClose}
+      <Dialog.Root
+        open={open}
+        onOpenChange={(e) => (e.open ? onOpen() : onClose())}
+        role="alertdialog"
+        initialFocusEl={() => cancelRef.current}
       >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Header fontSize="lg" fontWeight="bold">
               Find transpositions
-            </AlertDialogHeader>
+            </Dialog.Header>
 
-            <AlertDialogBody>
+            <Dialog.Body>
               This is an expensive operation that will scan the entire db.
-              Please don't spam it &hearts;
-            </AlertDialogBody>
+              Please don&apos;t spam it &hearts;
+            </Dialog.Body>
 
-            <AlertDialogFooter>
-              <Button ref={cancelRef as any} onClick={onClose}>
+            <Dialog.Footer>
+              <Button ref={cancelRef} onClick={onClose}>
                 Cancel
               </Button>
               <Button colorScheme="blue" onClick={onConfirm} ml={3}>
                 Scan
               </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Root>
     </>
   );
 }

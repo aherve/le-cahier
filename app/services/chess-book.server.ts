@@ -4,7 +4,7 @@ import type {
 } from '@aws-sdk/client-dynamodb';
 import type { Move } from 'chess.js';
 import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
-import type { SaveMoveInput } from '~/routes/api/moves/create';
+import type { SaveMoveInput } from '~/routes/api.moves.create';
 import type { AdminReport } from '~/schemas/admin-report';
 import type { GameReport } from '~/schemas/game-report';
 import type { LichessGame } from '~/schemas/lichess';
@@ -77,7 +77,7 @@ export class ChessBook {
     });
   }
   public async addMove(input: SaveMoveInput & { userId: string }) {
-    let { isOpponentMove, fen, move } = input;
+    const { isOpponentMove, fen, move } = input;
 
     console.log('adding move', input);
 
@@ -90,7 +90,7 @@ export class ChessBook {
     const path = isOpponentMove ? 'opponentMoves' : 'bookMoves';
 
     try {
-      let updateExpr = 'SET #path = :move, #ankiScore = :zero';
+      const updateExpr = 'SET #path = :move, #ankiScore = :zero';
       const attrNames: Record<string, string> = {
         '#path': path,
         '#ankiScore': 'ankiScore',
@@ -117,7 +117,7 @@ export class ChessBook {
         ExpressionAttributeValues: attrValues,
       });
     } catch {
-      let updateExpr = 'SET #path.#move = :move';
+      const updateExpr = 'SET #path.#move = :move';
       const attrNames: Record<string, string> = {
         '#path': path,
         '#move': move,

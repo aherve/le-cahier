@@ -21,7 +21,7 @@ resource "aws_apprunner_service" "le_cahier" {
         code_configuration_values {
           build_command = "npm ci && npm run build"
           port          = "3000"
-          runtime       = "NODEJS_16"
+          runtime       = "NODEJS_22"
           start_command = "npm run start"
           runtime_environment_variables = {
             NODE_ENV       = "production"

@@ -1,28 +1,20 @@
 import type { Move } from 'chess.js';
 
 import {
-  AlertDialog,
+  Dialog,
   Card,
-  CardBody,
   Text,
   Flex,
-  List,
   Heading,
   Link,
   Stack,
-  StackDivider,
-  StackItem,
+  Separator,
   Wrap,
   Switch,
   WrapItem,
-  useToast,
   useDisclosure,
-  AlertDialogOverlay,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogBody,
-  AlertDialogFooter,
   Button,
+  createToaster,
 } from '@chakra-ui/react';
 import { Chess } from 'chess.js';
 import { chunk } from 'lodash';
@@ -32,6 +24,11 @@ import { FaTrash } from 'react-icons/fa';
 import { PositionComments } from './position-comments';
 
 import { GameContext } from '~/with-game';
+
+const toaster = createToaster({
+  placement: 'top',
+  duration: 2000,
+});
 
 export default function Moves(props: {
   allowDelete?: boolean;
@@ -45,7 +42,6 @@ export default function Moves(props: {
   const { orientation, moves, backTo, makeMove, fen } = useContext(GameContext);
   const chunks = chunk(moves, 2);
   const [showDelete, setShowDelete] = useState(false);
-  const toast = useToast();
 
   function onNavigate(m: Move) {
     backTo(m.after);
@@ -60,32 +56,34 @@ export default function Moves(props: {
   function toggleShowDelete() {
     setShowDelete((previous) => !previous);
     if (!showDelete) {
-      toast({
+      toaster.create({
         title: 'Delete mode',
         description: 'Click on a move to delete it',
-        status: 'info',
-        duration: 2000,
-        isClosable: true,
+        type: 'info',
       });
     }
   }
 
   return (
     <>
-      <Card h="100%">
-        <CardBody>
-          <Stack divider={<StackDivider />} spacing="10">
+      <Card.Root h="100%" display="flex" flexDirection="column">
+        <Card.Body flex="1" display="flex" flexDirection="column">
+          <Stack separator={<Separator />} gap="10" flex="1">
             {props.showBookMoves && (
-              <StackItem>
+              <>
                 <Wrap justify="space-between">
                   <Heading size="xs">Book moves</Heading>
                   {props.allowDelete && (
                     <WrapItem>
-                      <Switch
-                        colorScheme="red"
-                        isChecked={showDelete}
-                        onChange={toggleShowDelete}
-                      ></Switch>
+                      <Switch.Root
+                        colorPalette="red"
+                        checked={showDelete}
+                        onCheckedChange={() => toggleShowDelete()}
+                      >
+                        <Switch.Control>
+                          <Switch.Thumb />
+                        </Switch.Control>
+                      </Switch.Root>
                       <FaTrash color={'gray.500'} />
                     </WrapItem>
                   )}
@@ -110,11 +108,11 @@ export default function Moves(props: {
                     }
                   })}
                 </Wrap>
-              </StackItem>
+              </>
             )}
-            <StackItem>
+            <>
               <Heading size="xs">Game moves</Heading>
-              <List>
+              <Stack gap="1">
                 {chunks.map((c, i) => {
                   return (
                     <MoveItem
@@ -125,21 +123,21 @@ export default function Moves(props: {
                     ></MoveItem>
                   );
                 })}
-              </List>
-            </StackItem>
+              </Stack>
+            </>
             {props.showComments && (
-              <StackItem>
+              <Stack flex="1" minH="0">
                 <PositionComments
                   orientation={orientation}
                   comments={props.comments}
                   key={props.comments}
                   fen={fen}
                 />
-              </StackItem>
+              </Stack>
             )}
           </Stack>
-        </CardBody>
-      </Card>
+        </Card.Body>
+      </Card.Root>
     </>
   );
 }
@@ -167,8 +165,8 @@ function MoveItem(props: {
 }
 
 function DeleteWithConfirm(props: { text: string; onConfirm: () => void }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef = useRef<any>();
+  const { open, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef<HTMLButtonElement>(null);
 
   function onConfirm() {
     props.onConfirm();
@@ -181,30 +179,37 @@ function DeleteWithConfirm(props: { text: string; onConfirm: () => void }) {
         {props.text}
       </Link>
 
-      <AlertDialog
-        isOpen={isOpen}
-        leastDestructiveRef={cancelRef}
-        onClose={onClose}
+      <Dialog.Root
+        open={open}
+        onOpenChange={(e) => (e.open ? onOpen() : onClose())}
+        role="alertdialog"
+        initialFocusEl={() => cancelRef.current}
       >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Header fontSize="lg" fontWeight="bold">
               Delete Move
-            </AlertDialogHeader>
+            </Dialog.Header>
 
-            <AlertDialogBody>Confirm move deletion ?</AlertDialogBody>
+            <Dialog.Body>Confirm move deletion ?</Dialog.Body>
 
-            <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={onClose}>
+            <Dialog.Footer>
+              <Button variant="outline" ref={cancelRef} onClick={onClose}>
                 Abort !
               </Button>
-              <Button colorScheme="red" onClick={onConfirm} ml={3}>
+              <Button
+                variant="outline"
+                colorPalette="red"
+                onClick={onConfirm}
+                ml={3}
+              >
                 Yes, delete move
               </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Root>
     </>
   );
 }

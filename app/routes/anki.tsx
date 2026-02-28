@@ -28,10 +28,13 @@ import { TrainButton } from '~/components/train-button';
 import { GameContext } from '~/with-game';
 
 export const meta: MetaFunction = () => {
-  return {
-    title: 'Review mistakes | Le Cahier',
-    description: 'Reviewing positions you might have missed',
-  };
+  return [
+    { title: 'Review mistakes | Le Cahier' },
+    {
+      name: 'description',
+      content: 'Reviewing positions you might have missed',
+    },
+  ];
 };
 
 export default function Anki() {
@@ -82,7 +85,9 @@ export default function Anki() {
 
   useEffect(() => {
     if (fetcher.state === 'idle' && fetcher.data == null) {
-      mixpanel.track('getAnki');
+      if (mixpanel.config) {
+        mixpanel.track('getAnki');
+      }
       fetcher.load(`/api/moves/get-anki?skipNovelties=${!includeNovelties}`);
     }
   }, [fetcher, includeNovelties]);
@@ -119,7 +124,7 @@ export default function Anki() {
     const move = `${sourceSquare}${targetSquare}`;
 
     if (expectedMoves.includes(move)) {
-      soundEnabled && successSound.play();
+      void (soundEnabled && successSound.play());
       makeMove(move);
       setMsg(TrainMessageInput.enum.yourTurn);
       ankiUpdate(true).then(() => {
@@ -127,7 +132,7 @@ export default function Anki() {
       });
       return true;
     } else {
-      soundEnabled && errorSound.play();
+      void (soundEnabled && errorSound.play());
       setMsg(TrainMessageInput.enum.nope);
       ankiUpdate(false);
       return false;
@@ -141,7 +146,7 @@ export default function Anki() {
     }
 
     if (score > 0) {
-      return <Text> Let's review this position again !</Text>;
+      return <Text> Let&apos;s review this position again !</Text>;
     }
     if (score < 0) {
       return (
@@ -151,11 +156,13 @@ export default function Anki() {
       );
     }
     return (
-      <Text>This is a book position you didn't yet trained on or played</Text>
+      <Text>
+        This is a book position you didn&apos;t yet trained on or played
+      </Text>
     );
   }
 
-  function toggleNovelties(evt: any) {
+  function toggleNovelties(evt: { target: { checked: boolean } }) {
     const newValue = evt.target.checked;
     setIncludeNovelties(newValue);
     fetcher.load(`/api/moves/get-anki?skipNovelties=${!newValue}`);
@@ -169,9 +176,9 @@ export default function Anki() {
         justifySelf="center"
         paddingTop="5"
       >
-        <Wrap>
+        <Wrap align="center" gap="3">
           <GiFalling size="40" />
-          <Heading size="lg">Reviewing failed moves</Heading>
+          <Heading size="xl">Reviewing failed moves</Heading>
         </Wrap>
       </GridItem>
 
@@ -185,13 +192,27 @@ export default function Anki() {
         <Wrap align="center" justify="center">
           <ExploreButton />
           <TrainButton />
-          <Button leftIcon={<GoLightBulb />} onClick={showHint}>
+          <Button
+            variant="outline"
+            leftIcon={<GoLightBulb />}
+            onClick={showHint}
+          >
             get hint
           </Button>
           <LichessLink fen={fen}></LichessLink>
-          <Switch isChecked={includeNovelties} onChange={toggleNovelties}>
-            Include positions you haven't yet played
-          </Switch>
+          <Switch.Root
+            checked={includeNovelties}
+            onCheckedChange={(e) =>
+              toggleNovelties({ target: { checked: e.checked } })
+            }
+          >
+            <Switch.Control>
+              <Switch.Thumb />
+            </Switch.Control>
+            <Switch.Label>
+              Include positions you haven&apos;t yet played
+            </Switch.Label>
+          </Switch.Root>
         </Wrap>
       </GridItem>
     </ChessGrid>

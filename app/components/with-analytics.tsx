@@ -11,8 +11,10 @@ export function WithAnalytics(props: { children: ReactNode }) {
     if (!user.username) {
       return;
     }
-    mixpanel.identify(user.username);
-    mixpanel.people.set('$name', user.username);
+    if (mixpanel.config) {
+      mixpanel.identify(user.username);
+      mixpanel.people.set('$name', user.username);
+    }
   }, [user.username]);
 
   return <>{props.children}</>;

@@ -9,12 +9,14 @@ export function FlipBoardButton() {
   const { orientation, setOrientation } = useContext(GameContext);
 
   function flip() {
-    mixpanel.track('flip-board');
+    if (mixpanel.config) {
+      mixpanel.track('flip-board');
+    }
     setOrientation(orientation === 'white' ? 'black' : 'white');
   }
 
   return (
-    <Button leftIcon={<ImShuffle />} onClick={flip}>
+    <Button variant="outline" leftIcon={<ImShuffle />} onClick={flip}>
       flip board
     </Button>
   );

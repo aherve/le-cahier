@@ -1,7 +1,7 @@
 import type { TrainMessageInputType } from '../components/train-message';
 import type { MetaFunction } from '@remix-run/node';
 import type { Square } from 'react-chessboard/dist/chessboard/types';
-import type { GetChallengeOutput } from '~/routes/api/moves/challenge';
+import type { GetChallengeOutput } from '~/routes/api.moves.challenge';
 
 import { Button, GridItem, Heading, Tooltip, Wrap } from '@chakra-ui/react';
 import { useFetcher, useSearchParams } from '@remix-run/react';
@@ -20,14 +20,14 @@ import TrainMessage, { TrainMessageInput } from '../components/train-message';
 import { ChessGrid } from '~/components/chess-grid';
 import { ExploreButton } from '~/components/explore-button';
 import { FlipBoardButton } from '~/components/flip-board-button';
-import { GetChallengeOutputSchema } from '~/routes/api/moves/challenge';
+import { GetChallengeOutputSchema } from '~/routes/api.moves.challenge';
 import { GameContext } from '~/with-game';
 
 export const meta: MetaFunction = () => {
-  return {
-    title: 'Train | Le Cahier',
-    description: 'How well do you know your openings?',
-  };
+  return [
+    { title: 'Train | Le Cahier' },
+    { name: 'description', content: 'How well do you know your openings?' },
+  ];
 };
 
 export default function Train() {
@@ -69,7 +69,9 @@ export default function Train() {
   useEffect(() => {
     const practiceCompleteSound = new Audio('/sounds/PracticeComplete.ogg');
     if (!isPlayerTurn && fetcher.state === 'idle' && fetcher.data == null) {
-      mixpanel.track('get-challenge');
+      if (mixpanel.config) {
+        mixpanel.track('get-challenge');
+      }
 
       fetcher.load(`/api/moves/challenge?fen=${encodeURIComponent(fen)}`);
     }
@@ -78,7 +80,7 @@ export default function Train() {
       const data = GetChallengeOutputSchema.parse(fetcher.data);
       if (!data.challengeMove) {
         setMsg(TrainMessageInput.enum.noMoreData);
-        soundEnabled && practiceCompleteSound.play();
+        void (soundEnabled && practiceCompleteSound.play());
       } else {
         makeMove(data.challengeMove);
         fetcher.data = null;
@@ -116,7 +118,7 @@ export default function Train() {
       makeMove({ from: sourceSquare, to: targetSquare });
       return true;
     } else {
-      soundEnabled && errorSound.play();
+      void (soundEnabled && errorSound.play());
       ankiUpdate(false);
       setMsg(TrainMessageInput.enum.nope);
       return false;
@@ -124,7 +126,9 @@ export default function Train() {
   }
 
   function again() {
-    mixpanel.track('again');
+    if (mixpanel.config) {
+      mixpanel.track('again');
+    }
     if (startingFEN) {
       backTo(startingFEN);
     } else {
@@ -135,7 +139,9 @@ export default function Train() {
   }
 
   function showHint() {
-    mixpanel.track('show-hint');
+    if (mixpanel.config) {
+      mixpanel.track('show-hint');
+    }
     if (hints.length === 0) {
       return;
     }
@@ -143,7 +149,9 @@ export default function Train() {
   }
 
   function anchor() {
-    mixpanel.track('anchor');
+    if (mixpanel.config) {
+      mixpanel.track('anchor');
+    }
     setStartingFEN(fen);
   }
 
@@ -155,9 +163,9 @@ export default function Train() {
         justifySelf="center"
         paddingTop="5"
       >
-        <Wrap>
+        <Wrap align="center" gap="3">
           <MdOutlineSmartToy size="40" />
-          <Heading size="lg">Training mode</Heading>
+          <Heading size="xl">Training mode</Heading>
         </Wrap>
       </GridItem>
 
@@ -172,17 +180,39 @@ export default function Train() {
       <GridItem gridArea="actions">
         <Wrap align="center" justify="center">
           <FlipBoardButton />
-          <Tooltip label="Set current position as the new starting point for training">
-            <Button onClick={anchor}>
-              <FaAnchor />
-            </Button>
-          </Tooltip>
-          <Tooltip label="(re)start from anchored or starting position">
-            <Button leftIcon={<VscDebugRestart />} onClick={again}>
-              Again
-            </Button>
-          </Tooltip>
-          <Button leftIcon={<GoLightBulb />} onClick={showHint}>
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              <Button variant="outline" onClick={anchor}>
+                <FaAnchor />
+              </Button>
+            </Tooltip.Trigger>
+            <Tooltip.Positioner>
+              <Tooltip.Content>
+                Set current position as the new starting point for training
+              </Tooltip.Content>
+            </Tooltip.Positioner>
+          </Tooltip.Root>
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              <Button
+                variant="outline"
+                leftIcon={<VscDebugRestart />}
+                onClick={again}
+              >
+                Again
+              </Button>
+            </Tooltip.Trigger>
+            <Tooltip.Positioner>
+              <Tooltip.Content>
+                (re)start from anchored or starting position
+              </Tooltip.Content>
+            </Tooltip.Positioner>
+          </Tooltip.Root>
+          <Button
+            variant="outline"
+            leftIcon={<GoLightBulb />}
+            onClick={showHint}
+          >
             get hint
           </Button>
           <ExploreButton />

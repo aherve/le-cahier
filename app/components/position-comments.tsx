@@ -2,26 +2,28 @@ import type { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 
 import {
   Button,
-  FormControl,
   Spinner,
   Stack,
-  StackItem,
   Textarea,
-  useToast,
   Wrap,
   WrapItem,
   Text,
+  createToaster,
 } from '@chakra-ui/react';
 import { Form } from '@remix-run/react';
 import { useEffect, useState } from 'react';
 import { FaRegEdit, FaRegSave } from 'react-icons/fa';
+
+const toaster = createToaster({
+  placement: 'top',
+  duration: 5000,
+});
 
 export function PositionComments(props: {
   orientation: BoardOrientation;
   fen: string;
   comments?: string;
 }) {
-  const toast = useToast();
   const [editMode, setEditMode] = useState(false);
   const [comments, setComments] = useState(props.comments ?? '');
   const [isSaving, setIsSaving] = useState(false);
@@ -47,36 +49,32 @@ export function PositionComments(props: {
       if (res.ok) {
         setComments(newComment);
       } else {
-        toast({
+        toaster.create({
           title: 'Error saving comment',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
+          type: 'error',
         });
       }
     });
   }
 
   return (
-    <Stack>
-      <StackItem alignSelf="center">
-        {editMode && !isSaving && (
-          <DisplayEdit
-            comments={comments}
-            submit={saveComment}
-            cancel={() => setEditMode(false)}
-          />
-        )}
+    <Stack alignItems="stretch" h="100%">
+      {editMode && !isSaving && (
+        <DisplayEdit
+          comments={comments}
+          submit={saveComment}
+          cancel={() => setEditMode(false)}
+        />
+      )}
 
-        {!editMode && !isSaving && (
-          <DisplayComment
-            comments={comments}
-            setEditMode={() => setEditMode(true)}
-          />
-        )}
+      {!editMode && !isSaving && (
+        <DisplayComment
+          comments={comments}
+          setEditMode={() => setEditMode(true)}
+        />
+      )}
 
-        {isSaving && <Spinner />}
-      </StackItem>
+      {isSaving && <Spinner />}
     </Stack>
   );
 }
@@ -88,7 +86,7 @@ function DisplayEdit(props: {
 }) {
   const [comments, setComments] = useState(props.comments ?? '');
 
-  function updateComments(evt: any) {
+  function updateComments(evt: React.ChangeEvent<HTMLTextAreaElement>) {
     setComments(evt.target.value);
   }
 
@@ -100,16 +98,12 @@ function DisplayEdit(props: {
   return (
     <Form onSubmit={() => props.submit(comments)}>
       <Stack>
-        <FormControl>
-          <Textarea
-            autoFocus={true}
-            onChange={updateComments}
-            value={comments}
-          />
-        </FormControl>
+        <Textarea onChange={updateComments} value={comments} />
         <Wrap alignSelf="end">
-          <Button onClick={cancel}>Cancel</Button>
-          <Button leftIcon={<FaRegSave />} type="submit">
+          <Button variant="outline" onClick={cancel}>
+            Cancel
+          </Button>
+          <Button variant="outline" leftIcon={<FaRegSave />} type="submit">
             Save
           </Button>
         </Wrap>
@@ -120,13 +114,18 @@ function DisplayEdit(props: {
 
 function DisplayComment(props: { comments: string; setEditMode: () => void }) {
   return (
-    <Stack>
+    <Stack gap="4" align="stretch" h="100%" justifyContent="space-between">
       <Wrap>
         <WrapItem whiteSpace="pre-wrap">
           <Text>{props.comments}</Text>
         </WrapItem>
       </Wrap>
-      <Button onClick={props.setEditMode} leftIcon={<FaRegEdit />} size="xs">
+      <Button
+        variant="outline"
+        onClick={props.setEditMode}
+        leftIcon={<FaRegEdit />}
+        size="xs"
+      >
         {props.comments ? 'Edit' : 'Add comments'}
       </Button>
     </Stack>

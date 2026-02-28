@@ -16,7 +16,7 @@ export function RecordButton(props: { reset?: boolean }) {
     navigate('/record');
   }
   return (
-    <Button leftIcon={<BsRecordCircle />} onClick={record}>
+    <Button variant="outline" leftIcon={<BsRecordCircle />} onClick={record}>
       {props.reset ? 'Record moves' : 'update repertoire'}
     </Button>
   );

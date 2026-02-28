@@ -1,18 +1,7 @@
 import type { LoaderFunction } from '@remix-run/node';
 import type { AdminReport } from '~/schemas/admin-report';
 
-import {
-  Box,
-  StackItem,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  VStack,
-} from '@chakra-ui/react';
+import { Box, Table, VStack } from '@chakra-ui/react';
 import { redirect, json } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 
@@ -42,39 +31,34 @@ export default function Admin() {
   return (
     <>
       <VStack paddingTop="10">
-        <StackItem>
+        <Box>
           <Box>Total users: {report.totalUsers}</Box>
           <Box>Total users with moves: {entries.length}</Box>
-        </StackItem>
-        <TableContainer>
-          <Table variant="striped">
-            <Thead>
-              <Tr>
-                <Th>UserId</Th>
-                <Th>Positions</Th>
-                <Th>BookMoves</Th>
-                <Th>OpponentMoves</Th>
-                <Th>Comments</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {entries.map(
-                ([
-                  userId,
-                  { positions, opponentMoves, bookMoves, comments },
-                ]) => (
-                  <Tr key={userId}>
-                    <Td>{userId}</Td>
-                    <Td>{positions}</Td>
-                    <Td>{bookMoves}</Td>
-                    <Td>{opponentMoves}</Td>
-                    <Td>{comments}</Td>
-                  </Tr>
-                ),
-              )}
-            </Tbody>
-          </Table>
-        </TableContainer>
+        </Box>
+        <Table.Root variant="outline">
+          <Table.Header>
+            <Table.Row>
+              <Table.ColumnHeader>UserId</Table.ColumnHeader>
+              <Table.ColumnHeader>Positions</Table.ColumnHeader>
+              <Table.ColumnHeader>BookMoves</Table.ColumnHeader>
+              <Table.ColumnHeader>OpponentMoves</Table.ColumnHeader>
+              <Table.ColumnHeader>Comments</Table.ColumnHeader>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {entries.map(
+              ([userId, { positions, opponentMoves, bookMoves, comments }]) => (
+                <Table.Row key={userId}>
+                  <Table.Cell>{userId}</Table.Cell>
+                  <Table.Cell>{positions}</Table.Cell>
+                  <Table.Cell>{bookMoves}</Table.Cell>
+                  <Table.Cell>{opponentMoves}</Table.Cell>
+                  <Table.Cell>{comments}</Table.Cell>
+                </Table.Row>
+              ),
+            )}
+          </Table.Body>
+        </Table.Root>
       </VStack>
     </>
   );
