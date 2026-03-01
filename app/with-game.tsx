@@ -136,14 +136,17 @@ export function WithGame(props: { children: ReactNode }) {
   }, []);
 
   const backTo = useCallback(
-    (fen: string) => {
-      let safety = 150;
-      while (game.fen() !== fen && safety > 0) {
-        safety--;
-        undo();
+    (targetFen: string) => {
+      const history = game.history({ verbose: true });
+      const newGame = new Chess();
+      for (const m of history) {
+        if (newGame.fen() === targetFen) break;
+        newGame.move({ from: m.from, to: m.to, promotion: m.promotion });
       }
+      setForwardMoveStack([]);
+      setGame(newGame);
     },
-    [game, undo],
+    [game],
   );
 
   return (
