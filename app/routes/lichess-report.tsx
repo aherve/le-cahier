@@ -75,22 +75,24 @@ export default function LichessReport() {
   return (
     <>
       <VStack gap={5} p="10" maxW="1200px" mx="auto">
-        <Table.Root size="sm" striped interactive>
-          <Table.Header>
-            <Table.Row>
-              <Table.ColumnHeader> Date</Table.ColumnHeader>
-              <Table.ColumnHeader> Type</Table.ColumnHeader>
-              <Table.ColumnHeader> Opening</Table.ColumnHeader>
-              <Table.ColumnHeader> report</Table.ColumnHeader>
-              <Table.ColumnHeader> </Table.ColumnHeader>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {games.map((game) => (
-              <GameItem game={game} key={game.id}></GameItem>
-            ))}
-          </Table.Body>
-        </Table.Root>
+        <Table.ScrollArea>
+          <Table.Root size="sm" striped interactive>
+            <Table.Header>
+              <Table.Row>
+                <Table.ColumnHeader> Date</Table.ColumnHeader>
+                <Table.ColumnHeader> Type</Table.ColumnHeader>
+                <Table.ColumnHeader> Opening</Table.ColumnHeader>
+                <Table.ColumnHeader> report</Table.ColumnHeader>
+                <Table.ColumnHeader> </Table.ColumnHeader>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {games.map((game) => (
+                <GameItem game={game} key={game.id}></GameItem>
+              ))}
+            </Table.Body>
+          </Table.Root>
+        </Table.ScrollArea>
         <Box>
           {gameListFetcher.state !== 'idle' && <Spinner />}
           {gameListFetcher.state === 'idle' && (
@@ -269,39 +271,41 @@ function getPlayerOrientation(game: LichessGame, report?: GameReport | null) {
 function TableSkeleton() {
   return (
     <VStack gap={5} p="10" maxW="1200px" mx="auto">
-      <Table.Root size="sm" striped interactive>
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeader> Date</Table.ColumnHeader>
-            <Table.ColumnHeader> Type</Table.ColumnHeader>
-            <Table.ColumnHeader> white</Table.ColumnHeader>
-            <Table.ColumnHeader> black</Table.ColumnHeader>
-            <Table.ColumnHeader> report</Table.ColumnHeader>
-            <Table.ColumnHeader> </Table.ColumnHeader>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {[1, 2, 3, 4, 5].map((i) => (
-            <Table.Row key={i}>
-              <Table.Cell>
-                <SkeletonText width="5em" />
-              </Table.Cell>
-              <Table.Cell>
-                <SkeletonText width="3em" />
-              </Table.Cell>
-              <Table.Cell>
-                <SkeletonText width="18em" />
-              </Table.Cell>
-              <Table.Cell>
-                <SkeletonText width="18em" />
-              </Table.Cell>
-              <Table.Cell>
-                <SkeletonText width="4em" />
-              </Table.Cell>
+      <Table.ScrollArea>
+        <Table.Root size="sm" striped interactive>
+          <Table.Header>
+            <Table.Row>
+              <Table.ColumnHeader> Date</Table.ColumnHeader>
+              <Table.ColumnHeader> Type</Table.ColumnHeader>
+              <Table.ColumnHeader> white</Table.ColumnHeader>
+              <Table.ColumnHeader> black</Table.ColumnHeader>
+              <Table.ColumnHeader> report</Table.ColumnHeader>
+              <Table.ColumnHeader> </Table.ColumnHeader>
             </Table.Row>
-          ))}
-        </Table.Body>
-      </Table.Root>
+          </Table.Header>
+          <Table.Body>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Table.Row key={i}>
+                <Table.Cell>
+                  <SkeletonText width="5em" />
+                </Table.Cell>
+                <Table.Cell>
+                  <SkeletonText width="3em" />
+                </Table.Cell>
+                <Table.Cell>
+                  <SkeletonText width="18em" />
+                </Table.Cell>
+                <Table.Cell>
+                  <SkeletonText width="18em" />
+                </Table.Cell>
+                <Table.Cell>
+                  <SkeletonText width="4em" />
+                </Table.Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table.Root>
+      </Table.ScrollArea>
     </VStack>
   );
 }
