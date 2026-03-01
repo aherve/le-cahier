@@ -27,6 +27,7 @@ export const GameContext = createContext({
 
 export function WithGame(props: { children: ReactNode }) {
   const [game, setGame] = useState<Chess>(new Chess());
+  const [initialFen, setInitialFen] = useState<string | undefined>();
   const [orientation, setOrientation] = useState<BoardOrientation>('white');
   const [backWasPressed, setBackWasPressed] = useState(false);
   const [forwardWasPressed, setForwardWasPressed] = useState(false);
@@ -56,7 +57,7 @@ export function WithGame(props: { children: ReactNode }) {
 
       // Create new game and replay all history to maintain move list
       const history = game.history({ verbose: true });
-      const newGame = new Chess();
+      const newGame = new Chess(initialFen);
       for (const m of history) {
         newGame.move({ from: m.from, to: m.to, promotion: m.promotion });
       }
@@ -73,14 +74,14 @@ export function WithGame(props: { children: ReactNode }) {
       setGame(newGame);
       return m;
     },
-    [game, forwardMoveStack, setForwardMoveStack, noSound],
+    [game, initialFen, forwardMoveStack, setForwardMoveStack, noSound],
   );
 
   const undo = useCallback(() => {
     const history = game.history({ verbose: true });
     if (history.length === 0) return;
 
-    const newGame = new Chess();
+    const newGame = new Chess(initialFen);
     // Replay all moves except the last one
     for (let i = 0; i < history.length - 1; i++) {
       newGame.move({
@@ -93,7 +94,7 @@ export function WithGame(props: { children: ReactNode }) {
     const undone = history[history.length - 1];
     setForwardMoveStack((moves) => [undone, ...moves]);
     setGame(newGame);
-  }, [game, setForwardMoveStack]);
+  }, [game, initialFen, setForwardMoveStack]);
 
   useEffect(() => {
     if (arrowRightPressed) {
@@ -132,13 +133,14 @@ export function WithGame(props: { children: ReactNode }) {
   );
 
   const reset = useCallback((fen?: string) => {
+    setInitialFen(fen);
     setGame(new Chess(fen));
   }, []);
 
   const backTo = useCallback(
     (targetFen: string) => {
       const history = game.history({ verbose: true });
-      const newGame = new Chess();
+      const newGame = new Chess(initialFen);
       for (const m of history) {
         if (newGame.fen() === targetFen) break;
         newGame.move({ from: m.from, to: m.to, promotion: m.promotion });
@@ -146,7 +148,7 @@ export function WithGame(props: { children: ReactNode }) {
       setForwardMoveStack([]);
       setGame(newGame);
     },
-    [game],
+    [game, initialFen],
   );
 
   return (
