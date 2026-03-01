@@ -360,6 +360,117 @@ export class ChessBook {
     });
   }
 
+  public async exportPGN(
+    startFen: string,
+    orientation: BoardOrientation,
+    userId: string,
+    preambleMoves: string[],
+  ): Promise<string> {
+    const isPlayerWhite = orientation === 'white';
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
+    const headers = [
+      `[Event "Le Cahier Repertoire"]`,
+      `[Site "le-cahier"]`,
+      `[Date "${today}"]`,
+      `[White "${isPlayerWhite ? 'Repertoire' : 'Opponent'}"]`,
+      `[Black "${isPlayerWhite ? 'Opponent' : 'Repertoire'}"]`,
+      `[Result "*"]`,
+    ].join('\n') + '\n';
+
+    const preamble = this.preambleToMovetext(preambleMoves);
+    const movetext = await this.traversePGN(
+      startFen,
+      orientation,
+      userId,
+      new Set<string>(),
+    );
+    const raw = (preamble + movetext).trim();
+    // Remove redundant black move numbers when they directly follow the white move
+    const cleaned = raw.replace(/(\d+)\. (\S+) \1\.\.\. /g, '$1. $2 ');
+    return headers + '\n' + cleaned + ' *\n';
+  }
+
+  private preambleToMovetext(moves: string[]): string {
+    if (moves.length === 0) return '';
+    const game = new Chess();
+    let result = '';
+    for (const lan of moves) {
+      const fenParts = game.fen().split(' ');
+      const moveNumber = parseInt(fenParts[5], 10);
+      const isWhite = fenParts[1] === 'w';
+      const made = game.move(lan);
+      if (!made) continue;
+      if (isWhite) {
+        result += `${moveNumber}. ${made.san} `;
+      } else {
+        result += `${made.san} `;
+      }
+    }
+    return result;
+  }
+
+  private async traversePGN(
+    fen: string,
+    orientation: BoardOrientation,
+    userId: string,
+    visited: Set<string>,
+  ): Promise<string> {
+    const position = await this.getPosition(stripFEN(fen), userId);
+    if (!position) return '';
+
+    const fenParts = fen.split(' ');
+    const activeColor = fenParts[1];
+    const isPlayerTurn =
+      (activeColor === 'w' && orientation === 'white') ||
+      (activeColor === 'b' && orientation === 'black');
+
+    const movesMap = isPlayerTurn ? position.bookMoves : position.opponentMoves;
+    const moveKeys = Object.keys(movesMap);
+    if (moveKeys.length === 0) return '';
+
+    const moveNumber = parseInt(fenParts[5], 10);
+    const isWhite = activeColor === 'w';
+
+    // Resolve each move: san text, target fen, and recursive continuation
+    const resolved: { prefix: string; targetFen: string; continuation: string }[] = [];
+    for (const lan of moveKeys) {
+      const chess = new Chess(fen);
+      const made = chess.move(lan);
+      if (!made) continue;
+
+      const targetFullFen = chess.fen();
+      const targetStripped = stripFEN(targetFullFen);
+      if (visited.has(targetStripped)) continue;
+
+      const prefix = isWhite
+        ? `${moveNumber}. ${made.san}`
+        : `${moveNumber}... ${made.san}`;
+
+      visited.add(targetStripped);
+      const continuation = await this.traversePGN(
+        targetFullFen,
+        orientation,
+        userId,
+        visited,
+      );
+      visited.delete(targetStripped);
+
+      resolved.push({ prefix, targetFen: targetFullFen, continuation });
+    }
+
+    if (resolved.length === 0) return '';
+
+    // Main move, then sibling variations, then main-line continuation
+    let result = resolved[0].prefix + ' ';
+    for (let i = 1; i < resolved.length; i++) {
+      const alt = (resolved[i].prefix + ' ' + resolved[i].continuation).trim();
+      result += '(' + alt + ') ';
+    }
+    result += resolved[0].continuation;
+
+    return result;
+  }
+
   public async adminReport(): Promise<AdminReport> {
     const users = await listUsers();
     const res: AdminReport['usage'] = {};
