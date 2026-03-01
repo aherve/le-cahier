@@ -28,6 +28,7 @@ export function FenEditor(props: { width: number }) {
         onFocus={(event) => event.target.select()}
         onChange={(event) => setFormFEN(event.target.value)}
         width={props.width}
+        maxWidth="100%"
         value={formFEN}
         onBlur={submit}
       />
