@@ -9,6 +9,12 @@ import {
   WrapItem,
   Text,
   createToaster,
+  Toaster,
+  ToastRoot,
+  ToastTitle,
+  ToastDescription,
+  ToastCloseTrigger,
+  ToastIndicator,
 } from '@chakra-ui/react';
 import { Form } from '@remix-run/react';
 import { useEffect, useState } from 'react';
@@ -59,6 +65,16 @@ export function PositionComments(props: {
 
   return (
     <Stack alignItems="stretch" h="100%">
+      <Toaster toaster={toaster}>
+        {(toast) => (
+          <ToastRoot maxW="sm">
+            <ToastIndicator />
+            <ToastTitle>{toast.title}</ToastTitle>
+            <ToastDescription>{toast.description}</ToastDescription>
+            <ToastCloseTrigger />
+          </ToastRoot>
+        )}
+      </Toaster>
       {editMode && !isSaving && (
         <DisplayEdit
           comments={comments}

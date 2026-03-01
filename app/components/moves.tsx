@@ -15,6 +15,12 @@ import {
   useDisclosure,
   Button,
   createToaster,
+  Toaster,
+  ToastRoot,
+  ToastTitle,
+  ToastDescription,
+  ToastCloseTrigger,
+  ToastIndicator,
 } from '@chakra-ui/react';
 import { Chess } from 'chess.js';
 import { chunk } from 'lodash';
@@ -66,6 +72,16 @@ export default function Moves(props: {
 
   return (
     <>
+      <Toaster toaster={toaster}>
+        {(toast) => (
+          <ToastRoot maxW="sm">
+            <ToastIndicator />
+            <ToastTitle>{toast.title}</ToastTitle>
+            <ToastDescription>{toast.description}</ToastDescription>
+            <ToastCloseTrigger />
+          </ToastRoot>
+        )}
+      </Toaster>
       <Card.Root h="100%" display="flex" flexDirection="column">
         <Card.Body flex="1" display="flex" flexDirection="column">
           <Stack separator={<Separator />} gap="10" flex="1">

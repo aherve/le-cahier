@@ -17,6 +17,12 @@ import {
   useDisclosure,
   Wrap,
   createToaster,
+  Toaster,
+  ToastRoot,
+  ToastTitle,
+  ToastDescription,
+  ToastCloseTrigger,
+  ToastIndicator,
 } from '@chakra-ui/react';
 import { Chess } from 'chess.js';
 import mixpanel from 'mixpanel-browser';
@@ -186,6 +192,16 @@ export default function Record() {
 
   return (
     <ChessGrid fen={fen} onPieceDrop={onDrop} orientation={orientation}>
+      <Toaster toaster={toaster}>
+        {(toast) => (
+          <ToastRoot maxW="sm">
+            <ToastIndicator />
+            <ToastTitle>{toast.title}</ToastTitle>
+            <ToastDescription>{toast.description}</ToastDescription>
+            <ToastCloseTrigger />
+          </ToastRoot>
+        )}
+      </Toaster>
       <GridItem
         gridArea="title"
         alignSelf="center"
