@@ -60,8 +60,9 @@ function MovesSection(props: {
   return (
     <GridItem
       gridArea="moves"
-      width={{ base: `${boardWidth}px`, lg: '300px' }}
+      width={{ base: `${boardWidth}px`, lg: '100%' }}
       justifySelf={{ base: 'center', lg: 'start' }}
+      pr={{ lg: 8 }}
     >
       <Moves
         comments={props.comment}
