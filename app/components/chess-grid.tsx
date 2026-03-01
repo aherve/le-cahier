@@ -76,7 +76,8 @@ export function ChessGrid(props: {
           base: '1fr',
           lg: 'minmax(0, 1fr) minmax(0, 560px) minmax(0, 500px)',
         }}
-        gap={{ base: 2, md: 8 }}
+        columnGap={{ base: 2, md: 8 }}
+        rowGap={{ base: 2, md: 4 }}
         p={{ base: 1, md: 2 }}
         minWidth={0}
       >
