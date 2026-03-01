@@ -3,7 +3,7 @@ import type {
   Square,
 } from 'react-chessboard/dist/chessboard/types';
 
-import { Grid, GridItem } from '@chakra-ui/react';
+import { Box, Grid, GridItem } from '@chakra-ui/react';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 
@@ -66,12 +66,11 @@ export function ChessGrid(props: {
           lg: `"title title title"
                "message message message"
                "spacer board moves"
-               "spacer fen moves"
                "actions actions actions"`,
         }}
         gridTemplateRows={{
           base: 'auto auto auto auto auto auto',
-          lg: 'auto auto 1fr auto auto',
+          lg: 'auto auto 1fr auto',
         }}
         gridTemplateColumns={{
           base: '1fr',
@@ -83,26 +82,28 @@ export function ChessGrid(props: {
       >
         {props.children}
 
-        <GridItem gridArea="fen" justifySelf="center">
+        <GridItem gridArea="fen" justifySelf="center" display={{ base: 'block', lg: 'none' }}>
           <FenEditor width={boardWidth} />
         </GridItem>
 
         <GridItem
           gridArea="board"
           ref={containerRef}
-          display="flex"
-          justifyContent="center"
-          alignItems="start"
           minWidth={0}
           overflow="hidden"
         >
           {boardWidth > 0 && (
-            <Chessboard
-              position={props.fen}
-              onPieceDrop={props.onPieceDrop}
-              boardWidth={boardWidth}
-              boardOrientation={props.orientation}
-            />
+            <Box width={boardWidth} marginX="auto">
+              <Chessboard
+                position={props.fen}
+                onPieceDrop={props.onPieceDrop}
+                boardWidth={boardWidth}
+                boardOrientation={props.orientation}
+              />
+              <Box display={{ base: 'none', lg: 'block' }} mt={2}>
+                <FenEditor width={boardWidth} />
+              </Box>
+            </Box>
           )}
         </GridItem>
       </Grid>
