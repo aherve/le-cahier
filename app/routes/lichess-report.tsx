@@ -244,7 +244,7 @@ function GameExploreButton(props: {
   game: LichessGame;
   report?: GameReport | null;
 }) {
-  const fen = props.report?.firstError?.before;
+  const fen = props.report?.firstError?.before ?? props.report?.firstOutOfBook?.before;
   if (!fen) {
     return <></>;
   }
