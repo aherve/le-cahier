@@ -28,11 +28,17 @@ import { TrainButton } from '~/components/train-button';
 import { GameContext } from '~/with-game';
 
 export const meta: MetaFunction = ({ matches }) => {
-  const parentMeta = matches.flatMap(match => match.meta ?? []);
+  const parentMeta = matches.flatMap((match) => match.meta ?? []);
   return [
-    ...parentMeta.filter(meta => !('title' in meta) && !(('name' in meta) && meta.name === 'description')),
+    ...parentMeta.filter(
+      (meta) =>
+        !('title' in meta) && !('name' in meta && meta.name === 'description'),
+    ),
     { title: 'Review mistakes | Le Cahier' },
-    { name: 'description', content: 'Reviewing positions you might have missed' },
+    {
+      name: 'description',
+      content: 'Reviewing positions you might have missed',
+    },
   ];
 };
 
@@ -191,7 +197,12 @@ export default function Anki() {
         <Wrap align="center" justify="center" gap={2} width="100%">
           <ExploreButton />
           <TrainButton />
-          <Button variant="outline" onClick={showHint} fontSize="md" flexShrink={0}>
+          <Button
+            variant="outline"
+            onClick={showHint}
+            fontSize="md"
+            flexShrink={0}
+          >
             <GoLightBulb />
             get hint
           </Button>

@@ -41,7 +41,12 @@ export function ExploreButton(props: {
     return (
       <Tooltip.Root>
         <Tooltip.Trigger asChild>
-          <Button onClick={explore} variant="plain" fontSize="md" flexShrink={0}>
+          <Button
+            onClick={explore}
+            variant="plain"
+            fontSize="md"
+            flexShrink={0}
+          >
             <VscBook />
           </Button>
         </Tooltip.Trigger>

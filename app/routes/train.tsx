@@ -24,9 +24,12 @@ import { GetChallengeOutputSchema } from '~/routes/api.moves.challenge';
 import { GameContext } from '~/with-game';
 
 export const meta: MetaFunction = ({ matches }) => {
-  const parentMeta = matches.flatMap(match => match.meta ?? []);
+  const parentMeta = matches.flatMap((match) => match.meta ?? []);
   return [
-    ...parentMeta.filter(meta => !('title' in meta) && !(('name' in meta) && meta.name === 'description')),
+    ...parentMeta.filter(
+      (meta) =>
+        !('title' in meta) && !('name' in meta && meta.name === 'description'),
+    ),
     { title: 'Train | Le Cahier' },
     { name: 'description', content: 'How well do you know your openings?' },
   ];
@@ -196,7 +199,12 @@ export default function Train() {
           <FlipBoardButton />
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button variant="outline" onClick={anchor} fontSize="md" flexShrink={0}>
+              <Button
+                variant="outline"
+                onClick={anchor}
+                fontSize="md"
+                flexShrink={0}
+              >
                 <FaAnchor />
               </Button>
             </Tooltip.Trigger>
@@ -208,7 +216,12 @@ export default function Train() {
           </Tooltip.Root>
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <Button variant="outline" onClick={again} fontSize="md" flexShrink={0}>
+              <Button
+                variant="outline"
+                onClick={again}
+                fontSize="md"
+                flexShrink={0}
+              >
                 <VscDebugRestart />
                 Again
               </Button>
@@ -219,7 +232,12 @@ export default function Train() {
               </Tooltip.Content>
             </Tooltip.Positioner>
           </Tooltip.Root>
-          <Button variant="outline" onClick={showHint} fontSize="md" flexShrink={0}>
+          <Button
+            variant="outline"
+            onClick={showHint}
+            fontSize="md"
+            flexShrink={0}
+          >
             <GoLightBulb />
             get hint
           </Button>

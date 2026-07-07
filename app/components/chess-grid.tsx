@@ -36,7 +36,8 @@ export function ChessGrid(props: {
       // On desktop, also fit within available viewport height
       if (window.matchMedia('(min-width: 62em)').matches) {
         const belowBoard = 200; // fen row + actions row + gaps + footer + padding
-        const available = window.innerHeight - el.getBoundingClientRect().top - belowBoard;
+        const available =
+          window.innerHeight - el.getBoundingClientRect().top - belowBoard;
         size = Math.min(size, Math.max(available, 200));
       }
 
@@ -83,7 +84,11 @@ export function ChessGrid(props: {
       >
         {props.children}
 
-        <GridItem gridArea="fen" justifySelf="center" display={{ base: 'block', lg: 'none' }}>
+        <GridItem
+          gridArea="fen"
+          justifySelf="center"
+          display={{ base: 'block', lg: 'none' }}
+        >
           <FenEditor width={boardWidth} />
         </GridItem>
 

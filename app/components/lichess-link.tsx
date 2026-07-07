@@ -8,8 +8,7 @@ import { GameContext } from '~/with-game';
 
 export default function LichessLink(
   props: { orientation?: BoardOrientation } & (
-    | { fen: string }
-    | { gameId: string; moveIndex?: number }
+    { fen: string } | { gameId: string; moveIndex?: number }
   ),
 ) {
   let link: string;

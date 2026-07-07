@@ -49,9 +49,12 @@ const toaster = createToaster({
 });
 
 export const meta: MetaFunction = ({ matches }) => {
-  const parentMeta = matches.flatMap(match => match.meta ?? []);
+  const parentMeta = matches.flatMap((match) => match.meta ?? []);
   return [
-    ...parentMeta.filter(meta => !('title' in meta) && !(('name' in meta) && meta.name === 'description')),
+    ...parentMeta.filter(
+      (meta) =>
+        !('title' in meta) && !('name' in meta && meta.name === 'description'),
+    ),
     { title: 'Update Repertoire | Le Cahier' },
     { name: 'description', content: 'Update your repertoire' },
   ];

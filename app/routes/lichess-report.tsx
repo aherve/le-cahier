@@ -30,9 +30,12 @@ import { GameReportSchema, MissedMoveSchema } from '~/schemas/game-report';
 import { LichessGameSchema } from '~/schemas/lichess';
 
 export const meta: MetaFunction = ({ matches }) => {
-  const parentMeta = matches.flatMap(match => match.meta ?? []);
+  const parentMeta = matches.flatMap((match) => match.meta ?? []);
   return [
-    ...parentMeta.filter(meta => !('title' in meta) && !(('name' in meta) && meta.name === 'description')),
+    ...parentMeta.filter(
+      (meta) =>
+        !('title' in meta) && !('name' in meta && meta.name === 'description'),
+    ),
     { title: 'Lichess Report | Le Cahier' },
     { name: 'description', content: 'Analyzing your lichess games' },
   ];
@@ -244,7 +247,8 @@ function GameExploreButton(props: {
   game: LichessGame;
   report?: GameReport | null;
 }) {
-  const fen = props.report?.firstError?.before ?? props.report?.firstOutOfBook?.before;
+  const fen =
+    props.report?.firstError?.before ?? props.report?.firstOutOfBook?.before;
   if (!fen) {
     return <></>;
   }

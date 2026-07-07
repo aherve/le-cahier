@@ -10,6 +10,7 @@ import type { GameReport } from '~/schemas/game-report';
 import type { LichessGame } from '~/schemas/lichess';
 import type { BookPosition } from '~/schemas/position';
 
+import { AsyncPool } from '@aherve/async-pool';
 import { DynamoDB, ScanCommand } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { Chess } from 'chess.js';
@@ -305,12 +306,12 @@ export class ChessBook {
     let positionScanned = 0;
     const scanner = this.positionScanner(userId);
     const allPositions: Record<string, BookPosition> = {};
-    const savePromises: Promise<void>[] = [];
     for await (const item of scanner) {
       allPositions[stripFEN(item.fen)] = item;
     }
 
     // Find transpositions
+    const pool = new AsyncPool().withRetries(1).withConcurrency(50);
     for (const position of Object.values(allPositions)) {
       await Promise.resolve(); // This loop is cpu-intensive. Don't block the event loop for too long
       positionScanned++;
@@ -326,20 +327,21 @@ export class ChessBook {
           Object.keys(allPositions[newFen].bookMoves).length > 0
         ) {
           newTransposition++;
-          savePromises.push(
-            this.addMove({
-              fen: stripFEN(position.fen),
-              userId,
-              isOpponentMove: true,
-              move: newMove.lan,
-            }),
-          );
+          pool.add({
+            task: () =>
+              this.addMove({
+                fen: stripFEN(position.fen),
+                userId,
+                isOpponentMove: true,
+                move: newMove.lan,
+              }),
+          });
         } else {
           deadEnds++;
         }
       }
     }
-    await Promise.all(savePromises);
+    await pool.waitForTermination();
     const res = {
       newTransposition,
       deadEnds,
@@ -368,14 +370,15 @@ export class ChessBook {
   ): Promise<string> {
     const isPlayerWhite = orientation === 'white';
     const today = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
-    const headers = [
-      `[Event "Le Cahier Repertoire"]`,
-      `[Site "le-cahier"]`,
-      `[Date "${today}"]`,
-      `[White "${isPlayerWhite ? 'Repertoire' : 'Opponent'}"]`,
-      `[Black "${isPlayerWhite ? 'Opponent' : 'Repertoire'}"]`,
-      `[Result "*"]`,
-    ].join('\n') + '\n';
+    const headers =
+      [
+        '[Event "Le Cahier Repertoire"]',
+        '[Site "le-cahier"]',
+        `[Date "${today}"]`,
+        `[White "${isPlayerWhite ? 'Repertoire' : 'Opponent'}"]`,
+        `[Black "${isPlayerWhite ? 'Opponent' : 'Repertoire'}"]`,
+        '[Result "*"]',
+      ].join('\n') + '\n';
 
     const preamble = this.preambleToMovetext(preambleMoves);
     const movetext = await this.traversePGN(
@@ -432,7 +435,11 @@ export class ChessBook {
     const isWhite = activeColor === 'w';
 
     // Resolve each move: san text, target fen, and recursive continuation
-    const resolved: { prefix: string; targetFen: string; continuation: string }[] = [];
+    const resolved: {
+      prefix: string;
+      targetFen: string;
+      continuation: string;
+    }[] = [];
     for (const lan of moveKeys) {
       const chess = new Chess(fen);
       const made = chess.move(lan);

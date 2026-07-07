@@ -46,12 +46,7 @@ export function LCLayout(props: { user: AmplifyUser | undefined }) {
           <GridItem w="100%" gridArea="header" minWidth={0}>
             <LCMenu />
           </GridItem>
-          <GridItem
-            w="100%"
-            gridArea="main"
-            justifySelf="center"
-            minWidth={0}
-          >
+          <GridItem w="100%" gridArea="main" justifySelf="center" minWidth={0}>
             <Outlet />
           </GridItem>
           <GridItem

@@ -2,6 +2,7 @@ import type { ParseTree } from '@mliebelt/pgn-parser';
 import type { ActionFunction } from '@remix-run/node';
 import type { Move } from 'chess.js';
 
+import { AsyncPool } from '@aherve/async-pool';
 import { parse } from '@mliebelt/pgn-parser';
 import { json } from '@remix-run/node';
 import { Chess } from 'chess.js';
@@ -25,28 +26,30 @@ export const action: ActionFunction = async ({ request }) => {
 
   try {
     const { moves, comments } = PGNWalk(pgn);
-    const promises: Array<Promise<void>> = [];
+    const pool = new AsyncPool().withConcurrency(50).withRetries(2);
     for (const move of moves) {
-      promises.push(
-        ChessBookService.addMove({
-          userId,
-          fen: move.before,
-          isOpponentMove: move.color !== myColor,
-          move: move.lan,
-        }),
-      );
+      pool.add({
+        task: () =>
+          ChessBookService.addMove({
+            userId,
+            fen: move.before,
+            isOpponentMove: move.color !== myColor,
+            move: move.lan,
+          }),
+      });
     }
     for (const [fen, comment] of comments) {
-      promises.push(
-        ChessBookService.addComment({
-          fen,
-          userId,
-          comment,
-          orientation,
-        }),
-      );
+      pool.add({
+        task: () =>
+          ChessBookService.addComment({
+            fen,
+            userId,
+            comment,
+            orientation,
+          }),
+      });
     }
-    await Promise.all(promises);
+    await pool.waitForTermination();
     return json({ success: true });
   } catch (e) {
     console.error('Error while loading pgn', e);
@@ -54,12 +57,19 @@ export const action: ActionFunction = async ({ request }) => {
   }
 };
 
+function moveKey(move: Move): string {
+  return `${stripFEN(move.before)}|${move.lan}|${move.color}`;
+}
+
 function PGNWalk(pgn: string) {
-  const moves: Array<Move> = [];
+  const uniqueMoves: Array<Move> = [];
+  const uniqueMap = new Map<string, boolean>();
+
   const comments: Map<string, string> = new Map();
 
   const games = parse(pgn, { startRule: 'games' }) as ParseTree[];
 
+  let total = 0;
   for (const game of games) {
     const tree = game.moves;
 
@@ -86,13 +96,29 @@ function PGNWalk(pgn: string) {
           })),
         );
         const m = g.move(node.notation.notation);
-        if (node.commentAfter) {
-          comments.set(stripFEN(m.after), node.commentAfter);
+        const comment = node.commentAfter;
+        if (comment) {
+          // dedup mechanism: keep longest string
+          const fen = stripFEN(m.after);
+          const existing = comments.get(fen);
+          if (!existing || comment.length > existing.length) {
+            comments.set(fen, comment);
+          }
         }
-        moves.push(m);
+
+        total++;
+        const key = moveKey(m);
+        if (uniqueMap.has(key)) {
+          continue;
+        } else {
+          uniqueMap.set(key, true);
+          uniqueMoves.push(m);
+        }
       }
     }
   }
 
-  return { moves, comments };
+  console.log({ total, reduced: uniqueMoves.length });
+
+  return { moves: uniqueMoves, comments };
 }

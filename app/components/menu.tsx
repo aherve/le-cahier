@@ -55,7 +55,11 @@ export function LCMenu() {
     const res = await fetch('/api/moves/export-pgn', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fen, orientation, moves: moves.map((m) => m.lan) }),
+      body: JSON.stringify({
+        fen,
+        orientation,
+        moves: moves.map((m) => m.lan),
+      }),
     });
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
@@ -85,7 +89,12 @@ export function LCMenu() {
         Review mistakes
       </Button>
       <RecordButton reset={true} />
-      <Button variant="outline" onClick={lichessReport} fontSize="md" flexShrink={0}>
+      <Button
+        variant="outline"
+        onClick={lichessReport}
+        fontSize="md"
+        flexShrink={0}
+      >
         <SiLichess />
         lichess report
       </Button>
@@ -98,8 +107,14 @@ export function LCMenu() {
         <Menu.Positioner>
           <Menu.Content>
             <Menu.Item value="sound" onClick={toggleSound}>
-              {soundEnabled ? <HiOutlineSpeakerXMark /> : <HiOutlineSpeakerWave />}
-              <Menu.ItemText>{soundEnabled ? 'Disable sound' : 'Enable sound'}</Menu.ItemText>
+              {soundEnabled ? (
+                <HiOutlineSpeakerXMark />
+              ) : (
+                <HiOutlineSpeakerWave />
+              )}
+              <Menu.ItemText>
+                {soundEnabled ? 'Disable sound' : 'Enable sound'}
+              </Menu.ItemText>
             </Menu.Item>
             <Menu.Item value="export-pgn" onClick={exportPGN}>
               <MdFileDownload />
