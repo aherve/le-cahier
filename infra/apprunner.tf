@@ -19,10 +19,10 @@ resource "aws_apprunner_service" "le_cahier" {
     code_repository {
       code_configuration {
         code_configuration_values {
-          build_command = "npm ci && npm run build"
+          build_command = "npm install -g pnpm && pnpm install --frozen-lockfile && pnpm run build"
           port          = "3000"
           runtime       = "NODEJS_22"
-          start_command = "npm run start"
+          start_command = "pnpm run start"
           runtime_environment_variables = {
             NODE_ENV       = "production"
             MIXPANEL_TOKEN = "b65762eeaddacf3eb0888ad4e6da2c0b"
