@@ -42,18 +42,34 @@ export const meta: MetaFunction = () => [
   },
 ];
 
-export const links: LinksFunction = () => {
-  return [
-    {
-      rel: 'stylesheet',
-      href: styles,
-    },
-  ];
-};
-
 // Load the GA tracking id from the .env
 export const loader = async () => {
   return json({ mixpanelToken: process.env.MIXPANEL_TOKEN });
+};
+
+export const links: LinksFunction = () => {
+  return [
+    { rel: 'stylesheet', href: styles },
+    { rel: 'stylesheet', href: styles },
+    {
+      rel: 'apple-touch-icon',
+      sizes: '180x180',
+      href: '/apple-touch-icon.png',
+    },
+    {
+      rel: 'icon',
+      type: 'image/png',
+      sizes: '32x32',
+      href: '/favicon-32x32.png',
+    },
+    {
+      rel: 'icon',
+      type: 'image/png',
+      sizes: '16x16',
+      href: '/favicon-16x16.png',
+    },
+    { rel: 'manifest', href: '/site.webmanifest' },
+  ];
 };
 
 export default function App() {
@@ -75,6 +91,24 @@ export default function App() {
       <head>
         <Meta />
         <Links />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
+        <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body>
         <DndProvider options={HTML5toTouch}>
